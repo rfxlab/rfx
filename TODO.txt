@@ -1,0 +1,21 @@
+TODO List
+
+Rfx Framework, Core tasks:
+* Unit Testing (Kafka Producer, Kafka Consumer)
+~ groovy job engine
+* monitor jobs,
+* encode/decode realtime data to/from Redis
+* realtime ws monitor module : customized realtime view
+~ push worker status using ws
+* EventLogUtil : logging event to master, master collecting and show in daskboard
+* remote Deployment : worker.jar
+* topology monitor: all workers
+* AOP caching using Guava
+
+Important tasks
+* centralize configs: worker, schedule job, kafka 
+* deploy: topo per jar (separate worker and app topology )
+* monitor core systen events
+
+admin tab for Kafka broker 
+* Create, List, Delete, Monitor 
