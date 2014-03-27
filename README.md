@@ -1,4 +1,4 @@
-rfx
+rfx for small data, collect logs from everywhere , analytics for everyone
 ===
 
-Reactive Functor - the Real-time Big Data Framework
+
