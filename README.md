@@ -1,8 +1,8 @@
-rfx for small data
+rfx for processing "fast data"
 ===
-the fullstack small-data framework
-* Collecting logs from everywhere with privacy in mind.
-* Encrypting data logs and put results to Dropbox.
-* Analytics for everyone
+the fullstack big data framework
+* Collecting logs from everywhere with scalability in design.
+* Reactive Processing stream data in simple way (topology processing)
+* Visual Reactive Analytics Dashboard
 
 
