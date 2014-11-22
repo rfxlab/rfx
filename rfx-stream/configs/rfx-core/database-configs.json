@@ -1,0 +1,22 @@
+{
+	map : {	
+		dbMySqlReportConfigs : {			
+			username : "root"
+			,password : ""
+			,database : "rfx-report"
+			,host : "127.0.0.1"
+			,port : 3306			
+			,dbdriver : "mysql"
+			,dbdriverclasspath : "com.mysql.jdbc.Driver"
+		},		
+		dbHbaseConfigs : {
+			username : "root"
+			,password : ""
+			,database : "hbase"
+			,host : "localhost"
+			,port : 0			
+			,dbdriver : "phoenix"
+			,dbdriverclasspath : "org.apache.phoenix.jdbc.PhoenixDriver"
+		}
+	}
+}

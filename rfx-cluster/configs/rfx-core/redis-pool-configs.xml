@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<RedisPoolConfigs classpath="rfx.core.configs.RedisPoolConfigs" type="object" >
+
+	<RedisPools fieldname="redisPools" >
+		
+		<!-- ############################# BEGIN ############################### -->
+		
+		<!-- System Cluster and worker data, worker info, logged events -->
+		<RedisInfo host="127.0.0.1" port="6379" auth="">
+			<access-key>clusterInfoRedis</access-key>
+		</RedisInfo>
+				
+		<!-- real-time report (total, daily, hourly, perMinute, perSecond) -->
+		<RedisInfo host="127.0.0.1" port="6379" >
+			<access-key>realtimeDataStats</access-key>
+		</RedisInfo>
+	
+		<!-- ############################# END ############################### -->
+			
+	</RedisPools>
+	
+</RedisPoolConfigs>

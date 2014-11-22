@@ -1,0 +1,80 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+sourceCompatibility = 1.8
+
+version = '1.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile (   		 	
+    		'io.vertx:vertx-core:2.1.5'
+    		,'com.typesafe.akka:akka-actor_2.11:2.3.6'
+    		,'com.google.code.gson:gson:2.3'
+    		,'com.netflix.rxnetty:rx-netty:0.3.18'
+    		,'log4j:log4j:1.2.17'    	
+    		,'org.jsoup:jsoup:1.8.1'    		
+    		,'org.apache.commons:commons-lang3:3.3.2'
+    		,'commons-net:commons-net:3.3'    		
+    		,'redis.clients:jedis:2.6.0'
+    		,'org.apache.httpcomponents:httpclient:4.3.6'
+    		, fileTree(dir: 'lib', include: '**/*.jar')
+    		
+    		,'commons-dbcp:commons-dbcp:1.4'
+    		,'org.mongodb:mongo-java-driver:2.12.4'
+    		,'org.mapdb:mapdb:1.0.6'
+    		,'org.apache.kafka:kafka_2.9.2:0.8.1.1'
+    		,'org.twitter4j:twitter4j-core:4.0.2'
+    		,'org.yaml:snakeyaml:1.14'
+    		,'org.apache.phoenix:phoenix-hadoop-compat:4.1.0'
+    		)
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+}
+
+test {
+    systemProperties 'property': 'value'
+}
+
+uploadArchives {
+    repositories {
+       flatDir {
+           dirs 'repos'
+       }
+    }
+}
+
+task listJars << {
+    configurations.compile.each { File file -> println file.name }
+}
+
+task printClasspathStringJars << {   
+    println getClasspathStringJars()
+}
+
+def getClasspathStringJars() {
+	def baseFolder = 'deps/'
+    def fileNames = []
+    configurations.compile.each { File file -> fileNames.add(baseFolder + file.name) }
+    
+    def classpath = fileNames.join(" ; ")    
+    return classpath
+}
+
+task copyRuntimeLibs(type: Copy) {  
+  into "build/libs/deps"  
+  from configurations.compile  
+}
+
+jar {
+	def classpath = '. ; ' + getClasspathStringJars() + ' ; '
+    manifest {
+        attributes ('Implementation-Title': 'chapter1.recipe1', 
+        			'Implementation-Version': version ,
+        			'Main-Class': 'netty.cookbook.chapter1.recipe1.netty.cookbook.chapter1.recipe1',
+        			'Class-Path' : classpath)
+        
+    }
+}

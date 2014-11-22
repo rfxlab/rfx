@@ -1,0 +1,48 @@
+
+<div class="tab-pane" id="settings">
+	<br> <b>Display common settings, mapping worker => topology , schedule-jobs</b> <br>
+	<div class="div-set panel panel-success">
+		<div class="panel-heading">Worker Assign Topic</div>
+		<div class="panel-body">
+			<div class="row">
+				<div class="col">
+					<label class="lblname">Worker:</label>
+				</div>
+				<div class="col">
+					<select class="input" id="slWorker">
+
+					</select>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col">
+					<label class="lblname">Topic:</label>
+				</div>
+				<div class="col">
+					<select class="input" id="slTopic">
+						<option value="">Choose topic</option>
+					</select>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col">
+					<label class="lblname">Partition:</label>
+				</div>
+				<div class="col">
+					<input type="text" class="input" style="width: 50px;" id="txtBeginPartition" value="0" /> <span
+						class="input">-</span> <input type="text" class="input" style="width: 50px;"
+						id="txtEndPartition" value="0" />
+				</div>
+			</div>
+			<div class="row" style="padding-top: 20px;">
+				<div class="col">&nbsp;</div>
+				<div class="col">
+					<input data-loading-text="Loading..." class="btn btn-primary btn-success" type="button"
+						id="btnSubmitWorker" value="Submit" /> <img id="imgLoading" style="display: none;"
+						src="../img/loading.gif" />
+				</div>
+			</div>
+		</div>
+		<!-- end panel body -->
+	</div>
+</div>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Real-time report with NVD3.JS</title>
+<base href="http://localhost:8080/">
+<meta charset="utf-8">
+
+<link href="js/nvd3-final/nv.d3.min.css" rel="stylesheet"
+	type="text/css">
+
+<style>
+body {
+	overflow-y: scroll;
+}
+
+text {
+	font: 12px sans-serif;
+}
+
+svg {
+	display: block;
+}
+
+#chart1 svg {
+	height: 500px;
+	min-width: 100px;
+	min-height: 100px;
+}
+</style>
+</head>
+<body>
+	
+	<div id="chart1">
+		<svg style="height: 500px;"></svg>
+	</div>
+
+	<script src="js/nvd3-final/lib/d3.v3.js"></script>
+	<script src="js/nvd3-final/nv.d3.min.js"></script>
+	<script src="js/nvd3-final/src/tooltip.js"></script>
+	<script src="js/nvd3-final/src/utils.js"></script>
+	<script src="js/nvd3-final/src/models/legend.js"></script>
+	<script src="js/nvd3-final/src/models/axis.js"></script>
+	<script src="js/nvd3-final/src/models/scatter.js"></script>
+	<script src="js/nvd3-final/src/models/line.js"></script>
+	<script src="js/nvd3-final/src/models/cumulativeLineChart.js"></script>
+	<script src="js/ws/monitor-socket.js"></script>
+	
+
+	<script>
+		var chart;
+		var buildChart = function() {
+
+			chart = nv.models.cumulativeLineChart().x(function(d) {
+				return d[0]
+			}).y(function(d) {
+				return d[1];
+			}).color(d3.scale.category10().range()).average(function(d) {
+				return d.mean;
+			}).clipVoronoi(false).showLegend(true);
+
+			chart.xAxis.axisLabel('Facebook Statistics by Date').tickFormat(
+					function(d) {
+						return d3.time.format('%x')(new Date(d))
+					});
+
+			chart.yAxis.tickFormat(d3.format(',.s'));
+
+			d3.select('#chart1 svg').datum(cumulativeTestData()).transition()
+					.duration(500).call(chart);
+
+			nv.utils.windowResize(chart.update);
+			chart.dispatch.on('stateChange', function(e) {
+				nv.log('New State:', JSON.stringify(e));
+			});
+			return chart;
+		};
+		nv.addGraph(buildChart);
+
+		function randomInt(min, max) {
+			return Math.floor(Math.random() * (max - min + 1) + min);
+		}
+
+		function cumulativeTestData() {
+
+			return [
+					{
+						key : "Facebook Trending of 'Thời sự'",
+						values : [ [ 1408006917203, 0 ],
+								[ 1408007117203, randomInt(1, 10) ],
+								[ 1408007217203, randomInt(1, 10) ],
+								[ 1408007317203, randomInt(1, 10) ],
+								[ 1408007417203, randomInt(1, 10) ] ]
+					},
+					{
+						key : "Facebook Trending of 'Thể thao'",
+						values : [ [ 1408006917203, 0 ],
+								[ 1408007117203, randomInt(1, 10) ],
+								[ 1408007217203, randomInt(1, 10) ],
+								[ 1408007317203, randomInt(1, 10) ],
+								[ 1408007417203, randomInt(1, 10) ] ]
+					} ];
+		}
+	</script>
+</body>
+</html>

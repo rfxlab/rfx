@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<KafkaConfig classpath="rfx.core.stream.configs.KafkaTopologyConfig" type="list" >
+
+	<!-- sample demo for how to use the Rfx Stream Processor Framework -->	
+	<topic name="social-activity" topology="rfx.sample.social.tracking.TrackingUserTopology" >	
+		<brokers>127.0.0.1:9092</brokers>
+	</topic>
+	
+	<topic name="log-cpa" topology="rfx.sample.item.tracking.TrackingItemTopology" >	
+		<brokers>127.0.0.1:9092</brokers>
+	</topic>
+	
+	<topic name="user-activity" topology="rfx.sample.user.tracking.UserTrackingTopology" >	
+		<brokers>127.0.0.1:9092</brokers>
+	</topic>
+	
+</KafkaConfig>

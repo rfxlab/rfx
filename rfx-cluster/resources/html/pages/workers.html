@@ -1,0 +1,28 @@
+<div class="tab-pane" id="workers">
+	<br>
+	<p>
+		The list of reactive analytical workers, actions: <a href="javascript:void(0)"
+			onclick="loadClusterData()">Refresh data</a> &nbsp; <a href="javascript:;" id="lnkRestartSys">Restart
+			system</a>
+	</p>
+	<table>
+		<thead>
+			<tr>
+				<th>Worker Info</th>
+				<th>Memory Usage</th>
+				<th>Topology Name</th>
+
+				<th>Kafka Topic</th>
+				<th>Partition Range</th>
+				<th>Kafka Brokers</th>
+				<th>Seeding Counter</th>
+				<th>Uptime</th>
+
+				<th>Topology Actors</th>
+				<th>Total Actors</th>
+				<th>Actions</th>
+			</tr>
+		</thead>
+		<tbody id="cluster_list"></tbody>
+	</table>
+</div>
