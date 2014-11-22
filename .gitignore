@@ -1,9 +1,12 @@
 *.class
+*.classpath
 
 **/bin/*
 **/build/*
 **/data/*
 **/log/*
+**/.gradle/*
+**/.settings/*
 
 # Package Files #
 *.jar
