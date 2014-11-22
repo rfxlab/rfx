@@ -1,5 +1,10 @@
 *.class
 
+**/bin/*
+**/build/*
+**/data/*
+**/log/*
+
 # Package Files #
 *.jar
 *.war

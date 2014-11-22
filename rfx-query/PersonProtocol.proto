@@ -1,0 +1,22 @@
+
+package sample.netty;
+
+// How to generate
+// ===============
+// $ cd example
+// $ protoc src/main/java/io/netty/example/worldclock/WorldClockProtocol.proto \
+//          --java_out=src/main/java
+//
+// Add @SuppressWarnings("all") to the generated code not to pollute IDE task list.
+
+option optimize_for = SPEED;
+
+option java_package = "sample.rfx.query";
+option java_outer_classname = "Persons";
+
+message Person {
+  required int64 actorId = 1;
+  required string name = 2;
+  required int32 id = 3;  
+  required string data = 4;
+}
