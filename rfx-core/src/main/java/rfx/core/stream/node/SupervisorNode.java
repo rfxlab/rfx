@@ -55,7 +55,6 @@ public class SupervisorNode {
             return;
         }
         supervisorTimer.schedule(new TimerTask() {
-
             @Override
             public void run() {
                 SupervisorNode.checkWorkerStatus(autoHeal);
@@ -83,29 +82,25 @@ public class SupervisorNode {
         Map<String, WorkerInfo> workers = getManagedWorkers();
 
         Set<String> workerNames = workers.keySet();
-        List<WorkerInfo> healedWorkers = new ArrayList<>(workerNames.size());
+        List<WorkerInfo> diedWorkerNodes = new ArrayList<>(workerNames.size());
         for (String workerName : workerNames) {
             WorkerInfo node = workers.get(workerName);
             try {
                 if (node != null) {
                     boolean isAlive = ClusterDataManager.ping(node);
                     node.setAlive(isAlive);
-                    System.out.println("worker:" + workerName + " isAlive:" + isAlive
-                            + " autoHeal:" + autoHeal);
+                    System.out.println("worker:" + workerName + " isAlive:" + isAlive + " autoHeal:" + autoHeal);
                     ClusterDataManager.saveWorkerInfo(node);
-//                    if (isAlive) {
-//                        updateWorkerData(node);
-//                    } else if (autoHeal) {
                     if (!isAlive && autoHeal) {
-                        healedWorkers.add(node);
+                        diedWorkerNodes.add(node);
                     }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        for (WorkerInfo healedWorker : healedWorkers) {
-            int pid = startWorker(healedWorker, healedWorker.getMainClass());
+        for (WorkerInfo workerInfo : diedWorkerNodes) {
+            int pid = startWorker(workerInfo, workerInfo.getMainClass());
             if (pid == 0) {
                 System.out.println("Start worker failed. Auto re-try after 20 seconds");
             } else {
@@ -147,7 +142,7 @@ public class SupervisorNode {
                 java_path = prop.getProperty("java_path");
             }
             ProcessBuilder pb = new ProcessBuilder(java_path, "-cp",
-                    "lib/*:" + workerInfo.getMainClass() + ".jar", workerInfo.getMainClass(),
+            		"lib/*:" + workerInfo.getMainClass() + ".jar", workerInfo.getMainClass(),
                     workerInfo.getHost(), workerInfo.getPort() + "");
             System.out.println("Running command: "
                     + java_path + " -cp lib/*:" + workerInfo.getMainClass()

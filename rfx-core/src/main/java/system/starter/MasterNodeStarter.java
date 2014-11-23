@@ -5,7 +5,6 @@ import rfx.core.configs.loader.ConfigAutoLoader;
 import rfx.core.stream.node.MasterNode;
 
 public class MasterNodeStarter {	
-	
 	public static void main(String[] args) {
 		ConfigAutoLoader.loadAll();
 		ClusterInfoConfigs configs = ClusterInfoConfigs.load();

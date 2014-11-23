@@ -5,11 +5,9 @@ import java.io.IOException;
 import rfx.core.job.ScheduledJobNode;
 
 public class ScheduledJobNodeStarter {
-	public static void main(String[] args) throws IOException {		
-		
+	public static void main(String[] args) throws IOException {	
 		int port = 11999;
 		String host = "localhost";
-		
 				
 		try {
 			String name = host + "_" + port;

@@ -24,24 +24,31 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }
 
-test {
-    systemProperties 'property': 'value'
+ext.rfxCoreMasterManifest = manifest {
+   attributes ('Implementation-Title': 'rfx.core.MasterNodeStarter', 
+        			'Implementation-Version': version ,
+        			'Main-Class': 'system.starter.MasterNodeStarter',
+        			'Class-Path' : getClasspathStringJars() )
 }
 
-uploadArchives {
-    repositories {
-       flatDir {
-           dirs 'repos'
-       }
-    }
+ext.rfxSupervisorManifest = manifest {
+   attributes ('Implementation-Title': 'rfx.core.SupervisorNodeStarter', 
+        			'Implementation-Version': version ,
+        			'Main-Class': 'system.starter.SupervisorNodeStarter',
+        			'Class-Path' : getClasspathStringJars() )
 }
+
+ext.rfxScheduledJobManifest = manifest {
+   attributes ('Implementation-Title': 'rfx.core.ScheduledJobNodeStarter', 
+        			'Implementation-Version': version ,
+        			'Main-Class': 'system.starter.ScheduledJobNodeStarter',
+        			'Class-Path' : getClasspathStringJars() )
+}
+
+// ------------ tasks for build src ---------------------
 
 task listJars << {
     configurations.compile.each { File file -> println file.name }
-}
-
-task printClasspathStringJars << {   
-    println getClasspathStringJars()
 }
 
 def getClasspathStringJars() {
@@ -50,21 +57,96 @@ def getClasspathStringJars() {
     configurations.compile.each { File file -> fileNames.add(baseFolder + file.name) }
     
     def classpath = fileNames.join(" ; ")    
-    return classpath
+    return '. ; ' + classpath + ' ; '
 }
 
-task copyRuntimeLibs(type: Copy) {  
+task printClasspathStringJars << {   
+    println getClasspathStringJars()
+}
+
+uploadArchives {
+    repositories {
+       flatDir {
+           dirs 'rfx-lib'
+       }
+    }
+}
+
+jar {	 
+   	dependsOn classes
+    from(sourceSets.main.output) {
+        include "**"
+    }
+    baseName = 'rfx-core-master'
+    manifest = project.manifest {
+        from rfxCoreMasterManifest
+    }
+}
+
+// ------------ copy tasks for core deployment ---------------------
+task rfxCopyRuntimeLibs(type: Copy) {  
   into "build/libs/deps"  
   from configurations.compile  
 }
 
-jar {
-	def classpath = '. ; ' + getClasspathStringJars() + ' ; '
-    manifest {
-        attributes ('Implementation-Title': 'chapter1.recipe1', 
-        			'Implementation-Version': version ,
-        			'Main-Class': 'netty.cookbook.chapter1.recipe1.netty.cookbook.chapter1.recipe1',
-        			'Class-Path' : classpath)
-        
+task rfxCopyConfigs(type: Copy) {  
+  into "build/libs/configs"  
+  from files('configs')
+}
+
+task rfxCopyResources(type: Copy) {  
+  into "build/libs/resources"  
+  from files('resources')
+}
+// ------------------------------------------------------------------
+
+task rfxCoreMasterJar(type: Jar) {	
+	dependsOn classes
+    from(sourceSets.main.output) {
+        include "**"
     }
+    version = ''
+    baseName = 'rfx-core-master'
+    manifest = project.manifest {
+        from rfxCoreMasterManifest
+    }
+}
+
+task rfxSupervisorJar(type: Jar) {	
+	dependsOn classes
+    from(sourceSets.main.output) {
+        include "**"
+    }
+    version = ''
+    baseName = 'rfx-supervisor'
+    manifest = project.manifest {
+        from rfxSupervisorManifest
+    }
+}
+
+task rfxScheduledJobJar(type: Jar) {	
+	dependsOn classes
+    from(sourceSets.main.output) {
+        include "**"
+    }
+    version = ''
+    baseName = 'rfx-scheduled-job'
+    manifest = project.manifest {
+        from rfxScheduledJobManifest
+    }
+}
+
+task sampleHelloWorker(type: Jar) {	
+	dependsOn classes
+    from(sourceSets.test.output) {
+        include "**"
+    }   
+    version = ''
+    baseName = 'sample.hello.HelloWorker'
+    manifest {
+   		attributes ('Implementation-Title': 'sample.hello.HelloWorker', 
+        			'Implementation-Version': version ,
+        			'Main-Class': 'sample.hello.HelloWorker',
+        			'Class-Path' : getClasspathStringJars() + ' ./rfx-core-master.jar ; ' )
+	}
 }
