@@ -98,6 +98,12 @@ task rfxCopyResources(type: Copy) {
   into "build/libs/resources"  
   from files('resources')
 }
+
+task rfxCopyToRelease(type: Copy) {
+    from('build/libs')
+    into('../releases/rfx-core')
+    include('**')
+}
 // ------------------------------------------------------------------
 
 task rfxCoreMasterJar(type: Jar) {	

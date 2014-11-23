@@ -70,6 +70,17 @@ task rfxCopyRuntimeLibs(type: Copy) {
   from configurations.compile  
 }
 
+task rfxCopyConfigs(type: Copy) {  
+  into "build/libs/configs"  
+  from files('configs')
+}
+
+task rfxCopyToRelease(type: Copy) {
+    from('build/libs')
+    into('../releases/rfx-stream')
+    include('**')
+}
+
 task rfxStreamJar(type: Jar) {	
 	dependsOn classes
     from(sourceSets.main.output) {
