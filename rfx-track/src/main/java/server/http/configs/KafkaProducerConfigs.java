@@ -27,6 +27,7 @@ public class KafkaProducerConfigs implements Serializable {
 	
 	String defaultPartitioner = "";
 	Map<String,Map<String,String>> kafkaProducerList;	
+	String defaultHttpHandlerClass = "";
 
 	public KafkaProducerConfigs() {
 		super();
@@ -137,5 +138,14 @@ public class KafkaProducerConfigs implements Serializable {
 	public void setDefaultPartitioner(String defaultPartitioner) {
 		this.defaultPartitioner = defaultPartitioner;
 	}
+
+	public String getDefaultHttpHandlerClass() {
+		return defaultHttpHandlerClass;
+	}
+
+	public void setDefaultHttpHandlerClass(String defaultHttpHandlerClass) {
+		this.defaultHttpHandlerClass = defaultHttpHandlerClass;
+	}
+	
 	
 }

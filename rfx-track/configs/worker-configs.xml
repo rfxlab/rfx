@@ -16,12 +16,8 @@
 		<!-- empty workers -->
 		<worker id="w1">
 			<port>14001</port>
-			<mainClass>sample.hello.HelloWorker</mainClass>
-		</worker>
-		<worker>
-			<port>14002</port>
-			<mainClass>sample.hello.OtherWorker</mainClass>
-		</worker>
+			<mainClass>server.http.HttpLogCollector</mainClass>
+		</worker>	
 	</allocatedWorkers>
 	
 	<!-- where the debug/info/error logs store -->

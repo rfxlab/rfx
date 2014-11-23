@@ -76,8 +76,23 @@ jar {
         include "**"
     }
     version = ''
-    baseName = 'track-http-server'
+    baseName = 'rfx-track-http-server'
     manifest = project.manifest {
         from rfxTrackManifest
     }
+}
+
+task sampleItemTrackHttpServer(type: Jar) {	
+	dependsOn classes   
+    from(sourceSets.test.output) {
+        include "**"
+    }  
+    version = '1.0'
+    baseName = 'sample-item-track'
+    manifest {
+   		attributes ('Implementation-Title': 'ItemTrackHttpServer', 
+        			'Implementation-Version': version ,
+        			'Main-Class': 'sample.server.item.track.ItemTrackHttpServer',
+        			'Class-Path' : getClasspathStringJars() + ' ./rfx-core-master.jar ; ./rfx-track-http-server.jar ; ' )
+	}
 }
