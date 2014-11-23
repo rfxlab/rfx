@@ -11,7 +11,7 @@ repositories {
 
 dependencies {
     compile (   		 	
-    		'io.vertx:vertx-core:2.1.5'
+			'io.vertx:vertx-core:2.1.5'
     		,'com.typesafe.akka:akka-actor_2.10:2.3.7'
     		,'com.google.code.gson:gson:2.3'    		
     		,'log4j:log4j:1.2.17'    	
@@ -20,6 +20,7 @@ dependencies {
     		,'commons-net:commons-net:3.3'    		
     		,'redis.clients:jedis:2.6.0'
     		,'org.apache.httpcomponents:httpclient:4.3.6'
+
     		, fileTree(dir: 'lib', include: '**/*.jar')    		
     		,'org.apache.kafka:kafka_2.10:0.8.1.1'
     		,'com.google.guava:guava:18.0'    				
@@ -27,8 +28,11 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }
 
-test {
-    systemProperties 'property': 'value'
+ext.rfxTrackManifest = manifest {
+   attributes ('Implementation-Title': 'server.http.HttpLogCollector', 
+        			'Implementation-Version': version ,
+        			'Main-Class': 'server.http.HttpLogCollector',
+        			'Class-Path' : getClasspathStringJars() )
 }
 
 uploadArchives {
@@ -53,21 +57,27 @@ def getClasspathStringJars() {
     configurations.compile.each { File file -> fileNames.add(baseFolder + file.name) }
     
     def classpath = fileNames.join(" ; ")    
-    return classpath
+    return '. ; ' + classpath + ' ; '
 }
 
-task copyRuntimeLibs(type: Copy) {  
+task rfxCopyRuntimeLibs(type: Copy) {  
   into "build/libs/deps"  
   from configurations.compile  
 }
 
+task rfxCopyConfigs(type: Copy) {  
+  into "build/libs/configs"  
+  from files('configs')
+}
+
 jar {
-	def classpath = '. ; ' + getClasspathStringJars() + ' ; '
-    manifest {
-        attributes ('Implementation-Title': 'chapter1.recipe1', 
-        			'Implementation-Version': version ,
-        			'Main-Class': 'netty.cookbook.chapter1.recipe1.netty.cookbook.chapter1.recipe1',
-        			'Class-Path' : classpath)
-        
+	dependsOn classes
+    from(sourceSets.main.output) {
+        include "**"
+    }
+    version = ''
+    baseName = 'track-http-server'
+    manifest = project.manifest {
+        from rfxTrackManifest
     }
 }

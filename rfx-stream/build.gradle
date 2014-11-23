@@ -20,8 +20,8 @@ dependencies {
     		,'commons-net:commons-net:3.3'    		
     		,'redis.clients:jedis:2.6.0'
     		,'org.apache.httpcomponents:httpclient:4.3.6'
-    		, fileTree(dir: 'lib', include: '**/*.jar')
     		
+    		, fileTree(dir: 'lib', include: '**/*.jar')    		
     		,'commons-dbcp:commons-dbcp:1.4'
     		,'org.mongodb:mongo-java-driver:2.12.4'
     		,'org.mapdb:mapdb:1.0.6'
@@ -33,8 +33,11 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }
 
-test {
-    systemProperties 'property': 'value'
+ext.rfxStreamManifest = manifest {
+   attributes ('Implementation-Title': 'rfx.stream.core.library', 
+        			'Implementation-Version': version ,
+        			'Main-Class': '.',
+        			'Class-Path' : '.' )
 }
 
 uploadArchives {
@@ -59,21 +62,32 @@ def getClasspathStringJars() {
     configurations.compile.each { File file -> fileNames.add(baseFolder + file.name) }
     
     def classpath = fileNames.join(" ; ")    
-    return classpath
+    return '. ; ' + classpath + ' ; '
 }
 
-task copyRuntimeLibs(type: Copy) {  
+task rfxCopyRuntimeLibs(type: Copy) {  
   into "build/libs/deps"  
   from configurations.compile  
 }
 
+task rfxStreamJar(type: Jar) {	
+	dependsOn classes
+    from(sourceSets.main.output) {
+        include "**"
+    }
+    baseName = 'rfx-stream'
+    manifest = project.manifest {
+        from rfxStreamManifest
+    }
+}
+
 jar {
-	def classpath = '. ; ' + getClasspathStringJars() + ' ; '
-    manifest {
-        attributes ('Implementation-Title': 'chapter1.recipe1', 
-        			'Implementation-Version': version ,
-        			'Main-Class': 'netty.cookbook.chapter1.recipe1.netty.cookbook.chapter1.recipe1',
-        			'Class-Path' : classpath)
-        
+	dependsOn classes
+    from(sourceSets.main.output) {
+        include "**"
+    }
+    baseName = 'rfx-stream'
+    manifest = project.manifest {
+        from rfxStreamManifest
     }
 }
