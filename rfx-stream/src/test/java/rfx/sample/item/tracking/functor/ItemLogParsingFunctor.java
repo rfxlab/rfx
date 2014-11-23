@@ -12,7 +12,6 @@ import rfx.core.configs.ClusterInfoConfigs;
 import rfx.core.nosql.jedis.RedisCommand;
 import rfx.core.stream.data.RedisRealtimeAnalytics;
 import rfx.core.stream.functor.BaseFunctor;
-import rfx.core.stream.message.Fields;
 import rfx.core.stream.message.Tuple;
 import rfx.core.stream.model.DataFlowInfo;
 import rfx.core.stream.topology.BaseTopology;
@@ -28,7 +27,7 @@ public class ItemLogParsingFunctor extends BaseFunctor  {
 	static Parser uaParser = Parser.load();
 	static ShardedJedisPool jedisPool = ClusterInfoConfigs.load().getClusterInfoRedis().getShardedJedisPool();
 	static final int MAX_IP_COUNT_PER_MINUTE = 5;
-	static Fields outputFields = new Fields("loggedTime","reading_url","cookie");
+	//static Fields outputFields = new Fields("loggedTime","reading_url","cookie");
 
 	protected ItemLogParsingFunctor(DataFlowInfo dataFlowInfo, BaseTopology topology) {
 		super(dataFlowInfo, topology);

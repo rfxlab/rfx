@@ -6,7 +6,7 @@
 		<brokers>127.0.0.1:9092</brokers>
 	</topic>
 	
-	<topic name="log-cpa" topology="rfx.sample.item.tracking.TrackingItemTopology" >	
+	<topic name="item-tracking" topology="rfx.sample.item.tracking.TrackingItemTopology" >	
 		<brokers>127.0.0.1:9092</brokers>
 	</topic>
 	

@@ -14,7 +14,7 @@ public class TrackingItemWorker extends StreamProcessingWorker {
 	public static void main(String[] args) {
 		int beginPartitionId  = 0;
 		int endPartitionId  = 1;
-		String topic = "log-cpa";
+		String topic = "item-tracking";
 				
 		LogUtil.setDebug(true);
 		TaskDef taskDef = new KafkaTaskDef(topic, beginPartitionId, endPartitionId);
