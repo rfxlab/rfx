@@ -15,8 +15,7 @@ public class KafkaProducerConfigs implements Serializable {
 	static KafkaProducerConfigs _instance;
 
 	private static final long serialVersionUID = 4936959262031389418L;
-	
-	
+		
 	int writeKafkaLogEnable = 1;
 	int numberBatchJob = 20;
 	int timeSendKafkaPerBatchJob = 4000;

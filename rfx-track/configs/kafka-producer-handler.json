@@ -12,7 +12,7 @@
     defaultHttpHandlerClass: "sample.server.item.track.ItemTrackHttpHandler",
     
     kafkaProducerList : {
-        kafka-item-tracking-Producer : {
+        tk : {
             kafkaTopic : "item-tracking",
             brokerList : "127.0.0.1:9092"
         }

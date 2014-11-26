@@ -8,10 +8,17 @@ import rfx.core.util.StringUtil;
 import rfx.core.util.Utils;
 import server.http.configs.KafkaProducerConfigs;
 import server.http.handler.BaseHttpHandler;
+import server.http.handler.DefaultTrackingHttpHandler;
 import server.kafka.HttpLogKafkaHandler;
 
+/**
+ * The HTTP server instance 
+ * 
+ * @author trieunt
+ *
+ */
 public class HttpLogCollector extends BaseWorker {	
-	public static final String version = "Reactive HttpLogCollector - version 1.0";
+	public static final String version = "Rfx-event-tracking-server - version 1.0";
 	static KafkaProducerConfigs kafkaProducerConfigs = KafkaProducerConfigs.load();
 	
 	public static void createHttpLogCollector(String name, String host, int port){
@@ -29,7 +36,11 @@ public class HttpLogCollector extends BaseWorker {
 		BaseHttpHandler theHandler;
 		try {
 			String className = kafkaProducerConfigs.getDefaultHttpHandlerClass();
-			theHandler = (BaseHttpHandler)Class.forName(className).newInstance();
+			if(StringUtil.isNotEmpty(className)){
+				theHandler = (BaseHttpHandler)Class.forName(className).newInstance();
+			} else {
+				theHandler = new DefaultTrackingHttpHandler();
+			}
 		} catch (Exception e) {			
 			e.printStackTrace();
 			System.out.println("defaultHttpHandlerClass is NULL");
