@@ -17,8 +17,7 @@ public class TestDataSeeder {
 	@Before
 	public void initData() {
 		System.out.println("initData");
-		MapDbConnector connector = KafkaDataSeeder.loadMapDbForTopic(
-				"my-topic", "TestDataSeeder");
+		MapDbConnector connector = KafkaDataSeeder.loadMapDbForTopic("my-topic", "");
 		DB mapDb = connector.getMapDb();
 		ConcurrentNavigableMap<String, Long> kafkaOffsetDb = connector.getOffsetMapDb();
 
@@ -39,7 +38,7 @@ public class TestDataSeeder {
 	public void checkData() {
 		System.out.println("checkData");
 		MapDbConnector connector = KafkaDataSeeder.loadMapDbForTopic(
-				"my-topic", "TestDataSeeder");
+				"my-topic", "");
 		DB mapDb = connector.getMapDb();
 		ConcurrentNavigableMap<String, Long> kafkaOffsetDb = connector
 				.getOffsetMapDb();

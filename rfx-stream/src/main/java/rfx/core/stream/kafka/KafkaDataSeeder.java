@@ -167,7 +167,7 @@ public class KafkaDataSeeder {
 		    // query kafka
 		    dataPayload = kafkaDataSource.query(query);
 	
-		    if (dataPayload != null) {
+		    if (dataPayload != null) {     
 				this.seededDataSize = dataPayload.size();
 				long readOffset = dataPayload.getEndOffset();
 				
