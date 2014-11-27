@@ -1,7 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'eclipse'
 
-sourceCompatibility = 1.8
+sourceCompatibility = 1.7
 
 version = '1.0'
 
@@ -86,6 +86,7 @@ task rfxStreamJar(type: Jar) {
     from(sourceSets.main.output) {
         include "**"
     }
+    version = ''
     baseName = 'rfx-stream'
     manifest = project.manifest {
         from rfxStreamManifest

@@ -9,9 +9,10 @@ import org.mapdb.DBMaker;
 import rfx.core.configs.WorkerConfigs;
 import rfx.core.util.LogUtil;
 import rfx.core.util.StringUtil;
+import rfx.core.util.Utils;
 
 public class MapDbConnector {
-	static String kafkaOffsetDirPath = WorkerConfigs.load().getKafkaOffsetDbPath() + "/kafka-offsets";
+	
 	String topic;
 	String workerName = "";
 	DB mapDb;
@@ -20,7 +21,7 @@ public class MapDbConnector {
 		super();
 		this.topic = topic;	
 		if( StringUtil.isNotEmpty(workerName) ){
-			this.workerName = "-"+workerName;	
+			this.workerName = workerName;	
 		}		
 		initMapDB();
 	}
@@ -34,16 +35,11 @@ public class MapDbConnector {
 	}
 	
 	void initMapDB(){
+		String kafkaOffsetPath = StringUtil.toString(WorkerConfigs.load().getKafkaOffsetDbPath(), "/" , topic, "-", workerName);
 		if(mapDb == null ){				
-			try {	
-				File kafkaOffsetFile = new File(kafkaOffsetDirPath);
-				if( ! kafkaOffsetFile.exists() ){
-					kafkaOffsetFile.mkdir();
-				}
-				
-				String path = StringUtil.isEmpty(topic) ? kafkaOffsetDirPath : StringUtil.toString(kafkaOffsetDirPath,"-",topic,this.workerName);
-				File file = new File(path);
-				File tfile = new File(path+".t");
+			try {
+				File file = new File(kafkaOffsetPath);
+				File tfile = new File(kafkaOffsetPath+".t");
 				if(tfile.isFile()){
 					tfile.delete();
 				}
@@ -60,7 +56,7 @@ public class MapDbConnector {
 				
 			} catch (Throwable e) {
 				if(e instanceof java.io.IOException){
-					LogUtil.e("KafkaDataSeeder.MapDbConnector", kafkaOffsetDirPath + " is NOT valid folder");
+					LogUtil.e("KafkaDataSeeder.MapDbConnector", kafkaOffsetPath + " is NOT valid path");
 				} else {
 					e.printStackTrace();
 					LogUtil.e("KafkaConfigManager", e.toString());
@@ -79,6 +75,10 @@ public class MapDbConnector {
 	public synchronized ConcurrentNavigableMap<String,Long>  getOffsetMapDb() {
 		//Kafka Offset Storage
 		ConcurrentNavigableMap<String,Long> kafkaOffsetDb = mapDb.getTreeMap("kafkaOffsetDb");
+		if(kafkaOffsetDb == null){
+			LogUtil.e("MapDbConnector.getOffsetMapDb", "mapDb.getTreeMap('kafkaOffsetDb') IS NULL");
+			Utils.exitSystemAfterTimeout(500);			
+		}
 		return kafkaOffsetDb;
 	}
 	

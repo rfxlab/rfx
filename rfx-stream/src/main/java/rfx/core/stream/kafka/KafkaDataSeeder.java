@@ -84,22 +84,21 @@ public class KafkaDataSeeder {
     private boolean stopSeedingData;
     private KafkaDataQuery query;
     private String workerName = "";
-
+    
+    MapDbConnector mapDbConnector;
+    DB mapDb;
+    
 
     public KafkaDataSeeder(String topic, int partition) {
 		super();
 		this.topic = topic;
 		this.partition = partition;
 		this.seeds = new ArrayList<>(0);
+		// mapDb loading
+		mapDbConnector = loadMapDbForTopic(topic,workerName);
+		mapDb = mapDbConnector.getMapDb();
     }
-    
-    public KafkaDataSeeder(String topic, int partition, String workerName) {
-		super();
-		this.topic = topic;
-		this.partition = partition;
-		this.seeds = new ArrayList<>(0);
-		this.workerName = workerName;
-    }
+   
 
     public KafkaDataSeeder buildQuery() {
 		if (query == null) {
@@ -151,10 +150,8 @@ public class KafkaDataSeeder {
 		}
 		buildQuery();
 	
-		// mapDb loading
-		MapDbConnector connector = loadMapDbForTopic(topic,workerName);
-		DB mapDb = connector.getMapDb();
-		ConcurrentNavigableMap<String, Long> kafkaOffsetDb = connector.getOffsetMapDb();
+		
+		ConcurrentNavigableMap<String, Long> kafkaOffsetDb = mapDbConnector.getOffsetMapDb();
 	
 		KafkaDataPayload dataPayload = null;
 		try {
@@ -163,33 +160,24 @@ public class KafkaDataSeeder {
 		    // load from MapDB
 		    String clientName = query.buildClientName();
 		    if (kafkaOffsetDb.containsKey(clientName)) {
-			query.setRecentReadOffset(kafkaOffsetDb.get(clientName));
-			
-			// test new offset
-			if(kafkaOffsetDb.get(clientName) < 10){
-			    System.out.println("###### New Offset: "+ kafkaOffsetDb.get(clientName));
-			}
-			
-			System.out.println("###getRecentReadOffset: "	+ query.getRecentReadOffset());
+		    	long offset = StringUtil.safeParseLong(kafkaOffsetDb.get(clientName));
+				query.setRecentReadOffset(offset);
 		    }
 	
 		    // query kafka
 		    dataPayload = kafkaDataSource.query(query);
 	
 		    if (dataPayload != null) {
-			this.seededDataSize = dataPayload.size();
-			long readOffset = dataPayload.getEndOffset();
-			
-			
-			query.setRecentReadOffset(readOffset);
-	
-			// save offset to MapDB
-			kafkaOffsetDb.put(clientName, readOffset);
-			
-	
-			System.out.println(new Date() + " ,topic:" + topic
-				+ " ,partition:" + partition + " ,offset:" + readOffset
-				+ " size:" + this.seededDataSize);
+				this.seededDataSize = dataPayload.size();
+				long readOffset = dataPayload.getEndOffset();
+				
+				query.setRecentReadOffset(readOffset);
+		
+				// save offset to MapDB
+				Utils.sleep(1);
+				kafkaOffsetDb.put(clientName, readOffset);
+		
+				System.out.println(new Date() + " ,topic:" + topic+ " ,partition:" + partition + " ,offset:" + readOffset + " size:" + this.seededDataSize);
 		    }
 		} catch (Exception e) {
 		    System.out.println("Oops:" + e);
@@ -197,6 +185,7 @@ public class KafkaDataSeeder {
 		} finally {
 		    // commit MapDB data to disk
 		    mapDb.commit();
+		    Utils.sleep(1);
 		}
 		return dataPayload;
     }
