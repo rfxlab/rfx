@@ -6,9 +6,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentNavigableMap;
-
-import org.mapdb.DB;
 
 import rfx.core.stream.connector.MapDbConnector;
 import rfx.core.stream.kafka.KafkaDataQuery.QueryFilter;
@@ -18,30 +15,6 @@ import rfx.core.util.Utils;
 
 public class KafkaDataSeeder {
     private static Map<String, MapDbConnector> mapDbTopic = new HashMap<>();
-
-    public static synchronized void updateOffset(String topic, Map<String, Long> offsets, String workerName) {
-		MapDbConnector connector = loadMapDbForTopic(topic,workerName);
-		DB mapDb = connector.getMapDb();
-		ConcurrentNavigableMap<String, Long> kafkaOffsetDb = connector.getOffsetMapDb();
-	
-		try {
-		    for (Map.Entry<String, Long> entry : offsets.entrySet()) {
-		    	kafkaOffsetDb.put(entry.getKey(), entry.getValue());
-		    }
-		} catch (Exception e) {
-		    System.out.println("Oops:" + e);
-		    e.printStackTrace();
-		} finally {
-		    // commit MapDB data to disk
-		    mapDb.commit();
-		}
-    }
-
-    public static synchronized Map<String, Long> getOffsets(String topic, String workerName) {
-		MapDbConnector connector = loadMapDbForTopic(topic, workerName);
-		ConcurrentNavigableMap<String, Long> kafkaOffsetDb = connector.getOffsetMapDb();
-		return kafkaOffsetDb;
-    }
 
     public static synchronized MapDbConnector loadMapDbForTopic(String topic, String workerName) {
 		MapDbConnector connector = mapDbTopic.get(topic);
@@ -58,7 +31,6 @@ public class KafkaDataSeeder {
 		    mapDbConnector.shutdown();
 		}
     }
-    
 
     public static int stopSeedingAndWait(List<KafkaDataSeeder> dataSeeders) {
 		for (KafkaDataSeeder dataSeeder : dataSeeders) {
@@ -83,20 +55,16 @@ public class KafkaDataSeeder {
     List<String> seeds;
     private boolean stopSeedingData;
     private KafkaDataQuery query;
-    private String workerName = "";
-    
+        
     MapDbConnector mapDbConnector;
-    DB mapDb;
     
-
     public KafkaDataSeeder(String topic, int partition) {
 		super();
 		this.topic = topic;
 		this.partition = partition;
 		this.seeds = new ArrayList<>(0);
 		// mapDb loading
-		mapDbConnector = loadMapDbForTopic(topic,workerName);
-		mapDb = mapDbConnector.getMapDb();
+		mapDbConnector = loadMapDbForTopic(topic,"kafka-worker-"+partition);		
     }
    
 
@@ -150,19 +118,14 @@ public class KafkaDataSeeder {
 		}
 		buildQuery();
 	
-		
-		ConcurrentNavigableMap<String, Long> kafkaOffsetDb = mapDbConnector.getOffsetMapDb();
-	
 		KafkaDataPayload dataPayload = null;
 		try {
 		    KafkaDataSource kafkaDataSource = new KafkaDataSource();
 	
-		    // load from MapDB
+		    // load from Map
 		    String clientName = query.buildClientName();
-		    if (kafkaOffsetDb.containsKey(clientName)) {
-		    	long offset = StringUtil.safeParseLong(kafkaOffsetDb.get(clientName));
-				query.setRecentReadOffset(offset);
-		    }
+		    long offset = mapDbConnector.getData(clientName);
+			query.setRecentReadOffset(offset);		    
 	
 		    // query kafka
 		    dataPayload = kafkaDataSource.query(query);
@@ -173,18 +136,16 @@ public class KafkaDataSeeder {
 				
 				query.setRecentReadOffset(readOffset);
 		
-				// save offset to MapDB
-				Utils.sleep(1);
-				kafkaOffsetDb.put(clientName, readOffset);
-		
+				// save offset to Map			
+				mapDbConnector.setData(clientName, readOffset);
 				System.out.println(new Date() + " ,topic:" + topic+ " ,partition:" + partition + " ,offset:" + readOffset + " size:" + this.seededDataSize);
 		    }
 		} catch (Exception e) {
 		    System.out.println("Oops:" + e);
 		    e.printStackTrace();
 		} finally {
-		    // commit MapDB data to disk
-		    mapDb.commit();
+		    // commit offset data to disk
+			mapDbConnector.save();
 		    Utils.sleep(1);
 		}
 		return dataPayload;

@@ -1,21 +1,24 @@
 package rfx.core.stream.connector;
 
 import java.io.File;
-import java.util.concurrent.ConcurrentNavigableMap;
-
-import org.mapdb.DB;
-import org.mapdb.DBMaker;
+import java.lang.reflect.Type;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import rfx.core.configs.WorkerConfigs;
-import rfx.core.util.LogUtil;
+import rfx.core.util.FileUtils;
 import rfx.core.util.StringUtil;
-import rfx.core.util.Utils;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 public class MapDbConnector {
 	
 	String topic;
 	String workerName = "";
-	DB mapDb;
+	ConcurrentMap<String, Long> mapDb;
+	String kafkaOffsetPath;
 			
 	public MapDbConnector(String topic, String workerName) {
 		super();
@@ -26,7 +29,7 @@ public class MapDbConnector {
 		initMapDB();
 	}
 	
-	public DB getMapDb() {
+	public ConcurrentMap<String, Long> getMapDb() {
 		return mapDb;
 	}
 	
@@ -35,66 +38,54 @@ public class MapDbConnector {
 	}
 	
 	void initMapDB(){
-		String kafkaOffsetPath = StringUtil.toString(WorkerConfigs.load().getKafkaOffsetDbPath(), "/" , topic, "-", workerName);
-		if(mapDb == null ){				
+		kafkaOffsetPath = StringUtil.toString(WorkerConfigs.load().getKafkaOffsetDbPath(), "/" , topic, "-", workerName);		
+		mapDb = new ConcurrentHashMap<>();
+		File file = new File(kafkaOffsetPath);
+		if(file.isFile()){
 			try {
-				File file = new File(kafkaOffsetPath);
-				File tfile = new File(kafkaOffsetPath+".t");
-				if(tfile.isFile()){
-					tfile.delete();
+				Type type = new TypeToken<Map<String, Long>>(){}.getType();
+				String json = FileUtils.readFileAsString(kafkaOffsetPath);
+				if(StringUtil.isNotEmpty(json)){
+					Map<String, Long> map = new Gson().fromJson(json, type);
+					if(map != null){
+						mapDb.putAll(map);
+					}
 				}
-				
-				boolean shouldMakeNewFile = false;
-				if( ! file.exists() ){
-					shouldMakeNewFile = file.createNewFile();
-					LogUtil.i("MapDbConnector.topic",this.topic+" createNewFile kafka offset at path: "+file.getAbsolutePath() + " : "+shouldMakeNewFile, true);
-				} else {
-					LogUtil.i("MapDbConnector.topic",this.topic+" loading persistent kafka offset at path: "+file.getAbsolutePath(), true);	
-				}
-				
-				mapDb = DBMaker.newFileDB(file).closeOnJvmShutdown().make();
-				
-			} catch (Throwable e) {
-				if(e instanceof java.io.IOException){
-					LogUtil.e("KafkaDataSeeder.MapDbConnector", kafkaOffsetPath + " is NOT valid path");
-				} else {
-					e.printStackTrace();
-					LogUtil.e("KafkaConfigManager", e.toString());
-				}
-				//WorkerUtil.autoSystemExit(444);
-				//FIXME
-			} finally {
-				if(mapDb == null){
-					LogUtil.e("KafkaConfigManager", "kafkaOffsetDb is NULL, failed at mapDb.getTreeMap(\"kafkaOffsetDb\") ");
-					//WorkerUtil.autoSystemExit(444);						
-				}	
-			}
+			} catch (Throwable e) {				
+				e.printStackTrace();
+			}	
 		}
+		else {
+			try {
+				file.createNewFile();
+			} catch (Throwable e) {
+				e.printStackTrace();
+			}
+		}		
 	}
 
-	public synchronized ConcurrentNavigableMap<String,Long>  getOffsetMapDb() {
-		//Kafka Offset Storage
-		ConcurrentNavigableMap<String,Long> kafkaOffsetDb = mapDb.getTreeMap("kafkaOffsetDb");
-		if(kafkaOffsetDb == null){
-			LogUtil.e("MapDbConnector.getOffsetMapDb", "mapDb.getTreeMap('kafkaOffsetDb') IS NULL");
-			Utils.exitSystemAfterTimeout(500);			
-		}
-		return kafkaOffsetDb;
+	public void setData(String key, long value){
+		mapDb.put(key, value);
 	}
 	
-	public synchronized int getOffsetMapDbSize() {
-		//Kafka Offset Storage
-		ConcurrentNavigableMap<String,Long> kafkaOffsetDb = mapDb.getTreeMap("kafkaOffsetDb");
-		if(kafkaOffsetDb != null){
-			return kafkaOffsetDb.size();
-		}
-		return 0;
+	public long getData(String key){
+		return StringUtil.safeParseLong(mapDb.get(key),-1L);
+	}
+	
+	public int getOffsetMapDbSize() {		
+		return mapDb.size();
+	}
+	
+	public void save(){	    
+	    FileUtils.writeStringToFile(kafkaOffsetPath, new Gson().toJson(mapDb));
+	}
+	
+	public void asynchSave(){	    
+		//TODO
 	}
 	
 	public void shutdown(){
-	    if(mapDb != null){
-		mapDb.commit();
-		mapDb.close();
-	    }
+		//TODO
+		save();
 	}
 }

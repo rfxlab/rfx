@@ -23,8 +23,7 @@ dependencies {
     		
     		, fileTree(dir: 'lib', include: '**/*.jar')    		
     		,'commons-dbcp:commons-dbcp:1.4'
-    		,'org.mongodb:mongo-java-driver:2.12.4'
-    		,'org.mapdb:mapdb:1.0.6'
+    		,'org.mongodb:mongo-java-driver:2.12.4'    		
     		,'org.apache.kafka:kafka_2.10:0.8.1.1'
     		,'org.twitter4j:twitter4j-core:4.0.2'
     		,'org.yaml:snakeyaml:1.14'
