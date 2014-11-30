@@ -6,3 +6,7 @@ the fullstack framework for reactive big data
 * Visual Reactive Analytics Dashboard (By http://nvd3.org and http://startbootstrap.com/template-categories/admin-dashboard )
 
 ![alt tag](http://3.bp.blogspot.com/-JLrB-66E2z0/VHa7dWGQ1VI/AAAAAAAADI0/neh8Rl7gpLU/s1600/RFX%2Bin%2BVenn%2BDiagram%2B-%2BPlain%2B(2).png)
+
+Lead Engineer and implemented by
+====
+https://twitter.com/tantrieuf31
