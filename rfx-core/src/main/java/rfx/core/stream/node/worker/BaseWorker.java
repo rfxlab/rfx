@@ -46,8 +46,8 @@ public abstract class BaseWorker {
 	protected int port;
 	protected String name;
 	protected String classnameWorker = getClass().getName();
-	int status = -1;
-	boolean autoStart = true;
+	protected int status = -1;
+	protected boolean autoStart = true;
 	
 	protected Timer timer = new Timer(true);
 	
@@ -65,6 +65,11 @@ public abstract class BaseWorker {
 		this.classnameWorker = getClass().getName();
 		status = STARTING;
 		initBeforeStart();
+	}
+	
+	public BaseWorker(String name, boolean autoStart) {
+		this(name);
+		this.autoStart = autoStart;
 	}
 
 	final public String getName() {

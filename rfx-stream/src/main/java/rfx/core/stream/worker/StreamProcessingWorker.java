@@ -27,6 +27,11 @@ public abstract class StreamProcessingWorker extends BaseWorker {
 		ConfigAutoLoader.load(KAFKA_TOPOLOGY_CONFIGS_FILE);
 	}
 	
+	public StreamProcessingWorker(String name, boolean autoStart) {
+		this(name);
+		this.autoStart = autoStart;
+	}
+	
 	final protected boolean handleRequestDone(HttpServerRequest req){
 		if (handleRequestToBaseWorker(req)) {
             return true;
