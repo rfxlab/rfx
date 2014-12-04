@@ -55,11 +55,8 @@ public class ItemLogParsingFunctor extends BaseFunctor  {
 
 				if( ! StringUtil.isEmpty(query) ){
 					Map<String, List<String>> params = ParamUtil.getQueryMap(query);
-					String test = ParamUtil.getParam(params,"test");	
-				
-					
-					System.out.println("ItemTrackingLogParsingFunctor test = "+test);
-										
+					String test = ParamUtil.getParam(params,"test");					
+					System.out.println("ItemTrackingLogParsingFunctor test = "+test);										
 					long ipCount = (new RedisCommand<Long>(jedisPool) {
 			            @Override
 			            public Long build() throws JedisException {

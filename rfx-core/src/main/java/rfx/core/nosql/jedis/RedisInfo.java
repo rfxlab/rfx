@@ -49,13 +49,10 @@ public class RedisInfo {
 	public boolean equals(Object obj) {
 		if (obj instanceof RedisInfo) {
 			RedisInfo hp = (RedisInfo) obj;
-
 			String thisHost = convertHost(host);
 			String hpHost = convertHost(hp.host);
 			return port == hp.port && thisHost.equals(hpHost);
-
 		}
-
 		return false;
 	}
 	
