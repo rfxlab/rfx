@@ -4,6 +4,10 @@ import java.util.Queue;
 
 import rfx.core.model.CallbackResult;
 
+/**
+ * @author trieunt
+ *
+ */
 public class DataFileEmitter extends DataEmitter {
 	
 	Queue<String> dataFiles;
@@ -11,6 +15,10 @@ public class DataFileEmitter extends DataEmitter {
 	public DataFileEmitter(Queue<String> dataFiles) {
 		super();
 		this.dataFiles = dataFiles;
+	}
+	
+	public void addFile(String file){
+		dataFiles.add(file);
 	}
 	
 	@Override

@@ -23,6 +23,7 @@ import rfx.core.stream.configs.ActorConfigs;
 import rfx.core.stream.configs.KafkaTopologyConfig;
 import rfx.core.stream.emitters.DataEmitter;
 import rfx.core.stream.emitters.DataFileEmitter;
+import rfx.core.stream.emitters.EmittedDataListener;
 import rfx.core.stream.functor.common.DataFileSourceFunctor;
 import rfx.core.stream.functor.common.DataSourceFunctor;
 import rfx.core.stream.functor.common.KafkaDataSourceFunctor;
@@ -57,10 +58,16 @@ public abstract class BaseTopology {
 	private int totalActors = 0;
 	
 	//common for data emitters	
-	protected List<KafkaDataSeeder> kafkaDataSeeders = new ArrayList<>();
-	protected List<DataEmitter> dataEmitters = new ArrayList<>();	
+	protected List<KafkaDataSeeder> kafkaLogSeeders = new ArrayList<>();
+	protected Map<String,DataEmitter> eventStreamEmitters = new HashMap<>();	
 	protected Map<String, ActorRef> emittingDataActors;
 	protected Map<String, Cancellable> emitterCancels;
+	protected EmittedDataListener emittedDataListener = new EmittedDataListener() {		
+		@Override
+		public void processingDone() {
+			System.out.println("Processing done!");
+		}
+	};
 	
 	
 	//control how system will shutdown safely
@@ -95,6 +102,21 @@ public abstract class BaseTopology {
 		return addDataFileEmitter(new DataFileEmitter(dataFiles));
 	}
 	
+	public BaseTopology addDataFile(String keyEmitter, String path){
+		Queue<String> dataFiles = new LinkedList<String>();
+		dataFiles.add(path);
+		DataEmitter emitter = eventStreamEmitters.get(keyEmitter);
+		if(emitter != null){
+			if(emitter instanceof DataFileEmitter){
+				((DataFileEmitter)emitter).addFile(path);
+			}
+		} else {
+			emitter = new DataFileEmitter(dataFiles);
+			eventStreamEmitters.put(keyEmitter,emitter);
+		}
+		return this;
+	}
+	
 	public BaseTopology addDataFiles(Queue<String> dataFiles){		
 		return addDataFileEmitter(new DataFileEmitter(dataFiles));
 	}
@@ -107,13 +129,14 @@ public abstract class BaseTopology {
 		return addDataFileEmitter(new DataFileEmitter(dataFiles));
 	}
 	
-	public BaseTopology addDataFileEmitter(DataFileEmitter emitter){	
-		dataEmitters.add(emitter);
+	public BaseTopology addDataFileEmitter(DataFileEmitter emitter){
+		String k = "DataFileEmitter"+(eventStreamEmitters.size()+1);
+		eventStreamEmitters.put(k,emitter);
 		return this;
 	}
 	
 	public int getDataEmitterSize(){
-		return this.dataEmitters.size();
+		return this.eventStreamEmitters.size();
 	}
 	
 	public BaseTopology initKafkaDataSeeders(String topic, int beginPartitionId, int endPartitionId){
@@ -125,10 +148,10 @@ public abstract class BaseTopology {
 	}
 	
 	public BaseTopology setKafkaDataSeeders(List<KafkaDataSeeder> dataSeeders) {
-		if(this.kafkaDataSeeders == null){
-			this.kafkaDataSeeders = dataSeeders;
+		if(this.kafkaLogSeeders == null){
+			this.kafkaLogSeeders = dataSeeders;
 		} else {
-			this.kafkaDataSeeders.addAll(dataSeeders);
+			this.kafkaLogSeeders.addAll(dataSeeders);
 		}
 		return this;
 	}
@@ -141,8 +164,7 @@ public abstract class BaseTopology {
 		executor.schedule(new Runnable() {			
 			@Override
 			public void run() {				 
-				system.shutdown();		
-				
+				system.shutdown();	
 				//shutdown other services
 				LogUtil.shutdownLogThreadPools();				
 				System.out.println("Shutdown actor system OK! BYE BYE ...");
@@ -174,11 +196,12 @@ public abstract class BaseTopology {
 	}
 	
 	public List<DataEmitter> getDataEmitters() {
-		return dataEmitters;
+		return new ArrayList<>(eventStreamEmitters.values());
 	}
 	
-	public BaseTopology addDataEmitter(DataEmitter dataEmitter) {
-		dataEmitters.add(dataEmitter);
+	public BaseTopology addDataEmitter(DataEmitter emitter) {
+		String k = emitter.getClass().getName()+(eventStreamEmitters.size()+1);
+		eventStreamEmitters.put(k,emitter);
 		return this;
 	}
 	
@@ -187,10 +210,10 @@ public abstract class BaseTopology {
 	}	
 	
 	private List<DataFlowInfo> getEmitFlows(Class<?> clazzSender){
-		List<DataFlowInfo> emitflows = new ArrayList<>(dataEmitters.size());
+		List<DataFlowInfo> emitflows = new ArrayList<>(eventStreamEmitters.size());
 		//emit log actors		
 		int i = 0;
-		for (DataEmitter dataEmitter : dataEmitters) {
+		for (DataEmitter dataEmitter : eventStreamEmitters.values()) {
 			i++;
 			DataFlowInfo emitflowInfo = new DataFlowInfo(clazzSender, String.valueOf(i));
 			emitflowInfo.setPreProcessingFunction(dataEmitter);
@@ -209,10 +232,12 @@ public abstract class BaseTopology {
 	private List<DataFlowInfo> defineDataEmitter(Class<?> clazzSender){
 		//FIXME better way ??
 		List<DataFlowInfo> emitflows = null;
-		if(this.kafkaDataSeeders.size()>0){
-			for (KafkaDataSeeder kafkaDataSeeder : kafkaDataSeeders) {
+		if(this.kafkaLogSeeders.size()>0){
+			int i = 1;
+			for (KafkaDataSeeder kafkaDataSeeder : kafkaLogSeeders) {
 				DataEmitter dataEmitter = new KafkaDataEmitter(kafkaDataSeeder);
-				dataEmitters.add(dataEmitter);
+				eventStreamEmitters.put("KafkaDataEmitter"+i,dataEmitter);
+				i++;
 			}
 			emitflows = getEmitFlows(clazzSender);
 			this.emittingDataActors = ActorUtil.createEmitterPool(this, KafkaDataSourceFunctor.class, emitflows);
@@ -345,12 +370,21 @@ public abstract class BaseTopology {
 		}
 
 		//stop seeding data
-		KafkaDataSeeder.stopSeedingAndWait(kafkaDataSeeders);
+		KafkaDataSeeder.stopSeedingAndWait(kafkaLogSeeders);
 		
 		//shutdown actor system after 5 seconds
 		this.shutdownTopologyActorSystem();		
 	}
 	
+	
+	public EmittedDataListener getEmittedDataListener() {
+		return emittedDataListener;
+	}
+
+	public void setEmittedDataListener(EmittedDataListener emittedDataListener) {
+		this.emittedDataListener = emittedDataListener;
+	}
+
 	public void shutdownAll(){
 		this.defaultShutdownKafkaWorker();
 	}

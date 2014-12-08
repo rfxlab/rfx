@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URL;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 import rfx.core.model.CallbackResult;
@@ -19,6 +20,10 @@ import rfx.core.util.Utils;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 
+/**
+ * @author trieunt
+ *
+ */
 public class DataFileSourceFunctor extends DataSourceFunctor {
 	
 	LoggingAdapter log = Logging.getLogger(getContext().system(), this);
@@ -43,6 +48,7 @@ public class DataFileSourceFunctor extends DataSourceFunctor {
 	}
 	
 	static int mb = 1024*1024;
+	static final AtomicBoolean notified = new AtomicBoolean(false);
 	
 	@Override
 	public void onReceive(Object message) throws Exception {
@@ -56,16 +62,17 @@ public class DataFileSourceFunctor extends DataSourceFunctor {
 			setEmitting(true);		
 			
 			CallbackResult<String> result = super.doPreProcessing();
+			System.out.println("doPreProcessing "+result);
 			if(result != null){
 				String uriStr = result.getResult();
 				if(uriStr.startsWith("/")){
 					uriStr = StringUtil.toString(SCHEME_FILE_PREFIX , uriStr);
 				}
-				URI uri = new URI(uriStr);				
 				
-				if(SCHEME_FILE.equals(uri.getScheme())){
-					
-				    int c = 0;				    
+				URI uri = new URI(uriStr);				
+				notified.set(false);
+				if(SCHEME_FILE.equals(uri.getScheme())){					
+				    int c = 0;	    
 					File file = new File(uri);
 					if( file.isFile() ){
 						BufferedReader br = null;
@@ -127,6 +134,11 @@ public class DataFileSourceFunctor extends DataSourceFunctor {
 			        }			            
 			        in.close();
 				}				
+			} else {
+				if(!notified.get()){
+					this.topology.getEmittedDataListener().processingDone();	
+					notified.set(true);
+				}
 			}
 			
 			setEmitting(false);

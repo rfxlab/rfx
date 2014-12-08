@@ -3,15 +3,21 @@ package rfx.sample.analytics;
 import java.io.File;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+import rfx.core.stream.emitters.EmittedDataListener;
 import rfx.core.stream.functor.common.DataSourceFunctor;
 import rfx.core.stream.topology.BaseTopology;
 import rfx.core.stream.topology.Pipeline;
 import rfx.core.util.Utils;
 
+/**
+ * @author trieunt
+ *
+ */
 public class TrueImpStatsImporterForDMP {
 	
 	static class TrueImpProcessingTopology extends BaseTopology{				
@@ -59,6 +65,12 @@ public class TrueImpStatsImporterForDMP {
 		System.out.println("files "+files.size() + " getDataEmitterSize = "+topology.getDataEmitterSize());
 		Utils.sleep(1000);
 	
+		topology.setEmittedDataListener(new EmittedDataListener() {
+			@Override
+			public void processingDone() {
+				System.out.println("Done !!!! at " + new Date());
+			}
+		});
 		topology.buildTopology().start(2000);
 		//Utils.sleep(10000);
 		
