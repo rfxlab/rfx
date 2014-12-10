@@ -41,6 +41,8 @@ public class ResponseUtil {
 		KafkaLogHandler kafkaHandler = HttpLogKafkaHandler.getKafkaHandler(kafkaType);
 		if (kafkaHandler != null) {
 			kafkaHandler.writeLogToKafka(req);
+		} else {
+			System.err.println("No KafkaLogHandler found for " + kafkaType);
 		}
 		trackingResponse(req);
 	}

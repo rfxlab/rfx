@@ -213,7 +213,7 @@ public class ModelingUserWithActor {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}		
-		Stopwatch stopwatch = new Stopwatch();
+		Stopwatch stopwatch = Stopwatch.createStarted();
 		//-------------------------------------------------------//
 	
 		FunctionGroupByEducation functionFactory = new FunctionGroupByEducation();
@@ -236,7 +236,7 @@ public class ModelingUserWithActor {
 		
 		//-------------------------------------------------------//
 		stopwatch.stop();
-		long millis = stopwatch.elapsedTime(TimeUnit.MILLISECONDS)-5;		 
+		long millis = stopwatch.elapsed(TimeUnit.MILLISECONDS)-5;		 
 		
 		printResults(query, queryResult);
 				

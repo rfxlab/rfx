@@ -10,7 +10,7 @@ public class ItemTrackHttpHandler extends BaseHttpHandler {
 	
 	private static final String ITEM = "/item";
 	private static final String PING = "/ping";
-	static final String logItemTrackingKafka = "kafka-item-tracking-Producer";
+	static final String logItemTrackingKafka = "tk";
 	static final String redirectClickPrefix = "/r/";
 
 	@Override
