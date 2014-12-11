@@ -1,10 +1,10 @@
 package rfx.core.util;
 
-import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -20,6 +21,7 @@ import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.routing.HttpRoute;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
@@ -29,26 +31,32 @@ import org.apache.http.util.EntityUtils;
 
 public class HttpClientUtil {	
 		
-	static int DEFAULT_TIMEOUT = 6000;//10 seconds
+	public static final Charset CHARSET_UTF8 = Charset.forName(StringPool.UTF_8);
+	static int DEFAULT_TIMEOUT = 10000;//10 seconds
 	public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 5.1; rv:9.0) Gecko/20100101 Firefox/9.0";
 	public static final String MOBILE_USER_AGENT = "Mozilla/5.0 (Linux; U; Android 2.2; en-us; DROID2 GLOBAL Build/S273) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1";
 	
-	final static int MAX_SIZE = 1;
+	final static int MAX_SIZE = 20;
 	static ConcurrentMap<Integer, HttpClient> httpClientPool = new ConcurrentHashMap<>(MAX_SIZE);
 	
 	public static final HttpClient getThreadSafeClient() throws Exception {
-		//int slot = (int)(Math.random() * (MAX_SIZE + 1));		
-	    return getThreadSafeClient(0);
+		int slot = (int)(Math.random() * (MAX_SIZE + 1));		
+	    return getThreadSafeClient(slot);
 	}
 	
 	public static final HttpClient getThreadSafeClient(int slot) throws Exception {		
 		HttpClient httpClient = httpClientPool.get(slot);
 		if(httpClient == null){
 			PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
-	        cm.setMaxTotal(50);
-	        httpClient = HttpClients.custom()
-	                .setConnectionManager(cm)
-	                .build();
+			// Increase max total connection to 200
+			cm.setMaxTotal(50);
+			// Increase default max connection per route to 20
+			cm.setDefaultMaxPerRoute(5);
+			// Increase max connections for localhost:80 to 50
+			HttpHost localhost = new HttpHost("locahost", 80);
+			cm.setMaxPerRoute(new HttpRoute(localhost), 50);
+
+			httpClient = HttpClients.custom().setConnectionManager(cm).build();
 		    httpClientPool.put(slot, httpClient);
 		}
 	    return httpClient;
@@ -84,7 +92,7 @@ public class HttpClientUtil {
 			HttpResponse response = httpClient.execute(postRequest);
 			HttpEntity entity = response.getEntity();
 			if (entity != null) {			
-				return EntityUtils.toString(entity, CommonUtil.CHARSET_UTF8);
+				return EntityUtils.toString(entity, CHARSET_UTF8);
 			}
 		} catch (HttpResponseException e) {
 			System.err.println(e.getMessage());
@@ -93,7 +101,9 @@ public class HttpClientUtil {
 			e.printStackTrace();
 		}
 		return "";
-	}	
+	}
+	
+	
 	
 	public static String executePost(String url){
 		try {	
@@ -107,7 +117,7 @@ public class HttpClientUtil {
 			HttpResponse response = getThreadSafeClient().execute(httppost);
 			HttpEntity entity = response.getEntity();				
 			if (entity != null) {
-				return EntityUtils.toString(entity, CommonUtil.CHARSET_UTF8);
+				return EntityUtils.toString(entity, CHARSET_UTF8);
 			}
 		
 		}  catch (HttpResponseException e) {
@@ -119,7 +129,7 @@ public class HttpClientUtil {
 		return "";
 	}
 	
-	public static String executeGet(final URL url, boolean safeThread){
+	public static String executeGet(final URL url){
 		HttpResponse response = null;
 		HttpClient httpClient = null;
 		//System.out.println("executeGet:" + url);
@@ -140,7 +150,7 @@ public class HttpClientUtil {
 			if (code == 200) {				
 				HttpEntity entity = response.getEntity();
 				if (entity != null) {										
-					String html = EntityUtils.toString(entity, CommonUtil.CHARSET_UTF8);
+					String html = EntityUtils.toString(entity, CHARSET_UTF8);
 					return html;
 				}
 			} else if(code == 404) {
@@ -148,11 +158,9 @@ public class HttpClientUtil {
 			} else {
 				return "500";
 			}
-		}  catch (Throwable e) {
-			if( e instanceof java.net.ConnectException){
-				return "444";
-			} 
-			e.printStackTrace(); 
+		}  catch (Throwable e) {						
+			//e.printStackTrace();
+			return "444";
 		} finally {
 			response = null;
 		}
@@ -180,11 +188,11 @@ public class HttpClientUtil {
 			if (code == 200) {				
 				HttpEntity entity = response.getEntity();
 				if (entity != null) {										
-					html = EntityUtils.toString(entity, CommonUtil.CHARSET_UTF8);					
+					html = EntityUtils.toString(entity, CHARSET_UTF8);					
 				}
 			} 
 		}  catch (Exception e) {
-			LogUtil.e("HttpClientUtil", e.toString() + ", fail http get to "+urlString);
+			e.printStackTrace();
 			httpClientPool.remove(slot);			
 		} finally {			
 			response = null;			
@@ -192,9 +200,9 @@ public class HttpClientUtil {
 		return html;
 	}
 	
-	public static String executeGet(final String url, boolean safeThread){
+	public static String executeGet(final String url){
 		try {
-			return executeGet(new URL(url), safeThread);
+			return executeGet(new URL(url));
 		} catch (MalformedURLException e) {			
 			e.printStackTrace();
 		}
@@ -204,10 +212,10 @@ public class HttpClientUtil {
 	public static String executeGet(final String url, boolean safeThread, boolean redownload500, int numRetry){		
 		try {
 			if(redownload500){
-				String html = executeGet(new URL(url), safeThread);
+				String html = executeGet(new URL(url));
 				while( html.equals("500") ){
 					Thread.sleep(400);
-					html = executeGet(new URL(url), safeThread);					
+					html = executeGet(new URL(url));					
 					numRetry --;
 					if(numRetry <= 0){
 						break;
@@ -215,7 +223,7 @@ public class HttpClientUtil {
 				}				
 				return html;
 			} else {
-				return executeGet(new URL(url), safeThread);
+				return executeGet(new URL(url));
 			}
 		} catch (Exception e) {			
 			e.printStackTrace();
@@ -245,13 +253,11 @@ public class HttpClientUtil {
 			}
 		} catch (UnsupportedEncodingException e) {}
 		System.out.println(url.toString());
-		return executeGet(url.toString(),true);
+		return executeGet(url.toString());
 	}
 	
 	
-	public static String executeGet(final String url){		
-		return executeGet(url, true);
-	}	
+
 
 	
 	public static void main(String[] args) {
