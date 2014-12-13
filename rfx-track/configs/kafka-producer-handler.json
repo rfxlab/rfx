@@ -15,6 +15,10 @@
         tk : {
             kafkaTopic : "item-tracking",
             brokerList : "127.0.0.1:9092"
+        },
+        u : {
+            kafkaTopic : "user-activity",
+            brokerList : "127.0.0.1:9092"
         }
     }
 }
