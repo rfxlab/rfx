@@ -1,12 +1,16 @@
+# Java compiled files #
 *.class
 *.classpath
 
+# Runtime and IDE folders #
 **/bin/*
 **/build/*
 **/data/*
 **/log/*
 **/.gradle/*
 **/.settings/*
+**/.idea/*
+**/releases/*
 
 # Package Files #
 *.jar

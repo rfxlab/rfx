@@ -6,12 +6,14 @@
 		<brokers>127.0.0.1:9092</brokers>
 	</topic>
 	
+	
+	<!-- BEGIN: Real-time reactive marketing  -->
 	<topic name="item-tracking" topology="rfx.sample.item.tracking.TrackingItemTopology" >	
 		<brokers>127.0.0.1:9092</brokers>
-	</topic>
-	
+	</topic>	
 	<topic name="user-activity" topology="rfx.sample.user.tracking.UserTrackingTopology" >	
 		<brokers>127.0.0.1:9092</brokers>
 	</topic>
+	<!-- END: Real-time reactive marketing  -->
 	
 </KafkaConfig>

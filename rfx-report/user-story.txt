@@ -1,0 +1,20 @@
+Real-time Reactive Marketing
+1) Collect 3 types of data (Business Data, Behavior Data, Context Data) → store data as stream
+2) Stream processing → real-time behavioral analytics
+3) Reactive processing → personalized product recommendations
+4) Wait for feedback data → Send marketing email
+5) Compute social trends → Auto tweet and share promotions to social media
+
+the architecture about real-time reactive marketing platform
+Build Chrome Ext to collect data from multiple websites, simulating true user activity on the website (Amazon, Lazada, ..)
+Tools will be used:
++ rfx-track https://github.com/mc2ads/rfx
++ Apache Kafka http://kafka.apache.org/
++ rfx-stream https://github.com/mc2ads/rfx
++ HBase with Phoenix: http://blog.sequenceiq.com/blog/2014/09/04/sql-on-hbase-with-apache-phoenix/
++ Redis http://redis.io
++ Real-time report: http://coenraets.org/blog/2012/10/real-time-web-analytics-with-node-js-and-socket-io/
++ email marketing: https://github.com/sendgrid/sendgrid-nodejs
++ Facebook API (https://github.com/Thuzi/facebook-node-sdk )
++ personalized recommender: https://www.npmjs.com/package/raccoon
+

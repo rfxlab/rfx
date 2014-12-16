@@ -1,0 +1,17 @@
+{
+  "name": "Agent Web",
+  "manifest_version": 2,
+  "version": "0.0.1",
+  "description": "Demo for Reactive Marketing",   
+  "permissions": [
+    "webRequest","webRequestBlocking", "tabs", "http://*/*", "https://*/*" 
+  ],
+  "icons": {"16": "icon16.png",	"48": "icon48.png", "128": "icon128.png" },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*","https://*/*"],
+      "js": ["jquery.min.js", "configs.js","utils.js","ads.js"],
+      "run_at": "document_end"	 
+    }
+  ]
+}
