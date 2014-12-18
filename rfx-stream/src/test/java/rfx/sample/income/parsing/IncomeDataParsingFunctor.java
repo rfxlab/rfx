@@ -3,6 +3,7 @@ package rfx.sample.income.parsing;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import rfx.core.stream.functor.BaseFunctor;
+import rfx.core.stream.functor.common.DataSourceFunctor;
 import rfx.core.stream.message.Fields;
 import rfx.core.stream.message.Tuple;
 import rfx.core.stream.message.Values;
@@ -24,7 +25,7 @@ public class IncomeDataParsingFunctor extends BaseFunctor  {
 		if (message instanceof Tuple) {			
 			Tuple inputTuple = (Tuple) message;
 			try {				
-				String row = inputTuple.getStringByField("row");
+				String row = inputTuple.getStringByField(DataSourceFunctor.EVENT);
 				
 				//System.out.println(row);
 				String[] toks = row.split(",");

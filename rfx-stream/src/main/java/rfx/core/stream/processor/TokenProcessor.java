@@ -1,5 +1,6 @@
 package rfx.core.stream.processor;
 
+import rfx.core.stream.functor.common.DataSourceFunctor;
 import rfx.core.stream.message.Fields;
 import rfx.core.stream.message.Tuple;
 import rfx.core.stream.message.Values;
@@ -18,7 +19,7 @@ public class TokenProcessor extends Processor{
 
 	@Override
 	public Tuple processToTuple(Tuple inputTuple, Fields outputMetadataFields) {
-		String logRow = inputTuple.getStringByField("log_row");
+		String logRow = inputTuple.getStringByField(DataSourceFunctor.EVENT);
     	String topic = inputTuple.getStringByField("topic");
     	String partitionId = inputTuple.getStringByField("partitionId");	    	
 		String[] logTokens = logRow.split(TAB_STRING);		  	

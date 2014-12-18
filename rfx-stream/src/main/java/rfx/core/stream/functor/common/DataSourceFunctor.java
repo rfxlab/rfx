@@ -16,6 +16,7 @@ public abstract class DataSourceFunctor extends BaseFunctor {
 
 	public static final String EMIT_LOG_EVENT = "EmitLogEvent";
 	public static final String STOP_EMIT_LOG_EVENT = "StopEmitLogEvent";
+	public static final String EVENT = "event";
 	private boolean isEmitting = false;
 	private boolean stopEmitting = false;
 	protected static int maxSizeToSleep = 5000;

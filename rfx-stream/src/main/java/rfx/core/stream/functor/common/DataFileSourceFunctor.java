@@ -33,7 +33,7 @@ public class DataFileSourceFunctor extends DataSourceFunctor {
 	}
 
 	//what data fields that this actor would send to next actor
-	static Fields fields = new Fields("row");
+	static Fields outFields = new Fields(DataSourceFunctor.EVENT);
 	
 	final static String SCHEME_FILE = "file";
 	final static String SCHEME_HTTP = "http";
@@ -81,9 +81,9 @@ public class DataFileSourceFunctor extends DataSourceFunctor {
 							br = new BufferedReader(new FileReader(file));
 							String line;
 							while((line = br.readLine()) != null) {
-								this.emitStringTuple(fields,line);
+								this.emitStringTuple(outFields,line);
 								if(++c % maxSizeToSleep == 0){
-									Utils.sleep(500);
+									Utils.sleep(400);
 								}
 							}
 							System.out.println(" #END Total: "+c+" rows at file: " + file.getAbsolutePath());
@@ -121,7 +121,7 @@ public class DataFileSourceFunctor extends DataSourceFunctor {
 			        while (true) {
 			        	row = in.readLine();
 			        	if(row != null){
-			        		Tuple newTuple = new Tuple(fields, new Values(row));	
+			        		Tuple newTuple = new Tuple(outFields, new Values(row));	
 							this.emit(newTuple, self());
 							
 							if(++c % maxSizeToSleep == 0){

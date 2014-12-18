@@ -16,6 +16,7 @@ import akka.event.Logging;
 import akka.event.LoggingAdapter;
 
 public class KafkaDataSourceFunctor extends DataSourceFunctor {
+	
 	LoggingAdapter log = Logging.getLogger(getContext().system(), this);
 	
 	public KafkaDataSourceFunctor(DataFlowInfo dataFlowInfo, BaseTopology topology) {
@@ -23,7 +24,7 @@ public class KafkaDataSourceFunctor extends DataSourceFunctor {
 	}
 
 	//what data fields that this actor would send to next actor
-	static Fields fields = new Fields("log_row","topic","partitionId");
+	static Fields fields = new Fields(EVENT,"topic","partitionId");
 	List<KafkaData> kafkaDatas;
 	
 	@Override
