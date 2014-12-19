@@ -6,6 +6,8 @@ import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -67,6 +69,12 @@ public class DataFileSourceFunctor extends DataSourceFunctor {
 				String uriStr = result.getResult();
 				if(uriStr.startsWith("/")){
 					uriStr = StringUtil.toString(SCHEME_FILE_PREFIX , uriStr);
+				} else {
+					Path currentRelativePath = Paths.get("");
+					String s = currentRelativePath.toAbsolutePath().toString();
+					System.out.println(s);
+					uriStr = StringUtil.toString(SCHEME_FILE_PREFIX, s , "/" , uriStr);
+					System.out.println(uriStr);
 				}
 				
 				URI uri = new URI(uriStr);				

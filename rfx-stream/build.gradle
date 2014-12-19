@@ -20,6 +20,7 @@ dependencies {
     		,'commons-net:commons-net:3.3'    		
     		,'redis.clients:jedis:2.6.0'
     		,'org.apache.httpcomponents:httpclient:4.3.6'
+    		,'io.reactivex:rxjava:1.0.2'    		
     		
     		, fileTree(dir: 'lib', include: '**/*.jar')    		
     		,'commons-dbcp:commons-dbcp:1.4'

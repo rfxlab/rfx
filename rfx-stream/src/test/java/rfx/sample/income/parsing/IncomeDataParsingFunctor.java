@@ -26,7 +26,6 @@ public class IncomeDataParsingFunctor extends BaseFunctor  {
 			Tuple inputTuple = (Tuple) message;
 			try {				
 				String row = inputTuple.getStringByField(DataSourceFunctor.EVENT);
-				
 				//System.out.println(row);
 				String[] toks = row.split(",");
 				if(toks.length == 15){

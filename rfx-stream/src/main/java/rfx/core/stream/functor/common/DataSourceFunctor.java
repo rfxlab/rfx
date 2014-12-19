@@ -27,8 +27,6 @@ public abstract class DataSourceFunctor extends BaseFunctor {
 	public DataSourceFunctor(DataFlowInfo dataFlowInfo, BaseTopology topology) {
 		super(dataFlowInfo, topology);
 	}
-	
-	
 
 	public static void setMaxSizeToSleep(int maxSizeToSleep) {
 		DataSourceFunctor.maxSizeToSleep = maxSizeToSleep;
