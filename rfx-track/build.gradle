@@ -12,18 +12,18 @@ repositories {
 dependencies {
     compile (   		 	
 			'io.vertx:vertx-core:2.1.5'
-    		,'com.typesafe.akka:akka-actor_2.10:2.3.7'
+    		,'com.typesafe.akka:akka-actor_2.10:2.3.8'
     		,'com.google.code.gson:gson:2.3'    		
     		,'log4j:log4j:1.2.17'    	
     		,'org.jsoup:jsoup:1.8.1'    		
     		,'org.apache.commons:commons-lang3:3.3.2'
     		,'commons-net:commons-net:3.3'    		
-    		,'redis.clients:jedis:2.6.0'
+    		,'redis.clients:jedis:2.6.1'
     		,'org.apache.httpcomponents:httpclient:4.3.6'
 
     		, fileTree(dir: 'lib', include: '**/*.jar')    		
     		,'org.apache.kafka:kafka_2.10:0.8.1.1'
-    		,'com.google.guava:guava:18.0'    				
+    		,'com.google.guava:guava:18.0'
     		)
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }
