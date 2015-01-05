@@ -99,6 +99,7 @@ public abstract class BaseFunctor extends UntypedActor implements Metricable{
 		}
 		return null;
 	}
+	
 	protected final synchronized AtomicLong counter(String metricName) {
 		AtomicLong counter = counters.get(metricName);
 		if(counter == null){
