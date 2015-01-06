@@ -1,6 +1,6 @@
 package rfx.sample.social.tracking;
 
-import rfx.core.stream.functor.common.TokenizingDefaultEventLog;
+import rfx.core.stream.functor.common.HttpEventTokenizing;
 import rfx.core.stream.topology.BaseTopology;
 import rfx.core.stream.topology.Pipeline;
 import rfx.core.util.LogUtil;
@@ -20,7 +20,7 @@ public class TrackingUserTopology extends BaseTopology  {
 	public BaseTopology buildTopology(){
 		LogUtil.setPrefixFileName(TOPIC_SOCIAL_ACTIVITY);		
 		return Pipeline.create(this)
-				.apply(TokenizingDefaultEventLog.class)
+				.apply(HttpEventTokenizing.class)
 				.apply(ParsingSocialActivityLog.class)
 				.apply(FindingSocialTrends.class)	
 				.done();

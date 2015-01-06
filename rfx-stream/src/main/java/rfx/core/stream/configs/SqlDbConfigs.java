@@ -58,6 +58,7 @@ public class SqlDbConfigs implements Serializable {
 	private int port;
 	private String dbdriver;
 	private String dbdriverclasspath;
+	private boolean enabled = true;
 	
 	
 	static final Map<String,SqlDbConfigs> sqlDbConfigsCache = new HashMap<String,SqlDbConfigs>(6);
@@ -225,6 +226,12 @@ public class SqlDbConfigs implements Serializable {
 	}
 	public void setDbId(String dbId) {
 		this.dbId = dbId;
+	}
+	public boolean isEnabled() {
+		return enabled;
+	}
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
 	}
 
 	public DataSource getDataSource() throws IllegalArgumentException{

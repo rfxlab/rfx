@@ -27,7 +27,7 @@ public class UserTrackingLogTokenizer extends BaseFunctor {
 		if (message instanceof Tuple) {
 			this.doPreProcessing();
 			Tuple inputTuple = (Tuple) message;
-			Tuple outTuple = processor.processToTuple(inputTuple, outputFields);
+			Tuple outTuple = processor.process(inputTuple, outputFields);
 
 			if (outTuple != null) {
 				// output to next phase
@@ -47,7 +47,7 @@ public class UserTrackingLogTokenizer extends BaseFunctor {
 	
 	static class UserTrackingLogProcessor extends Processor{
 		@Override
-		public Tuple processToTuple(Tuple inputTuple, Fields outputMetadataFields) {
+		public Tuple process(Tuple inputTuple, Fields outputMetadataFields) {
 			String logRow = inputTuple.getStringByField(DataSourceFunctor.EVENT);
 	    	String topic = inputTuple.getStringByField("topic");
 	    	String partitionId = inputTuple.getStringByField("partitionId");	    	

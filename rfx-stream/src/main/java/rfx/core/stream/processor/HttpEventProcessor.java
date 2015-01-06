@@ -13,7 +13,7 @@ import rfx.core.util.StringUtil;
  * @author trieu
  *
  */
-public class TokenProcessor extends Processor{
+public class HttpEventProcessor extends Processor{
 
 	public static final String PARTITION_ID = "partitionId";
 	public static final String TOPIC = "topic";
@@ -27,7 +27,7 @@ public class TokenProcessor extends Processor{
 	public static final String TAB_STRING = "\t";
 
 	@Override
-	public Tuple processToTuple(Tuple inputTuple, Fields outFields) {
+	public Tuple process(Tuple inputTuple, Fields outFields) {
 		String logRow = inputTuple.getStringByField(DataSourceFunctor.EVENT);
     	String topic = inputTuple.getStringByField(TOPIC,_FROM_FILE);
     	String partitionId = inputTuple.getStringByField(PARTITION_ID,_EMPTY);	    	
