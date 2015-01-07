@@ -4,7 +4,7 @@ import org.vertx.java.core.http.HttpServerRequest;
 
 import server.http.handler.BaseHttpHandler;
 import server.http.util.RedirectUtil;
-import server.http.util.ResponseUtil;
+import server.http.util.LogHandlerUtil;
 
 public class ItemTrackHttpHandler extends BaseHttpHandler {
 	
@@ -36,12 +36,12 @@ public class ItemTrackHttpHandler extends BaseHttpHandler {
 		//just for dev
 		else if(uri.startsWith(logItemTracking)){
 			//handle request for ITEM TRACKING				
-			ResponseUtil.logRequestToKafka(req, logItemTracking);
+			LogHandlerUtil.logRequestToKafka(req, logItemTracking);
 			return true;
 		}	
 		else if(uri.startsWith(logUserActivity)){
 			//handle request for ITEM TRACKING				
-			ResponseUtil.logRequestToKafka(req, logUserActivity);
+			LogHandlerUtil.logRequestToKafka(req, logUserActivity);
 			return true;
 		}	
 		return false;

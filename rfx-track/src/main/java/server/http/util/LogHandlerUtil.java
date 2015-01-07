@@ -11,10 +11,11 @@ import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.json.impl.Base64;
 
 import rfx.core.util.SecurityUtil;
+import server.http.model.HttpEventKafkaLog;
 import server.kafka.HttpLogKafkaHandler;
 import server.kafka.KafkaLogHandler;
 
-public class ResponseUtil {
+public class LogHandlerUtil {
 	
 	public static final String BASE64_GIF_BLANK = "R0lGODlhAQABAIAAAAAAAAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==";
 	static final byte[] DECODED_GIF_1PX_BYTES = Base64.decode(BASE64_GIF_BLANK);
@@ -45,6 +46,16 @@ public class ResponseUtil {
 			System.err.println("No KafkaLogHandler found for " + kafkaType);
 		}
 		trackingResponse(req);
+	}
+	
+	public static void logRequestToKafka(HttpEventKafkaLog el ){
+		String kafkaType = el.getEventType();
+		KafkaLogHandler kafkaHandler = HttpLogKafkaHandler.getKafkaHandler(kafkaType );
+		if (kafkaHandler != null) {
+			kafkaHandler.writeLogToKafka(el);
+		} else {
+			System.err.println("No KafkaLogHandler found for " + kafkaType);
+		}		
 	}
 
 }

@@ -3,7 +3,9 @@ package sample.hello;
 import java.util.TimerTask;
 
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerRequest;
+import org.vertx.java.core.net.NetSocket;
 
 import redis.clients.jedis.ShardedJedisPool;
 import redis.clients.jedis.exceptions.JedisException;
@@ -24,6 +26,18 @@ public class HelloWorker extends BaseWorker {
 
     @Override
     public void start(String host, int port) {
+    	 registerWorkerTcpHandler(host, port+1, new Handler<NetSocket>() {
+ 			@Override
+ 			public void handle(final NetSocket event) {
+ 				event.dataHandler(new Handler<Buffer>() {
+ 					public void handle(Buffer buffer) {
+ 						System.out.println(buffer.toString());
+ 						event.write("ok");
+ 					}
+ 				});
+ 			}
+ 		});
+    	
         Handler<HttpServerRequest> handler = new Handler<HttpServerRequest>() {
 
             public void handle(HttpServerRequest request) {
@@ -50,7 +64,7 @@ public class HelloWorker extends BaseWorker {
             @Override
             protected Boolean build() throws JedisException {
                 jedis = shardedJedis.getShard(StringPool.BLANK);
-                String workerName = StringUtil.toString(host.replaceAll("\\.", ""), "_", port);
+                String workerName = StringUtil.toString(publicHost.replaceAll("\\.", ""), "_", publicPort);
                 WorkerTimeLog timeLog = new Gson().fromJson(
                         jedis.hget(ClusterDataManager.CLUSTER_WORKER_PREFIX, workerName
                                 + ClusterDataManager.WORKER_TIMELOG_POSTFIX), WorkerTimeLog.class);
@@ -70,17 +84,16 @@ public class HelloWorker extends BaseWorker {
         }
         
         timer.schedule(new TimerTask() {
-
             @Override
             public void run() {
-                ClusterDataManager.updateWorkerData(host, port);
+                ClusterDataManager.updateWorkerData(publicHost, publicPort);
             }
         }, 2000, 2000);
     }
 
     public static void main(String[] args) {
-        String host = args[0];
-        int port = StringUtil.safeParseInt(args[1]);
+        String host = "localhost";//args[0];
+        int port = 8080;//StringUtil.safeParseInt(args[1]);
         String name = host + "_" + port;
 
         BaseWorker worker = new HelloWorker(name);

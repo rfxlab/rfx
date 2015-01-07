@@ -13,6 +13,8 @@ import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpServerResponse;
 import org.vertx.java.core.http.RouteMatcher;
+import org.vertx.java.core.net.NetServer;
+import org.vertx.java.core.net.NetSocket;
 
 import redis.clients.jedis.ShardedJedisPool;
 import redis.clients.jedis.exceptions.JedisException;
@@ -34,6 +36,14 @@ import com.google.gson.Gson;
  */
 public abstract class BaseWorker {
 	
+	private static final String URI_GET_SERVER_TIME = "/get/server-time";
+	private static final String URI_GET_HOST = "/get/host";
+	private static final String URI_GET_NAME = "/get/name";
+	private static final String URI_GET_STATUS = "/get/status";
+	private static final String URI_KILL = "/kill";
+	private static final String URI_RESTART = "/restart";
+	private static final String URI_PAUSE = "/pause";
+	private static final String URI_PING = "/ping";
 	public final int STARTING = 0;
 	public final int STARTED = 1;
 	public final int RUNNING = 2;
@@ -42,8 +52,10 @@ public abstract class BaseWorker {
 	
 	static BaseWorker _worker;
 	
-	protected String host;
-	protected int port;
+	protected String publicHost;
+	protected int publicPort;
+	protected String privateHost;
+	protected int privatePort;
 	protected String name;
 	protected String classnameWorker = getClass().getName();
 	protected int status = -1;
@@ -81,12 +93,20 @@ public abstract class BaseWorker {
 		return status;
 	}
 	
-	final public String getHost() {
-		return host;
+	final public String getPublicHost() {
+		return publicHost;
 	}
 
-	final public int getPort() {
-		return port;
+	final public int getPublicPort() {
+		return publicPort;
+	}
+
+	final public String getPrivateHost() {
+		return privateHost;
+	}
+
+	final public int getPrivatePort() {
+		return privatePort;
 	}
 
 	@Override
@@ -114,10 +134,26 @@ public abstract class BaseWorker {
 			return null;
 		}
 		try {
-			this.host = host;
-			this.port = port;
+			this.publicHost = host;
+			this.publicPort = port;
 			Vertx vertx = VertxFactory.newVertx();    
 			return vertx.createHttpServer();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	private NetServer checkAndCreateNetServer(String host, int port){
+		if(isAddressAlreadyInUse(host, port)){
+			System.err.println(host+":"+port + " isAddressAlreadyInUse!");
+			Utils.exitSystemAfterTimeout(200);
+			return null;
+		}
+		try {
+			this.privateHost = host;
+			this.privatePort = port;			
+			return VertxFactory.newVertx().createNetServer();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -127,6 +163,7 @@ public abstract class BaseWorker {
 	final protected void registerWorkerHttpHandler(String host, int port, Handler<HttpServerRequest> handler) {
 		HttpServer server = checkAndCreateHttpServer(host, port);
 		if(server == null){
+			System.err.println("registerWorkerHttpHandler return NULL value");
 			return;
 		}
 		server.requestHandler(handler).listen(port, host);
@@ -136,10 +173,23 @@ public abstract class BaseWorker {
 	final protected void registerWorkerHttpHandler(String host, int port, RouteMatcher routeMatcher) {
 		HttpServer server = checkAndCreateHttpServer(host, port);
 		if(server == null){
+			System.err.println("registerWorkerHttpHandler return NULL value");
 			return;
 		}
 		server.requestHandler(routeMatcher).listen(port, host);
 		registerWorkerNodeIntoCluster();		
+	}
+	
+	final protected void registerWorkerTcpHandler(String host, int port, Handler<NetSocket> handler) {
+		NetServer server = checkAndCreateNetServer(host, port);
+		if(server == null){
+			System.err.println("checkAndCreateNetServer return NULL value");
+			return;
+		}
+		System.out.println(String.format("...registerWorkerTcpHandler %s:%s",host,port));
+		server.connectHandler(handler).listen(port, host);
+		//TODO
+		//registerWorkerNodeIntoCluster();		
 	}
 	
 	final synchronized protected void killWorker(){
@@ -149,7 +199,7 @@ public abstract class BaseWorker {
 	            @Override
 	            protected Boolean build() throws JedisException {
 	                jedis = shardedJedis.getShard(StringPool.BLANK);
-	                String workerName = StringUtil.toString(host.replaceAll("\\.", ""), "_", port);
+	                String workerName = StringUtil.toString(publicHost.replaceAll("\\.", ""), "_", publicPort);
 	                WorkerTimeLog timeLog = new Gson().fromJson(jedis.hget(ClusterDataManager.CLUSTER_WORKER_PREFIX, workerName + ClusterDataManager.WORKER_TIMELOG_POSTFIX), WorkerTimeLog.class);
 	                if (timeLog == null) {
 	                    timeLog = new WorkerTimeLog();
@@ -191,7 +241,7 @@ public abstract class BaseWorker {
             @Override
             protected Boolean build() throws JedisException {
                 jedis = shardedJedis.getShard(StringPool.BLANK);
-                String workerName = StringUtil.toString(host.replaceAll("\\.", ""), "_", port);
+                String workerName = StringUtil.toString(publicHost.replaceAll("\\.", ""), "_", publicPort);
                 WorkerTimeLog timeLog = new Gson().fromJson(jedis.hget(ClusterDataManager.CLUSTER_WORKER_PREFIX, workerName + ClusterDataManager.WORKER_TIMELOG_POSTFIX), WorkerTimeLog.class);
                 if (timeLog == null) {
                     timeLog = new WorkerTimeLog();
@@ -205,7 +255,7 @@ public abstract class BaseWorker {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                ClusterDataManager.updateWorkerData(host, port);
+                ClusterDataManager.updateWorkerData(publicHost, publicPort);
             }
         }, 2000, 2000);
         
@@ -216,7 +266,7 @@ public abstract class BaseWorker {
 			startProcessing();			
 		}
 		
-		System.out.println("started worker Ok at ADDRESS[ "+this.host + ":" + this.port + "] classname:" +classnameWorker);
+		System.out.println("started worker Ok at ADDRESS[ "+this.publicHost + ":" + this.publicPort + "] classname:" +classnameWorker);
 		Utils.foreverLoop();
 	}
 	
@@ -229,31 +279,31 @@ public abstract class BaseWorker {
 	final protected boolean handleRequestToBaseWorker(HttpServerRequest request){
 		String uri = request.absoluteURI().getPath();
 		HttpServerResponse res = request.response();
-		if (uri.equalsIgnoreCase("/ping")) {
+		if (uri.equalsIgnoreCase(URI_PING)) {
         	res.end("PONG");
             return true;
-        } else if (uri.equalsIgnoreCase("/pause")) {
+        } else if (uri.equalsIgnoreCase(URI_PAUSE)) {
         	pauseWorker();
 			res.end("paused");
 			return true;
-        } else if (uri.equalsIgnoreCase("/restart")) {
+        } else if (uri.equalsIgnoreCase(URI_RESTART)) {
         	restartWorker();
 			res.end("restarted");
 			return true;
-        } else if (uri.equalsIgnoreCase("/kill")) {
+        } else if (uri.equalsIgnoreCase(URI_KILL)) {
 			res.end("Exiting...");
             killWorker();
             return true;
-        } else if (uri.equalsIgnoreCase("/get/status")) {        	
+        } else if (uri.equalsIgnoreCase(URI_GET_STATUS)) {        	
         	res.end(""+status);
         	return true;
-        } else if (uri.equalsIgnoreCase("/get/name")) {        	
+        } else if (uri.equalsIgnoreCase(URI_GET_NAME)) {        	
         	res.end(getName());
         	return true;
-        } else if (uri.equalsIgnoreCase("/get/host")) {        	
-        	res.end(getHost()+":"+getPort());
+        } else if (uri.equalsIgnoreCase(URI_GET_HOST)) {        	
+        	res.end(getPublicHost()+":"+getPublicPort());
         	return true;
-        } else if (uri.equalsIgnoreCase("/get/server-time")) {        	
+        } else if (uri.equalsIgnoreCase(URI_GET_SERVER_TIME)) {        	
         	res.end(new Date().toString());
         	return true;
         }
@@ -265,8 +315,7 @@ public abstract class BaseWorker {
 			status = RUNNING;
 			onProcessing();
 		}
-	}
-	
+	}	
 	
 	// for the implementer
 	public abstract void start(String host, int port);

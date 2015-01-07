@@ -49,7 +49,7 @@ public class OtherWorker extends BaseWorker {
             @Override
             protected Boolean build() throws JedisException {
                 jedis = shardedJedis.getShard(StringPool.BLANK);
-                String workerName = StringUtil.toString(host.replaceAll("\\.", ""), "_", port);
+                String workerName = StringUtil.toString(publicHost.replaceAll("\\.", ""), "_", publicPort);
                 WorkerTimeLog timeLog = new Gson().fromJson(
                         jedis.hget(ClusterDataManager.CLUSTER_WORKER_PREFIX, workerName
                                 + ClusterDataManager.WORKER_TIMELOG_POSTFIX), WorkerTimeLog.class);
@@ -67,7 +67,7 @@ public class OtherWorker extends BaseWorker {
 
             @Override
             public void run() {
-                ClusterDataManager.updateWorkerData(host, port);
+                ClusterDataManager.updateWorkerData(publicHost, publicPort);
             }
         }, 2000, 2000);
     }

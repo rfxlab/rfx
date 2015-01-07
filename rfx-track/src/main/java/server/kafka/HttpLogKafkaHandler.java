@@ -26,6 +26,7 @@ import rfx.core.util.StringPool;
 import rfx.core.util.StringUtil;
 import rfx.core.util.Utils;
 import server.http.configs.KafkaProducerConfigs;
+import server.http.model.HttpEventKafkaLog;
 
 public class HttpLogKafkaHandler implements KafkaLogHandler {
 	
@@ -83,8 +84,6 @@ public class HttpLogKafkaHandler implements KafkaLogHandler {
 		}		
 	}
 	
-	
-	
 	public void shutdown() {
 		//executor.shutdown();
 		//producer.close();		
@@ -131,10 +130,9 @@ public class HttpLogKafkaHandler implements KafkaLogHandler {
 			}
 		}, 15000, 15000);
 		randomGenerator = new Random();
-	}	
+	}
 	
-	@Override
-	public void writeLogToKafka(String ip, String userAgent, String logDetails, String cookieString){
+	void writeLogToKafka(String ip, String userAgent, String logDetails, String cookieString){
 		if( ! writeToKafka){
 			//skip write logs to Kafka
 			return;
@@ -174,8 +172,8 @@ public class HttpLogKafkaHandler implements KafkaLogHandler {
 		if(idx < 0){
 			return;
 		}
-		String logDetails = uri.substring(idx+1);
-		if(StringUtil.isEmpty(logDetails)){
+		String queryStr = uri.substring(idx+1);
+		if(StringUtil.isEmpty(queryStr)){
 			return;
 		}
 		MultiMap headers = request.headers();
@@ -194,8 +192,12 @@ public class HttpLogKafkaHandler implements KafkaLogHandler {
 		if(StringUtil.isNotEmpty(referer)){
 			cookieStBuilder.append("; referer=").append(referer);
 		}		
-		writeLogToKafka(remoteIp, userAgent, logDetails, cookieStBuilder.toString());		
+		writeLogToKafka(remoteIp, userAgent, queryStr, cookieStBuilder.toString());		
 	}
-	
+
+	@Override
+	public void writeLogToKafka(HttpEventKafkaLog el) {
+		writeLogToKafka(el.getIp(), el.getUserAgent(), el.getLogDetails(), el.getCookieString());
+	}	
 
 }

@@ -9,6 +9,7 @@ import rfx.core.util.Utils;
 import server.http.configs.KafkaProducerConfigs;
 import server.http.handler.BaseHttpHandler;
 import server.http.handler.DefaultTrackingHttpHandler;
+import server.http.handler.DefaultTrackingTcpHandler;
 import server.kafka.HttpLogKafkaHandler;
 
 /**
@@ -18,7 +19,7 @@ import server.kafka.HttpLogKafkaHandler;
  *
  */
 public class HttpLogCollector extends BaseWorker {	
-	public static final String version = "Rfx-event-tracking-server - version 1.0";
+	public static final String version = "RFX-Event-Collector - version 1.1";
 	static KafkaProducerConfigs kafkaProducerConfigs = KafkaProducerConfigs.load();
 	
 	public static void createHttpLogCollector(String name, String host, int port){
@@ -31,9 +32,8 @@ public class HttpLogCollector extends BaseWorker {
 		super(name);
 	}
 	
-	@Override
-	public void start(String host, int port) {
-		BaseHttpHandler theHandler;
+	BaseHttpHandler getHttpHandler(){
+		BaseHttpHandler theHandler = null;
 		try {
 			String className = kafkaProducerConfigs.getDefaultHttpHandlerClass();
 			if(StringUtil.isNotEmpty(className)){
@@ -45,8 +45,17 @@ public class HttpLogCollector extends BaseWorker {
 			e.printStackTrace();
 			System.out.println("defaultHttpHandlerClass is NULL");
 			Utils.exitSystemAfterTimeout(500);
-			return;
+			return theHandler;
 		} 
+		return theHandler;
+	}
+	
+	@Override
+	public void start(String host, int port) {
+		//private port
+		registerWorkerTcpHandler(host, port+1, new DefaultTrackingTcpHandler());
+		
+		BaseHttpHandler theHandler = getHttpHandler();		
 		if(theHandler == null){
 			return;
 		}
@@ -58,7 +67,7 @@ public class HttpLogCollector extends BaseWorker {
 					req.response().end(version);
 				}
 			}
-		});
+		});		
 	}
 
 	@Override

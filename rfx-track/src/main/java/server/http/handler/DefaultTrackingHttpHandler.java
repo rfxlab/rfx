@@ -6,7 +6,7 @@ import org.vertx.java.core.http.HttpServerRequest;
 
 import rfx.core.util.StringPool;
 import server.http.configs.KafkaProducerConfigs;
-import server.http.util.ResponseUtil;
+import server.http.util.LogHandlerUtil;
 
 public class DefaultTrackingHttpHandler extends BaseHttpHandler {
 	private static final String PONG = "PONG";
@@ -26,7 +26,7 @@ public class DefaultTrackingHttpHandler extends BaseHttpHandler {
 		}		
 		else if(kafkaProducerConfigs.get(key) != null){
 			//log request to Kafka 		
-			ResponseUtil.logRequestToKafka(req, key);
+			LogHandlerUtil.logRequestToKafka(req, key);
 			return true;
 		}	
 		return false;

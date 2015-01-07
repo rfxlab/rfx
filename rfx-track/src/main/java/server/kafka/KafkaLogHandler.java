@@ -2,6 +2,8 @@ package server.kafka;
 
 import org.vertx.java.core.http.HttpServerRequest;
 
+import server.http.model.HttpEventKafkaLog;
+
 public interface KafkaLogHandler {
 	
 	/**
@@ -10,7 +12,7 @@ public interface KafkaLogHandler {
 	 * @param ip
 	 * @param request
 	 */
-	public abstract void writeLogToKafka(String ip, String userAgent, String logDetails, String cookieString);
+	public abstract void writeLogToKafka(HttpEventKafkaLog el);
 
 	public abstract void writeLogToKafka(HttpServerRequest req);
 	
