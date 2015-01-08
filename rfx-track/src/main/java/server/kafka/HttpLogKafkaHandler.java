@@ -40,7 +40,7 @@ public class HttpLogKafkaHandler implements KafkaLogHandler {
 		
 	private static Map<String, HttpLogKafkaHandler> _kafkaHandlerList = new HashMap<>();
 	
-	static boolean writeToKafka =  httpServerConfigs.getWriteKafkaLogEnable() == 1;
+	static final boolean writeToKafka =  httpServerConfigs.getWriteKafkaLogEnable() == 1;
 	AtomicLong counter = new AtomicLong();
 
 	private List<SendLogBufferTask> logBufferList = new ArrayList<>(NUM_BATCH_JOB);
@@ -135,8 +135,9 @@ public class HttpLogKafkaHandler implements KafkaLogHandler {
 	void writeLogToKafka(String ip, String userAgent, String logDetails, String cookieString){
 		if( ! writeToKafka){
 			//skip write logs to Kafka
+			System.out.println("Skip writeLogToKafka for log: "+logDetails);
 			return;
-		}		
+		}
 		countingToDebug();			
 		int index = randomGenerator.nextInt(logBufferList.size());
 		try {

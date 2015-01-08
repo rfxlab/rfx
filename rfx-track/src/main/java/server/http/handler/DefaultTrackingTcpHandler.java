@@ -4,6 +4,7 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.net.NetSocket;
 
+import rfx.core.util.Utils;
 import server.http.model.HttpEventKafkaLog;
 import server.http.util.LogHandlerUtil;
 
@@ -16,10 +17,15 @@ public class DefaultTrackingTcpHandler implements Handler<NetSocket> {
 	@Override
 	public void handle(final NetSocket event) {		
 		event.dataHandler(new Handler<Buffer>() {
-			public void handle(Buffer buffer) {
-				String json = buffer.toString();
-				HttpEventKafkaLog el = new Gson().fromJson(json, HttpEventKafkaLog.class);
-				LogHandlerUtil.logRequestToKafka(el);
+			public void handle(Buffer buffer) {				
+				
+				String json = new String(buffer.getBytes());
+				System.out.println(json);
+				System.out.println();
+				System.out.println(buffer.toString());
+				
+				//Utils.sleep(100);				
+				LogHandlerUtil.logRequestToKafka(json);
 				event.write(OK);
 			}
 		});

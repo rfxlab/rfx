@@ -1,5 +1,5 @@
 {    
-	writeKafkaLogEnable : 1,
+	writeKafkaLogEnable : 0,
     
     numberBatchJob : 2,
     sendKafkaThreadPerBatchJob : 3,
@@ -18,6 +18,10 @@
         },
         u : {
             kafkaTopic : "user-activity",
+            brokerList : "127.0.0.1:9092"
+        },
+        c : {
+            kafkaTopic : "click",
             brokerList : "127.0.0.1:9092"
         }
     }

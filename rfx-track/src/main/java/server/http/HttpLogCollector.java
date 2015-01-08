@@ -6,11 +6,16 @@ import org.vertx.java.core.http.HttpServerRequest;
 import rfx.core.stream.node.worker.BaseWorker;
 import rfx.core.util.StringUtil;
 import rfx.core.util.Utils;
+import rfx.core.util.netty.BootstrapTemplate;
 import server.http.configs.KafkaProducerConfigs;
 import server.http.handler.BaseHttpHandler;
 import server.http.handler.DefaultTrackingHttpHandler;
 import server.http.handler.DefaultTrackingTcpHandler;
+import server.http.model.HttpEventKafkaLog;
+import server.http.util.LogHandlerUtil;
 import server.kafka.HttpLogKafkaHandler;
+import server.log.CallbackProcessor;
+import server.log.EventKafkaLogReceiver;
 
 /**
  * The HTTP server instance 
@@ -52,10 +57,17 @@ public class HttpLogCollector extends BaseWorker {
 	
 	@Override
 	public void start(String host, int port) {
-		//private port
-		registerWorkerTcpHandler(host, port+1, new DefaultTrackingTcpHandler());
+		//private port		
+//		EventKafkaLogReceiver.listen(host, port+1, new CallbackProcessor() {			
+//			@Override
+//			public void process(Object obj) {
+//				if(obj instanceof HttpEventKafkaLog){
+//					LogHandlerUtil.logRequestToKafka((HttpEventKafkaLog) obj);
+//				}
+//			}
+//		});
 		
-		BaseHttpHandler theHandler = getHttpHandler();		
+		final BaseHttpHandler theHandler = getHttpHandler();		
 		if(theHandler == null){
 			return;
 		}
