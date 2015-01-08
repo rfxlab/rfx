@@ -8,8 +8,10 @@ import server.http.util.RedirectUtil;
 
 public class ItemTrackHttpHandler extends BaseHttpHandler {
 		
+	private static final String PONG = "PONG";
+	private static final String DATA = "data";
 	private static final String FAVICON_ICO = "favicon.ico";
-	private static final String DIRECT_WRITE = "direct-write";
+	private static final String LOG_DATA = "log-data";
 	private static final String PING = "ping";
 	static final String logItemTracking = "tk";
 	static final String logUserActivity = "u";
@@ -26,10 +28,9 @@ public class ItemTrackHttpHandler extends BaseHttpHandler {
 		
 		System.out.println("URI: " + uri);		
 		//common
-		if(uri.startsWith(DIRECT_WRITE)){			
-			String json = req.params().get("data");
-			LogHandlerUtil.trackingResponse(req);
-			LogHandlerUtil.logRequestToKafka(json);			
+		if(uri.startsWith(LOG_DATA)){			
+			String json = req.params().get(DATA);
+			LogHandlerUtil.logDataToKafka(req,json);			
 			return true;
 		} 
 		else if (uri.equalsIgnoreCase(FAVICON_ICO)) {
@@ -37,7 +38,7 @@ public class ItemTrackHttpHandler extends BaseHttpHandler {
 			return true;
 		}
 		else if (uri.equalsIgnoreCase(PING)) {
-			req.response().end("PONG");
+			req.response().end(PONG);
 			return true;
 		}
 		else if (uri.startsWith(redirectClickPrefix)) {
@@ -47,12 +48,12 @@ public class ItemTrackHttpHandler extends BaseHttpHandler {
 		//just for dev
 		else if(uri.startsWith(logItemTracking)){
 			//handle request for ITEM TRACKING				
-			LogHandlerUtil.logRequestToKafka(req, logItemTracking);
+			LogHandlerUtil.logHttpRequestToKafka(req, logItemTracking);
 			return true;
 		}	
 		else if(uri.startsWith(logUserActivity)){
 			//handle request for ITEM TRACKING				
-			LogHandlerUtil.logRequestToKafka(req, logUserActivity);
+			LogHandlerUtil.logHttpRequestToKafka(req, logUserActivity);
 			return true;
 		} 
 		return false;

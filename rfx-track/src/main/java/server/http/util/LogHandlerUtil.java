@@ -42,7 +42,7 @@ public class LogHandlerUtil {
 		return result;
 	}
 	
-	public static void logRequestToKafka(HttpServerRequest req, String kafkaType){
+	public static void logHttpRequestToKafka(HttpServerRequest req, String kafkaType){
 		KafkaLogHandler kafkaHandler = HttpLogKafkaHandler.getKafkaHandler(kafkaType);
 		if (kafkaHandler != null) {
 			kafkaHandler.writeLogToKafka(req);
@@ -51,8 +51,12 @@ public class LogHandlerUtil {
 		}
 		trackingResponse(req);
 	}
+	public static void logDataToKafka(HttpServerRequest req, String json){
+		LogHandlerUtil.trackingResponse(req);
+		logRequestToKafka(json);
+	}
 	
-	public static void logRequestToKafka(String json){
+	public static void logRequestToKafka(String json){		
 		if(StringUtil.isEmpty(json)){
 			return;
 		}

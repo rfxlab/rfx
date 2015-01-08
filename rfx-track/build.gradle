@@ -82,13 +82,13 @@ jar {
     }
 }
 
-task sampleItemTrackHttpServer(type: Jar) {	
+task clickTrackHttpServer(type: Jar) {	
 	dependsOn classes   
     from(sourceSets.test.output) {
         include "**"
     }  
     version = '1.0'
-    baseName = 'sample-item-track'
+    baseName = 'click-track-server'
     manifest {
    		attributes ('Implementation-Title': 'ItemTrackHttpServer', 
         			'Implementation-Version': version ,

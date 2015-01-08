@@ -26,7 +26,7 @@ public class DefaultTrackingHttpHandler extends BaseHttpHandler {
 		}		
 		else if(kafkaProducerConfigs.get(key) != null){
 			//log request to Kafka 		
-			LogHandlerUtil.logRequestToKafka(req, key);
+			LogHandlerUtil.logHttpRequestToKafka(req, key);
 			return true;
 		}	
 		return false;
