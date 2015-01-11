@@ -42,7 +42,7 @@ import akka.actor.Props;
 import com.typesafe.config.Config;
 
 /**
- * The BaseTopology for RFX topology
+ * The BaseTopology for distributed processing
  * 
  * @author trieu
  *

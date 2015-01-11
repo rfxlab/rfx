@@ -4,22 +4,21 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import rfx.core.stream.emitters.EmittedDataListener;
 import rfx.core.stream.topology.BaseTopology;
 import rfx.core.stream.topology.Pipeline;
+import rfx.core.stream.topology.PipelineTopology;
 import rfx.core.util.Utils;
 import rfx.sample.income.parsing.IncomeDataParsingFunctor;
 import rfx.sample.income.parsing.PersonProcessingFunctor;
 
 
-public class IncomeDataProcessingTopology extends BaseTopology  {
+public class IncomeDataProcessingTopology extends PipelineTopology  {
 
 	@Override
-	public BaseTopology buildTopology(){
+	public BaseTopology build(){
 		return Pipeline.create(this)				
 				.apply(IncomeDataParsingFunctor.class)
 				.apply(PersonProcessingFunctor.class)		
