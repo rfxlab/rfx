@@ -89,7 +89,7 @@ public class DataFileSourceFunctor extends DataSourceFunctor {
 							br = new BufferedReader(new FileReader(file));
 							String line;
 							while((line = br.readLine()) != null) {
-								this.emitStringTuple(outFields,line);
+								this.emit(outFields,line);
 								if(++c % maxSizeToSleep == 0){
 									Utils.sleep(400);
 								}

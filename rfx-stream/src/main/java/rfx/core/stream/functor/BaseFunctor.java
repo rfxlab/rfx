@@ -19,7 +19,7 @@ import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
 
 /**
- * abstract Functor: functional actor, the interface for reactive data processing entity <br>
+ * base class: lambda functional actor, the reactive data processing entity <br>
  * @author trieu
  */
 public abstract class BaseFunctor extends UntypedActor implements Metricable{
@@ -60,14 +60,17 @@ public abstract class BaseFunctor extends UntypedActor implements Metricable{
 	/**
 	 * emit a tuple from sender to defined receiver in topology 
 	 * 
-	 * @param newTuple
-	 * @param sender
+	 * @param Tuple newT
 	 */
-	protected final void emit(Tuple newTuple) {		
-		ActorUtil.sendToActor(dataFlowInfo, newTuple, self());
+	protected final void emit(Tuple tuple) {		
+		ActorUtil.sendToActor(dataFlowInfo, tuple, self());
 	}
 	
-	protected final void emitStringTuple(Fields fields, String row){
+	/**
+	 * @param Fields fields
+	 * @param String row
+	 */
+	protected final void emit(Fields fields, String row){
 		if(StringUtil.isEmpty(row)){
 			return;
 		}
