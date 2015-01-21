@@ -26,14 +26,14 @@ import rfx.core.util.DateTimeUtil;
 import rfx.core.util.LogUtil;
 import rfx.core.util.StringUtil;
 
-public class ParsingSocialActivityLog extends BaseFunctor {
+public class UserSocialActivityCounting extends BaseFunctor {
 	
 	static Parser uaParser = Parser.load();
 	static ShardedJedisPool jedisPool = ClusterInfoConfigs.load().getClusterInfoRedis().getShardedJedisPool();
 	static final int MAX_IP_COUNT_PER_MINUTE = 5;
 	static Fields outputFields = new Fields("loggedTime","reading_url","cookie");
 
-	protected ParsingSocialActivityLog(DataFlowInfo dataFlowInfo, BaseTopology topology) {
+	protected UserSocialActivityCounting(DataFlowInfo dataFlowInfo, BaseTopology topology) {
 		super(dataFlowInfo, topology);
 	}
 

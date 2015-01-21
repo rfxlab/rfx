@@ -10,9 +10,9 @@ import rfx.core.stream.topology.BaseTopology;
  * @author trieunt
  *
  */
-public abstract class BaseProcessor extends BaseFunctor {
+public abstract class StreamProcessor extends BaseFunctor {
 	
-	protected BaseProcessor(DataFlowInfo dataFlowInfo, BaseTopology topology) {
+	protected StreamProcessor(DataFlowInfo dataFlowInfo, BaseTopology topology) {
 		super(dataFlowInfo, topology);
 	}
 

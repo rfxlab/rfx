@@ -1,8 +1,6 @@
 package rfx.core.stream.functor;
 
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -30,14 +28,14 @@ public abstract class BaseFunctor extends UntypedActor implements Metricable{
 	String metricKey;
 	
 	static {
-		Timer timer = new Timer(true);
-		timer.schedule(new TimerTask() {			
-			@Override
-			public void run() {
-				//ClusterDataManager.logMetrics(counters);
-				//TODo
-			}
-		}, 10000, 10000);		
+//		Timer timer = new Timer(true);
+//		timer.schedule(new TimerTask() {			
+//			@Override
+//			public void run() {
+//				//ClusterDataManager.logMetrics(counters);
+//				//TODO
+//			}
+//		}, 10000, 10000);		
 	}
 		
 	protected BaseFunctor(DataFlowInfo dataFlowInfo, BaseTopology topology) {

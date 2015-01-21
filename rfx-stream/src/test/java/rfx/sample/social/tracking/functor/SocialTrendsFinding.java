@@ -27,11 +27,11 @@ import rfx.core.util.HttpClientUtil;
  * to find trending keywords and most liked URL on Facebook
  *
  */
-public class FindingSocialTrends extends BaseFunctor {
+public class SocialTrendsFinding extends BaseFunctor {
 
 	static ShardedJedisPool jedisPool = ClusterInfoConfigs.load().getClusterInfoRedis().getShardedJedisPool();
 	
-	protected FindingSocialTrends(DataFlowInfo dataFlowInfo, BaseTopology topology) {
+	protected SocialTrendsFinding(DataFlowInfo dataFlowInfo, BaseTopology topology) {
 		super(dataFlowInfo, topology);
 	}
 	
