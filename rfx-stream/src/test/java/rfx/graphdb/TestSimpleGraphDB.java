@@ -1,12 +1,5 @@
 package rfx.graphdb;
 
-import java.util.List;
-
-import org.hypergraphdb.HGConfiguration;
-import org.hypergraphdb.HGEnvironment;
-import org.hypergraphdb.HGQuery.hg;
-import org.hypergraphdb.HyperGraph;
-import org.hypergraphdb.handle.SequentialUUIDHandleFactory;
 
 public class TestSimpleGraphDB {
 
@@ -68,34 +61,33 @@ public class TestSimpleGraphDB {
 		}
 	}
 
-	public static void main(String[] args) {
-		try {
-			
-			HGConfiguration config = new HGConfiguration();
-			config.setTransactional(false);
-			config.setSkipOpenedEvent(true);
-			String location = "data/hpg.data";
-			SequentialUUIDHandleFactory handleFactory =
-                    new SequentialUUIDHandleFactory(System.currentTimeMillis(), 0);
-			config.setHandleFactory(handleFactory);
-			HyperGraph graph = HGEnvironment.get(location, config);
-			hg.addUnique(graph, new Node("master"), hg.and(hg.type(Node.class), hg.gt("name","master")));
-						
-					
-			List<Name> hugos = hg.getAll(graph, hg.and(hg.type(Name.class), hg.gt("age",25) , hg.or( hg.eq("surname", "Hugo"), hg.eq("firstName", "Hugo") )));
-	        List<Name> noHugos = hg.getAll(graph, hg.and(hg.type(Name.class), hg.not(hg.or(hg.eq("surname", "Hugo"), hg.eq("firstName", "Hugo")))));
-
-	        for(Name n : hugos)
-	                System.out.println("hugo: surname:" + n.getSurname() + " . first name: " + n.getFirstName());
-
-	        for(Name n : noHugos)
-	            System.out.println("Not a Hugo: surname:" + n.getSurname() + " . first name: " + n.getFirstName());
-
-			graph.close();
-
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+//	public static void main(String[] args) {
+//		try {			
+//			HGConfiguration config = new HGConfiguration();
+//			config.setTransactional(false);
+//			config.setSkipOpenedEvent(true);
+//			String location = "data/hpg.data";
+//			SequentialUUIDHandleFactory handleFactory =
+//                    new SequentialUUIDHandleFactory(System.currentTimeMillis(), 0);
+//			config.setHandleFactory(handleFactory);
+//			HyperGraph graph = HGEnvironment.get(location, config);
+//			hg.addUnique(graph, new Node("master"), hg.and(hg.type(Node.class), hg.gt("name","master")));
+//						
+//					
+//			List<Name> hugos = hg.getAll(graph, hg.and(hg.type(Name.class), hg.gt("age",25) , hg.or( hg.eq("surname", "Hugo"), hg.eq("firstName", "Hugo") )));
+//	        List<Name> noHugos = hg.getAll(graph, hg.and(hg.type(Name.class), hg.not(hg.or(hg.eq("surname", "Hugo"), hg.eq("firstName", "Hugo")))));
+//
+//	        for(Name n : hugos)
+//	                System.out.println("hugo: surname:" + n.getSurname() + " . first name: " + n.getFirstName());
+//
+//	        for(Name n : noHugos)
+//	            System.out.println("Not a Hugo: surname:" + n.getSurname() + " . first name: " + n.getFirstName());
+//
+//			graph.close();
+//
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//	}
 }
