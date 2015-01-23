@@ -1,13 +1,13 @@
-package server.kafka;
+package server.http.handler.kafka;
 
 import java.io.Serializable;
 
 import rfx.core.util.CharPool;
+import server.kafka.EventData;
 
-public class HttpDataLog implements Serializable{
+public class HttpDataLog extends EventData implements Serializable{
 
 	private static final long serialVersionUID = -608716019415138628L;
-	long unixTime;
 	long unixTimeInQueue;
 	String ip;
 	String userAgent;
@@ -19,8 +19,7 @@ public class HttpDataLog implements Serializable{
 		this.ip = ip;
 		this.userAgent = userAgent;
 		this.logDetails = logDetails;
-		this.cookieString = cookieString;	
-		this.unixTime = System.currentTimeMillis() / 1000L;
+		this.cookieString = cookieString;
 	}
 	
 	@Override
@@ -33,14 +32,6 @@ public class HttpDataLog implements Serializable{
 		logLine.append(getLogDetails()).append(tab);
 		logLine.append(getCookieString());
 		return logLine.toString();
-	}
-
-	public long getUnixTime() {			
-		return unixTime;
-	}
-
-	public void setUnixTime(long unixTime) {
-		this.unixTime = unixTime;
 	}
 
 	public String getIp() {
@@ -81,6 +72,11 @@ public class HttpDataLog implements Serializable{
 
 	public void setUnixTimeInQueue(long unixTimeInQueue) {
 		this.unixTimeInQueue = unixTimeInQueue;
+	}
+
+	@Override
+	public String toStringMessage() {		
+		return toString();
 	}		
 
 }

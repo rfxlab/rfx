@@ -6,16 +6,9 @@ import org.vertx.java.core.http.HttpServerRequest;
 import rfx.core.stream.node.worker.BaseWorker;
 import rfx.core.util.StringUtil;
 import rfx.core.util.Utils;
-import rfx.core.util.netty.BootstrapTemplate;
 import server.http.configs.KafkaProducerConfigs;
 import server.http.handler.BaseHttpHandler;
 import server.http.handler.DefaultTrackingHttpHandler;
-import server.http.handler.DefaultTrackingTcpHandler;
-import server.http.model.HttpEventKafkaLog;
-import server.http.util.LogHandlerUtil;
-import server.kafka.HttpLogKafkaHandler;
-import server.log.CallbackProcessor;
-import server.log.EventKafkaLogReceiver;
 
 /**
  * The HTTP server instance 
@@ -28,7 +21,6 @@ public class HttpLogCollector extends BaseWorker {
 	static KafkaProducerConfigs kafkaProducerConfigs = KafkaProducerConfigs.load();
 	
 	public static void createHttpLogCollector(String name, String host, int port){
-		HttpLogKafkaHandler.initKafkaSession();
 		BaseWorker worker = new HttpLogCollector(name);
 		worker.start(host, port);		
 	}

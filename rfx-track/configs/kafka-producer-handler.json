@@ -1,16 +1,13 @@
 {    
-	writeKafkaLogEnable : 1,
-    
+	defaultHttpHandlerClass: "sample.server.item.track.ItemTrackHttpHandler",
+	writeKafkaLogEnable : 1,    
     numberBatchJob : 2,
     sendKafkaThreadPerBatchJob : 3,
     kafkaProducerAsyncEnabled : 0,
     kafkaProducerAckEnabled : 1,
     timeSendKafkaPerBatchJob : 5000,
-    sendKafkaMaxRetries : 2,
-    
-    defaultPartitioner: "server.kafka.SimplePartitioner",
-    defaultHttpHandlerClass: "sample.server.item.track.ItemTrackHttpHandler",
-    
+    sendKafkaMaxRetries : 2,    
+    defaultPartitioner: "server.kafka.SimplePartitioner",        
     kafkaProducerList : {
         tk : {
             kafkaTopic : "item-tracking",

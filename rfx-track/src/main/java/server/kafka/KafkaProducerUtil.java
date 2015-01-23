@@ -56,7 +56,7 @@ public class KafkaProducerUtil {
 		props.put("metadata.broker.list", brokerList);
 		//async mode Kafka Producer
 		if(kafkaProducerConfigs.getKafkaProducerAsyncEnabled()==1){
-			//props.put("producer.type", "async");
+			props.put("producer.type", "async");
 		}
 		props.put("serializer.class", "kafka.serializer.StringEncoder");
 		props.put("partitioner.class", partioner);

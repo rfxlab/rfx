@@ -15,6 +15,7 @@ public class ItemTrackHttpHandler extends BaseHttpHandler {
 	private static final String PING = "ping";
 	static final String logItemTracking = "tk";
 	static final String logUserActivity = "u";
+	static final String logUserClick = "c";
 	static final String redirectClickPrefix = "r/";
 
 	@Override
@@ -54,6 +55,11 @@ public class ItemTrackHttpHandler extends BaseHttpHandler {
 		else if(uri.startsWith(logUserActivity)){
 			//handle request for ITEM TRACKING				
 			LogHandlerUtil.logHttpRequestToKafka(req, logUserActivity);
+			return true;
+		} 
+		else if(uri.startsWith(logUserClick)){
+			//handle request for ITEM TRACKING				
+			LogHandlerUtil.logHttpRequestToKafka(req, logUserClick);
 			return true;
 		} 
 		return false;

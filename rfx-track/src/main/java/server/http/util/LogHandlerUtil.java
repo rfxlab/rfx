@@ -10,14 +10,12 @@ import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.json.impl.Base64;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-
 import rfx.core.util.SecurityUtil;
 import rfx.core.util.StringUtil;
+import server.http.handler.kafka.HttpEventKafkaHandler;
 import server.http.model.HttpEventKafkaLog;
-import server.kafka.HttpLogKafkaHandler;
-import server.kafka.KafkaLogHandler;
+
+import com.google.gson.Gson;
 
 public class LogHandlerUtil {
 	
@@ -42,15 +40,16 @@ public class LogHandlerUtil {
 		return result;
 	}
 	
-	public static void logHttpRequestToKafka(HttpServerRequest req, String kafkaType){
-		KafkaLogHandler kafkaHandler = HttpLogKafkaHandler.getKafkaHandler(kafkaType);
+	public static void logHttpRequestToKafka(HttpServerRequest req, String producerKey){
+		HttpEventKafkaHandler kafkaHandler = HttpEventKafkaHandler.loadHandler(producerKey);
 		if (kafkaHandler != null) {
 			kafkaHandler.writeLogToKafka(req);
 		} else {
-			System.err.println("No KafkaLogHandler found for " + kafkaType);
+			System.err.println("No KafkaLogHandler found for " + producerKey);
 		}
 		trackingResponse(req);
 	}
+	
 	public static void logDataToKafka(HttpServerRequest req, String json){
 		LogHandlerUtil.trackingResponse(req);
 		logRequestToKafka(json);
@@ -64,7 +63,7 @@ public class LogHandlerUtil {
 			HttpEventKafkaLog el = new Gson().fromJson(json, HttpEventKafkaLog.class);
 			System.out.println("logRequestToKafka "+json);
 			String kafkaType = el.getEventType();
-			KafkaLogHandler kafkaHandler = HttpLogKafkaHandler.getKafkaHandler(kafkaType );
+			HttpEventKafkaHandler kafkaHandler = HttpEventKafkaHandler.loadHandler(kafkaType);
 			if (kafkaHandler != null) {
 				kafkaHandler.writeLogToKafka(el);
 			} else {

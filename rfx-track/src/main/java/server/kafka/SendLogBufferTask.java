@@ -20,7 +20,7 @@ public class SendLogBufferTask extends TimerTask {
 	private ProducerConfig producerConfig;
 	private String topic = "";
 	private String actorId;
-	private Queue<HttpDataLog> queueLogs;
+	private Queue<EventData> queueLogs;
 	private ExecutorService executor;
 	int numberFlushOfJob = 3;
 	boolean refreshProducer = false;
@@ -33,8 +33,8 @@ public class SendLogBufferTask extends TimerTask {
 		this.actorId = id;
 	}
 	
-	public void addToBufferQueue(HttpDataLog log){
-		queueLogs.add(log);		
+	public void addToBufferQueue(EventData data){
+		queueLogs.add(data);		
 	}
 	
 	public boolean isRefreshProducer() {
@@ -71,12 +71,12 @@ public class SendLogBufferTask extends TimerTask {
 				List<KeyedMessage<String, String>> batchLogs = new ArrayList<>(queueSize);
 				int batchSize = 0;
 				while( true ){									
-					HttpDataLog log = this.queueLogs.poll();
-					if(log == null){
+					EventData data = this.queueLogs.poll();
+					if(data == null){
 						break;
 					} else {					
 						//build the payload, and add to the list
-						KeyedMessage<String, String> payload = new KeyedMessage<String, String>(this.topic, log.toString());	
+						KeyedMessage<String, String> payload = new KeyedMessage<String, String>(this.topic, data.toStringMessage());	
 						batchLogs.add(payload);						
 						batchSize = batchLogs.size();
 						if(batchSize >= maxSize && maxSize > 0){
@@ -99,7 +99,7 @@ public class SendLogBufferTask extends TimerTask {
 	}
 	
 	public void flushLogsToKafkaBroker(){			
-		flushLogsToKafkaBroker(HttpLogKafkaHandler.MAX_KAFKA_TO_SEND);
+		flushLogsToKafkaBroker(KafkaProducerHandler.MAX_KAFKA_TO_SEND);
 	}
 	
 	@Override

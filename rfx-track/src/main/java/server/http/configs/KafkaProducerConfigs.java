@@ -146,5 +146,4 @@ public class KafkaProducerConfigs implements Serializable {
 		this.defaultHttpHandlerClass = defaultHttpHandlerClass;
 	}
 	
-	
 }
