@@ -30,8 +30,7 @@ public abstract class RedisCommand<T> {
 				rs = build();
 				commited = true;
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception e) {			
 			LogUtil.e("JedisPool: "+jedisPool.toString(), e.toString());
 		} finally {			
 			freeRedisResource(jedisPool, shardedJedis, commited);

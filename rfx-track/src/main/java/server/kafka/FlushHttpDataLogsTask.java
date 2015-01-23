@@ -27,8 +27,7 @@ public class FlushHttpDataLogsTask implements Runnable  {
 			try {				
 				System.out.println("FlushHttpDataLogsTask "+this.actorId+" batchsize = "+batchLogs.size() + " "+producer);
 				producer.send(batchLogs);
-			} catch (Exception e) {
-				e.printStackTrace();
+			} catch (Exception e) {				
 				LogUtil.e("FlushHttpDataLogsTask", "sendToKafka fail : "+e.getMessage());	
 				//close & open the Kafka Connection manually				
 				KafkaProducerUtil.closeAndRemoveKafkaProducer(actorId);

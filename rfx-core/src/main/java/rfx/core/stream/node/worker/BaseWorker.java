@@ -236,28 +236,7 @@ public abstract class BaseWorker {
 	final protected void registerWorkerNodeIntoCluster() {		
 		status = STARTED;		
 		
-		ShardedJedisPool jedisPool =  ClusterDataManager.getRedisClusterInfoPool();
-        new RedisCommand<Boolean>(jedisPool) {
-            @Override
-            protected Boolean build() throws JedisException {
-                jedis = shardedJedis.getShard(StringPool.BLANK);
-                String workerName = StringUtil.toString(publicHost.replaceAll("\\.", ""), "_", publicPort);
-                WorkerTimeLog timeLog = new Gson().fromJson(jedis.hget(ClusterDataManager.CLUSTER_WORKER_PREFIX, workerName + ClusterDataManager.WORKER_TIMELOG_POSTFIX), WorkerTimeLog.class);
-                if (timeLog == null) {
-                    timeLog = new WorkerTimeLog();
-                }
-                timeLog.addUpTime(System.currentTimeMillis());
-                jedis.hset(ClusterDataManager.CLUSTER_WORKER_PREFIX, workerName + ClusterDataManager.WORKER_TIMELOG_POSTFIX, new Gson().toJson(timeLog));
-                return true;
-            }
-        }.execute();
-		
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                ClusterDataManager.updateWorkerData(publicHost, publicPort);
-            }
-        }, 2000, 2000);
+		updateClusterInfo();
         
         //hooking for child
 		onStartDone();
@@ -268,6 +247,35 @@ public abstract class BaseWorker {
 		
 		System.out.println("started worker Ok at ADDRESS[ "+this.publicHost + ":" + this.publicPort + "] classname:" +classnameWorker);
 		Utils.foreverLoop();
+	}
+
+	private void updateClusterInfo() {
+		try {
+			ShardedJedisPool jedisPool =  ClusterDataManager.getRedisClusterInfoPool();
+			new RedisCommand<Boolean>(jedisPool) {
+			    @Override
+			    protected Boolean build() throws JedisException {
+			        jedis = shardedJedis.getShard(StringPool.BLANK);
+			        String workerName = StringUtil.toString(publicHost.replaceAll("\\.", ""), "_", publicPort);
+			        WorkerTimeLog timeLog = new Gson().fromJson(jedis.hget(ClusterDataManager.CLUSTER_WORKER_PREFIX, workerName + ClusterDataManager.WORKER_TIMELOG_POSTFIX), WorkerTimeLog.class);
+			        if (timeLog == null) {
+			            timeLog = new WorkerTimeLog();
+			        }
+			        timeLog.addUpTime(System.currentTimeMillis());
+			        jedis.hset(ClusterDataManager.CLUSTER_WORKER_PREFIX, workerName + ClusterDataManager.WORKER_TIMELOG_POSTFIX, new Gson().toJson(timeLog));
+			        return true;
+			    }
+			}.execute();
+			
+			timer.schedule(new TimerTask() {
+			    @Override
+			    public void run() {
+			        ClusterDataManager.updateWorkerData(publicHost, publicPort);
+			    }
+			}, 2000, 2000);
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+		}
 	}
 	
 	/**
