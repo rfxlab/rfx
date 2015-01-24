@@ -28,16 +28,27 @@ public class RfxEventTrackingWorker extends BaseWorker {
 	private static final Map<String, BaseHttpHandler> cachedRoutes = new ConcurrentHashMap<>();
 	private static final Http404Handler http404Handler = new Http404Handler();	
 	
-	public static void createHttpLogCollector(String name, String host, int port,Set<BaseHttpHandler> routes) {
-		BaseWorker worker = new RfxEventTrackingWorker(name, routes);
+	static String getName(String host, int port){
+		return RfxEventTrackingWorker.class.getSimpleName() + "_" + host + "_" + port;
+	}
+	
+	public static void createHttpLogCollector(String host, int port,Set<BaseHttpHandler> routes) {		
+		BaseWorker worker = new RfxEventTrackingWorker(getName(host, port), routes);
 		worker.start(host, port);		
 	}
 	
-	public static void createHttpLogCollector(String name, String host, int port)  {
+	public static void createHttpLogCollector(String host, int port,BaseHttpHandler httpHandler) {		
+		Set<BaseHttpHandler> routes = new HashSet<>(1);
+		routes.add(httpHandler);
+		BaseWorker worker = new RfxEventTrackingWorker(getName(host, port), routes );
+		worker.start(host, port);		
+	}
+	
+	public static void createHttpLogCollector(String host, int port)  {		
 		Set<BaseHttpHandler> routes = new HashSet<>(2);
 		routes.add(new PingHttpHandler());
 		routes.add(new KafkaHttpEventLogHandler());		
-		BaseWorker worker = new RfxEventTrackingWorker(name, routes);		
+		BaseWorker worker = new RfxEventTrackingWorker(getName(host, port), routes);		
 		worker.start(host, port);
 	}
 	
@@ -96,8 +107,7 @@ public class RfxEventTrackingWorker extends BaseWorker {
 		//LogUtil.setDebug(true);
 		WorkerConfigs configs = WorkerConfigs.load();
 		String host = configs.getHostName();
-		int port = configs.getAllocatedWorkers().get(0).getPort();
-		String name = host + "_" + port;		
-		RfxEventTrackingWorker.createHttpLogCollector(name, host, port);		 
+		int port = configs.getAllocatedWorkers().get(0).getPort();		
+		RfxEventTrackingWorker.createHttpLogCollector(host, port);		 
 	}	
 }
