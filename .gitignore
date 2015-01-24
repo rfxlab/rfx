@@ -11,6 +11,7 @@
 **/.settings/*
 **/.idea/*
 **/releases/*
+**/contiperf-report/*
 
 # Package Files #
 *.jar
