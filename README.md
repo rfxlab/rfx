@@ -1,11 +1,15 @@
-Reactive Function X (RFX)
+Reactive Function (X)
 ===
-the fullstack framework for reactive real-time analytics
-* Collecting logs from everywhere with scalability in design (By http://netty.io and http://kafka.apache.org )
-* Reactive Stream Processing in simple way (Inspired Actor Model of http://akka.io and MillWheel: Fault-Tolerant Stream Processing at Internet Scale http://research.google.com/pubs/pub41378.html )
-* Visual Reactive Analytics Dashboard (By http://nvd3.org and http://startbootstrap.com/template-categories/admin-dashboard )
+RFX, the full-stack framework for reactive real-time analytics
+* Tracking event data for Internet of Things with scalability in design ( By http://netty.io and http://kafka.apache.org )
+* Simple Data Pipeline Model for Stream Processing ( Inspired by Actor Model at http://akka.io and MillWheel: Fault-Tolerant Stream Processing at Internet Scale http://research.google.com/pubs/pub41378.html )
+* Real-time Information Dashboard with HTML5 WebSocket( thanks to http://nvd3.org and http://startbootstrap.com/template-categories/admin-dashboard )
 
-Concepts
+Official website
+===
+http://www.mc2ads.org/p/rfx-framework.html
+
+Core Concepts
 ===
 ![alt tag](http://2.bp.blogspot.com/-qvY6yHo4Rt0/VJTxnnO9biI/AAAAAAAADQE/bQbNsSoLuSw/s1600/Real-time-Reactive-Marketing-Platform%2B-%2BNew%2BPage%2B(1).png)
 
@@ -15,6 +19,6 @@ Concepts
 
 ![alt tag](http://3.bp.blogspot.com/-JLrB-66E2z0/VHa7dWGQ1VI/AAAAAAAADI0/neh8Rl7gpLU/s1600/RFX%2Bin%2BVenn%2BDiagram%2B-%2BPlain%2B(2).png)
 
-Lead Engineer and implemented by
+This project is designed and implemented by
 ====
 https://twitter.com/tantrieuf31
