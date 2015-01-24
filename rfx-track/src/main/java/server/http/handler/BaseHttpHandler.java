@@ -2,6 +2,13 @@ package server.http.handler;
 
 import org.vertx.java.core.http.HttpServerRequest;
 
-public abstract class BaseHttpHandler {
-	public abstract boolean handle(HttpServerRequest req);
+/**
+ * the interface for handling HTTP request
+ * 
+ * @author trieu
+ *
+ */
+public interface BaseHttpHandler {	
+	public void handle(HttpServerRequest req);	
+	public String getPathKey();
 }

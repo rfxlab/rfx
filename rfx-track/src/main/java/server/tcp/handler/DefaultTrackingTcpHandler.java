@@ -1,4 +1,4 @@
-package server.http.handler;
+package server.tcp.handler;
 
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.buffer.Buffer;
@@ -6,7 +6,7 @@ import org.vertx.java.core.net.NetSocket;
 
 import rfx.core.util.Utils;
 import server.http.model.HttpEventKafkaLog;
-import server.http.util.LogHandlerUtil;
+import server.http.util.KafkaLogHandlerUtil;
 
 import com.google.gson.Gson;
 
@@ -25,7 +25,7 @@ public class DefaultTrackingTcpHandler implements Handler<NetSocket> {
 				System.out.println(buffer.toString());
 				
 				//Utils.sleep(100);				
-				LogHandlerUtil.logRequestToKafka(json);
+				KafkaLogHandlerUtil.logRequestToKafka(json);
 				event.write(OK);
 			}
 		});

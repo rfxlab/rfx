@@ -2,12 +2,12 @@ package server.http.data.service;
 
 
 
+/**
+ * TODO implement geo-location from IP
+ * 
+ * @author trieu
+ *
+ */
 public class LocationDataService {
-
-    
-   
-    //private static Map<String, Boolean> countryCacheMap = new HashMap<>(); 
-
-	//TODO
 
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <WorkerConfigs classpath="rfx.core.configs.WorkerConfigs" type="object" >
 	
-	<allocatedCmdActorPortRanges>30000-32000</allocatedCmdActorPortRanges>
+	<allocatedCmdActorPortRanges></allocatedCmdActorPortRanges>
 	
 	<!-- the shell-script for start workers -->
 	<startWorkerScriptPath>		
@@ -14,9 +14,9 @@
 	<!-- the allocated TCP for workers -->	
 	<allocatedWorkers type="list" >			
 		<!-- empty workers -->
-		<worker id="w1">
-			<port>14001</port>
-			<mainClass>server.http.HttpLogCollector</mainClass>
+		<worker id="trackingHttpWorker">
+			<port>8080</port>
+			<mainClass>server.http.RfxEventTrackingWorker</mainClass>
 		</worker>	
 	</allocatedWorkers>
 	
@@ -24,6 +24,6 @@
 	<debugLogPath>log</debugLogPath>
 	
 	<!-- where the worker in cluster will store mapDB offset -->
-	<kafkaOffsetDbPath>data/mapdb</kafkaOffsetDbPath>
+	<kafkaOffsetDbPath></kafkaOffsetDbPath>
 
 </WorkerConfigs>

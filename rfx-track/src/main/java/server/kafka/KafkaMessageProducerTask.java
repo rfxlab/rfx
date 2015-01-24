@@ -6,13 +6,13 @@ import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
 import rfx.core.util.LogUtil;
 
-public class FlushHttpDataLogsTask implements Runnable  {
+public class KafkaMessageProducerTask implements Runnable  {
 	
 	List<KeyedMessage<String, String>> batchLogs;
 	private String actorId;
 	Producer<String, String> producer;
 
-	public FlushHttpDataLogsTask(String actorId, Producer<String, String> producer, List<KeyedMessage<String, String>> batchLogs) {		
+	public KafkaMessageProducerTask(String actorId, Producer<String, String> producer, List<KeyedMessage<String, String>> batchLogs) {		
 		this.actorId = actorId;
 		this.producer = producer;
 		this.batchLogs = batchLogs;
@@ -25,7 +25,7 @@ public class FlushHttpDataLogsTask implements Runnable  {
 	public void run() {			
 		if(producer != null && batchLogs.size()>0){
 			try {				
-				System.out.println("FlushHttpDataLogsTask "+this.actorId+" batchsize = "+batchLogs.size() + " "+producer);
+				System.out.println("FlushHttpDataLogsTask "+this.actorId+" batchsize = "+batchLogs.size());
 				producer.send(batchLogs);
 			} catch (Exception e) {				
 				LogUtil.e("FlushHttpDataLogsTask", "sendToKafka fail : "+e.getMessage());	

@@ -88,7 +88,7 @@ public class SendLogBufferTask extends TimerTask {
 				if(batchSize > 0 && maxSize > 0){				
 					System.out.println( "producer.send , batchLogs size : " + batchLogs.size());
 					Producer<String, String> producer = KafkaProducerUtil.getKafkaProducer(actorId, producerConfig, refreshProducer);
-					executor.execute(new FlushHttpDataLogsTask(actorId, producer, batchLogs));
+					executor.execute(new KafkaMessageProducerTask(actorId, producer, batchLogs));
 				}
 			} catch (Exception e) {			
 				e.printStackTrace();

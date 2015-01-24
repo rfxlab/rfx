@@ -136,8 +136,14 @@ public abstract class BaseWorker {
 		try {
 			this.publicHost = host;
 			this.publicPort = port;
-			Vertx vertx = VertxFactory.newVertx();    
-			return vertx.createHttpServer();
+			
+			//refer http://vertx.io/manual.html#performance-tuning
+			Vertx vertx = VertxFactory.newVertx();
+			HttpServer server = vertx.createHttpServer();
+			server.setAcceptBacklog(10000).setUsePooledBuffers(true);
+			server.setSendBufferSize(4 * 1024);
+			server.setReceiveBufferSize(4 * 1024);
+			return server;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -1,6 +1,6 @@
 {    
-	defaultHttpHandlerClass: "sample.server.item.track.ItemTrackHttpHandler",
-	writeKafkaLogEnable : 1,    
+	writeKafkaLogEnable : 1,
+	    
     numberBatchJob : 2,
     sendKafkaThreadPerBatchJob : 3,
     kafkaProducerAsyncEnabled : 0,

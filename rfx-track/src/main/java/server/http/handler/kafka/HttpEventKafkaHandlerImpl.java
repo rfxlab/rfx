@@ -10,6 +10,7 @@ import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.http.HttpServerRequest;
 
 import rfx.core.util.HttpRequestUtil;
+import rfx.core.util.LogUtil;
 import rfx.core.util.StringPool;
 import rfx.core.util.StringUtil;
 import server.http.model.HttpEventKafkaLog;
@@ -23,7 +24,7 @@ public class HttpEventKafkaHandlerImpl extends HttpEventKafkaHandler {
 		
 	public void countingToDebug() {
 		long c = counter.addAndGet(1);
-		System.out.println(kafkaProducerHandler.getTopic() + " logCounter: " + c);		
+		LogUtil.d(kafkaProducerHandler.getTopic() + " logCounter: " + c);		
 	}
 		
 	protected HttpEventKafkaHandlerImpl(String producerKey) {
@@ -35,8 +36,8 @@ public class HttpEventKafkaHandlerImpl extends HttpEventKafkaHandler {
 		EventData data = new HttpDataLog(ip, userAgent, logDetails, cookieString);		
 		if( KafkaProducerHandler.KAFKA_ENABLED){
 			kafkaProducerHandler.writeData(data);
-		} else {
-			System.out.println("Skip writeLogToKafka: "+data.toStringMessage());
+		} else {			
+			LogUtil.d("Skip writeLogToKafka: "+data.toStringMessage());
 		}
 	}	
 

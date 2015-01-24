@@ -10,10 +10,14 @@ import rfx.core.util.LogUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
-public class KafkaProducerConfigs implements Serializable {
-	
+/**
+ * Kafka Producer Config
+ * 
+ * @author trieu
+ *
+ */
+public class KafkaProducerConfigs implements Serializable {	
 	static KafkaProducerConfigs _instance;
-
 	private static final long serialVersionUID = 4936959262031389418L;
 		
 	int writeKafkaLogEnable = 1;
@@ -26,7 +30,6 @@ public class KafkaProducerConfigs implements Serializable {
 	
 	String defaultPartitioner = "";
 	Map<String,Map<String,String>> kafkaProducerList;	
-	String defaultHttpHandlerClass = "";
 
 	public KafkaProducerConfigs() {
 		super();
@@ -136,14 +139,5 @@ public class KafkaProducerConfigs implements Serializable {
 
 	public void setDefaultPartitioner(String defaultPartitioner) {
 		this.defaultPartitioner = defaultPartitioner;
-	}
-
-	public String getDefaultHttpHandlerClass() {
-		return defaultHttpHandlerClass;
-	}
-
-	public void setDefaultHttpHandlerClass(String defaultHttpHandlerClass) {
-		this.defaultHttpHandlerClass = defaultHttpHandlerClass;
-	}
-	
+	}	
 }
