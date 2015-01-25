@@ -140,7 +140,11 @@ public abstract class BaseTopology {
 	}
 	
 	public BaseTopology initKafkaDataSeeders(String topic, int beginPartitionId, int endPartitionId){
-		List<KafkaDataSeeder> dataSeeders = new ArrayList<>(); 
+		if(beginPartitionId > endPartitionId){
+			throw new IllegalArgumentException("beginPartitionId must be less than or equals endPartitionId");
+		}
+		int size = (endPartitionId - beginPartitionId) + 1;	
+		List<KafkaDataSeeder> dataSeeders = new ArrayList<>(size); 
 		for (int partition = beginPartitionId; partition <= endPartitionId; partition++) {
 			dataSeeders.add(new KafkaDataSeeder(topic, partition));
 		}	

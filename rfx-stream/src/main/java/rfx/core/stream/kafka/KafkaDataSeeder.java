@@ -7,27 +7,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import rfx.core.stream.connector.MapDbConnector;
+import rfx.core.stream.connector.KafkaOffsetManager;
 import rfx.core.stream.kafka.KafkaDataQuery.QueryFilter;
 import rfx.core.stream.message.KafkaDataPayload;
 import rfx.core.util.StringUtil;
 import rfx.core.util.Utils;
 
 public class KafkaDataSeeder {
-    private static Map<String, MapDbConnector> mapDbTopic = new HashMap<>();
+    private static Map<String, KafkaOffsetManager> mapDbTopic = new HashMap<>();
 
-    public static synchronized MapDbConnector loadMapDbForTopic(String topic, String workerName) {
-		MapDbConnector connector = mapDbTopic.get(topic);
+    public static synchronized KafkaOffsetManager loadOffsetManagerForTopic(String topic, String workerName) {
+		KafkaOffsetManager connector = mapDbTopic.get(topic);
 		if (connector == null) {
-		    connector = new MapDbConnector(topic,workerName);
+		    connector = new KafkaOffsetManager(topic,workerName);
 		    mapDbTopic.put(topic, connector);
 		}
 		return connector;
     }
     
     public static synchronized void shutdownMapDB() {
-  		Collection<MapDbConnector> connectors = mapDbTopic.values();
-  		for (MapDbConnector mapDbConnector : connectors) {
+  		Collection<KafkaOffsetManager> connectors = mapDbTopic.values();
+  		for (KafkaOffsetManager mapDbConnector : connectors) {
 		    mapDbConnector.shutdown();
 		}
     }
@@ -56,7 +56,7 @@ public class KafkaDataSeeder {
     private boolean stopSeedingData;
     private KafkaDataQuery query;
         
-    MapDbConnector mapDbConnector;
+    KafkaOffsetManager offsetManager;
     
     public KafkaDataSeeder(String topic, int partition) {
 		super();
@@ -64,7 +64,7 @@ public class KafkaDataSeeder {
 		this.partition = partition;
 		this.seeds = new ArrayList<>(0);
 		// mapDb loading
-		mapDbConnector = loadMapDbForTopic(topic,"kafka-worker-"+partition);		
+		offsetManager = loadOffsetManagerForTopic(topic,"kafka-worker-"+partition);		
     }
    
 
@@ -124,7 +124,7 @@ public class KafkaDataSeeder {
 	
 		    // load from Map
 		    String clientName = query.buildClientName();
-		    long offset = mapDbConnector.getData(clientName);
+		    long offset = offsetManager.getData(clientName);
 			query.setRecentReadOffset(offset);		    
 	
 		    // query kafka
@@ -132,12 +132,10 @@ public class KafkaDataSeeder {
 	
 		    if (dataPayload != null) {     
 				this.seededDataSize = dataPayload.size();
-				long readOffset = dataPayload.getEndOffset();
-				
-				query.setRecentReadOffset(readOffset);
-		
+				long readOffset = dataPayload.getEndOffset();				
+				query.setRecentReadOffset(readOffset);		
 				// save offset to Map			
-				mapDbConnector.setData(clientName, readOffset);
+				offsetManager.setData(clientName, readOffset);
 				System.out.println(new Date() + " ,topic:" + topic+ " ,partition:" + partition + " ,offset:" + readOffset + " size:" + this.seededDataSize);
 		    }
 		} catch (Exception e) {
@@ -145,7 +143,7 @@ public class KafkaDataSeeder {
 		    e.printStackTrace();
 		} finally {
 		    // commit offset data to disk
-			mapDbConnector.save();
+			offsetManager.save();
 		    Utils.sleep(1);
 		}
 		return dataPayload;

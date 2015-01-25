@@ -13,33 +13,33 @@ import rfx.core.util.StringUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-public class MapDbConnector {
+public class KafkaOffsetManager {
 	
 	String topic;
 	String workerName = "";
-	ConcurrentMap<String, Long> mapDb;
+	ConcurrentMap<String, Long> offsetMap;
 	String kafkaOffsetPath;
 			
-	public MapDbConnector(String topic, String workerName) {
+	public KafkaOffsetManager(String topic, String workerName) {
 		super();
 		this.topic = topic;	
 		if( StringUtil.isNotEmpty(workerName) ){
 			this.workerName = workerName;	
 		}		
-		initMapDB();
+		init();
 	}
 	
-	public ConcurrentMap<String, Long> getMapDb() {
-		return mapDb;
+	public ConcurrentMap<String, Long> getOffsetMap() {
+		return offsetMap;
 	}
 	
 	public String getTopic() {
 		return topic;
 	}
 	
-	void initMapDB(){
+	private void init(){
 		kafkaOffsetPath = StringUtil.toString(WorkerConfigs.load().getKafkaOffsetDbPath(), "/" , topic, "-", workerName);		
-		mapDb = new ConcurrentHashMap<>();
+		offsetMap = new ConcurrentHashMap<>();
 		File file = new File(kafkaOffsetPath);
 		if(file.isFile()){
 			try {
@@ -48,7 +48,7 @@ public class MapDbConnector {
 				if(StringUtil.isNotEmpty(json)){
 					Map<String, Long> map = new Gson().fromJson(json, type);
 					if(map != null){
-						mapDb.putAll(map);
+						offsetMap.putAll(map);
 					}
 				}
 			} catch (Throwable e) {				
@@ -65,19 +65,19 @@ public class MapDbConnector {
 	}
 
 	public void setData(String key, long value){
-		mapDb.put(key, value);
+		offsetMap.put(key, value);
 	}
 	
 	public long getData(String key){
-		return StringUtil.safeParseLong(mapDb.get(key),-1L);
+		return StringUtil.safeParseLong(offsetMap.get(key),-1L);
 	}
 	
-	public int getOffsetMapDbSize() {		
-		return mapDb.size();
+	public int getOffsetMapSize() {		
+		return offsetMap.size();
 	}
 	
 	public void save(){	    
-	    FileUtils.writeStringToFile(kafkaOffsetPath, new Gson().toJson(mapDb));
+	    FileUtils.writeStringToFile(kafkaOffsetPath, new Gson().toJson(offsetMap));
 	}
 	
 	public void asynchSave(){	    

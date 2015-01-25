@@ -4,8 +4,8 @@ import rfx.core.stream.topology.BaseTopology;
 import rfx.core.stream.topology.Pipeline;
 import rfx.core.util.LogUtil;
 import rfx.core.util.Utils;
-import rfx.sample.user.tracking.functors.UserTrackingFunctor;
-import rfx.sample.user.tracking.functors.UserTrackingLogTokenizer;
+import rfx.sample.user.tracking.functors.UserTrackingProcessing;
+import rfx.sample.user.tracking.functors.UserTrackingLogTokening;
 
 
 public class UserTrackingTopology extends BaseTopology  {
@@ -13,8 +13,8 @@ public class UserTrackingTopology extends BaseTopology  {
 	@Override
 	public BaseTopology buildTopology(){
 		return Pipeline.create(this)
-				.apply(UserTrackingLogTokenizer.class)
-				.apply(UserTrackingFunctor.class)		
+				.apply(UserTrackingLogTokening.class)
+				.apply(UserTrackingProcessing.class)		
 				.done();
 	}	
 	

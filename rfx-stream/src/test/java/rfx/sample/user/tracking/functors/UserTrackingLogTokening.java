@@ -1,6 +1,6 @@
 package rfx.sample.user.tracking.functors;
 
-import rfx.core.stream.functor.BaseFunctor;
+import rfx.core.stream.functor.StreamProcessor;
 import rfx.core.stream.functor.common.DataSourceFunctor;
 import rfx.core.stream.message.Fields;
 import rfx.core.stream.message.Tuple;
@@ -11,38 +11,33 @@ import rfx.core.stream.topology.BaseTopology;
 import rfx.core.util.LogUtil;
 import rfx.core.util.StringUtil;
 
-public class UserTrackingLogTokenizer extends BaseFunctor {
+public class UserTrackingLogTokening extends StreamProcessor {
 
 	// what data fields that this actor would send to next actor
 	static Fields outputFields = new Fields("loggedtime", "uuid", "event","url", "topic", "partitionId");
 	UserTrackingLogProcessor processor;
 
-	public UserTrackingLogTokenizer(DataFlowInfo dataFlowInfo,
+	public UserTrackingLogTokening(DataFlowInfo dataFlowInfo,
 			BaseTopology topology) {
 		super(dataFlowInfo, topology);
 		processor = new UserTrackingLogProcessor();
 	}
 
-	public void onReceive(Object message) throws Exception {
-		if (message instanceof Tuple) {
-			this.doPreProcessing();
-			Tuple inputTuple = (Tuple) message;
-			Tuple outTuple = processor.process(inputTuple, outputFields);
+	public void onReceive(Tuple inputTuple) throws Exception {
+		this.doPreProcessing();			
+		Tuple outTuple = processor.process(inputTuple, outputFields);
 
-			if (outTuple != null) {
-				// output to next phase
-				this.emit(outTuple, self());
-				
-				String monitorkey = StringUtil.toString(this.getMetricKey(),outTuple.getStringByField("topic"), "#", outTuple.getIntegerByField("partitionId"));
-				this.counter(monitorkey).incrementAndGet();
-				this.topology.counter().incrementAndGet();
-			} else {
-				LogUtil.error("logTokens.length (delimiter is tab) is NOT = 5, INVALID LOG ROW FORMAT ");
-			}
-			inputTuple.clear();
+		if (outTuple != null) {
+			// output to next phase
+			this.emit(outTuple, self());
+			
+			String monitorkey = StringUtil.toString(this.getMetricKey(),outTuple.getStringByField("topic"), "#", outTuple.getIntegerByField("partitionId"));
+			this.counter(monitorkey).incrementAndGet();
+			this.topology.counter().incrementAndGet();
 		} else {
-			unhandled(message);
+			LogUtil.error("logTokens.length (delimiter is tab) is NOT = 5, INVALID LOG ROW FORMAT ");
 		}
+		inputTuple.clear();
 	}
 	
 	static class UserTrackingLogProcessor extends Processor{
@@ -51,8 +46,7 @@ public class UserTrackingLogTokenizer extends BaseFunctor {
 			String logRow = inputTuple.getStringByField(DataSourceFunctor.EVENT);
 	    	String topic = inputTuple.getStringByField("topic");
 	    	String partitionId = inputTuple.getStringByField("partitionId");	    	
-			String[] logTokens = logRow.split("\t");		  	
-
+			String[] logTokens = logRow.split("\t");
 			if(logTokens.length == 4){
 				if(	   StringUtil.isNotEmpty(logTokens[0])
 					&& StringUtil.isNotEmpty(logTokens[1]) 
