@@ -24,6 +24,7 @@ import rfx.core.stream.model.DataFlowInfo;
 import rfx.core.stream.topology.BaseTopology;
 import rfx.core.util.CommonUtil;
 import rfx.core.util.FileUtils;
+import rfx.core.util.RandomUtil;
 import rfx.core.util.StringUtil;
 import rfx.core.util.Utils;
 import scala.concurrent.duration.Duration;
@@ -87,7 +88,9 @@ public class ActorUtil {
 	}	
 	
 	public static void sendToActor(Map<String, ActorRef> actorPool, String prefixId, Tuple newTuple, ActorRef sender){
-		actorPool.get(prefixId + Utils.randomActorId(actorPool.size()-1)).tell(newTuple, sender);
+		int max = actorPool.size()-1;
+		String key = prefixId + RandomUtil.randomNumber(0,max);
+		actorPool.get(key).tell(newTuple, sender);
 	}
 	
 	public static void sendToActor(DataFlowInfo dataFlowInfo, Tuple newTuple, ActorRef sender){
@@ -111,12 +114,10 @@ public class ActorUtil {
 			//TODO
 		} else {
 			//randomized routing
-			randomId = namespaceReceiver + Utils.randomActorId(actorPool.size()-1);
+			randomId = namespaceReceiver + RandomUtil.randomNumber(0,actorPool.size()-1);
 		}
 		ActorRef actorRef = actorPool.get(randomId);			
 		if(actorRef != null){
-			//TODO debug sending flow
-			//System.out.println("-----"+dataFlowInfo.getNamespaceSender() + " -> "+namespaceReceiver);
 			actorRef.tell(newTuple, sender);				
 		} else {
 			System.err.println("commitSendToActor failed, no found valid actorRef for id:"+randomId + " ,dataFlowInfo: "+dataFlowInfo);
@@ -244,9 +245,5 @@ public class ActorUtil {
 		throw new WorkerInfoException("No TCP Port available for "+prefixWorkerName +" at "+ host + " in " + tcpPorts );
 	}
 	
-	public static Map<String, ActorRef> createActorPool(ActorSystem system, int maxPoolSize, Class<?> clazz, DataFlowInfo dataFlowInfo){
-		//TODO
-		return null;
-	}
 }
 

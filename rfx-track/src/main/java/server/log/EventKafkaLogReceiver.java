@@ -5,7 +5,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
-import rfx.core.util.netty.BootstrapTemplate;
+import rfx.core.util.netty.NettyBootstrapTemplate;
 import server.http.model.HttpEventKafkaLog;
 
 public class EventKafkaLogReceiver {
@@ -29,6 +29,6 @@ public class EventKafkaLogReceiver {
 			}
 		};
 		System.out.println("EventKafkaLogReceiver " + host + ":" + port);
-		BootstrapTemplate.newServerBootstrap(host, port, initializer);
+		NettyBootstrapTemplate.newServerBootstrap(host, port, initializer);
 	}
 }

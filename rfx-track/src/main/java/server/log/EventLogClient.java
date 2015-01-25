@@ -3,7 +3,7 @@ package server.log;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
-import rfx.core.util.netty.BootstrapTemplate;
+import rfx.core.util.netty.NettyBootstrapTemplate;
 import server.http.model.HttpEventKafkaLog;
 
 public class EventLogClient {
@@ -23,7 +23,7 @@ public class EventLogClient {
 				p.addLast(new EventLogClientHandler(message, asynchCall));
 			}
 		};
-		BootstrapTemplate.newClientBootstrap(host, port, initializer );
+		NettyBootstrapTemplate.newClientBootstrap(host, port, initializer );
     	return this;
     }  
     

@@ -9,18 +9,9 @@ import org.apache.log4j.Logger;
 import rfx.core.configs.WorkerConfigs;
 import rfx.core.util.CommonUtil.COLOR_CODE;
 
-
-
 public class LogUtil {
 
-	public static final String DAY_NAME_TOKEN = "/day=";
-	public static final String HOUR_NAME_TOKEN = "/hour=";
 	public static final String LOG_EXT = ".log";
-	public static final String RAW_PREFIX = "/raw-log-";
-	public static final String KAFKA_RAW_PREFIX = "/kafka-raw-log-";
-	public static final int BUFFER_SIZE = 1024 * 10;// 10 KB
-	public static final int NTHREDS = 120;
-	
 	static String prefixLogFile = "info-log-";
 	static String prefixErrorLogFile = "error-log-";
 	
@@ -61,7 +52,7 @@ public class LogUtil {
 	}
 
 	public static void i(Object tag, Object log) {
-		i(tag, log + "", false);
+		i(tag, String.valueOf(log), false);
 	}
 
 	static Logger logger = Logger.getRootLogger();
@@ -80,23 +71,16 @@ public class LogUtil {
 		dumpToFile(log, false, new Date());		
 	}
 
-	/**
-	 * @author: nhatvd
-	 * @param objectClass : Class name
-	 * @param functionName : function/ method
-	 * @param log : String log data
-	 * @param dumpToFile : True -> save file. Else Console print
-	 */
+
 	public static void info(Object objectClass, String functionName, String log, boolean dumpToFile) {
 		if (!(objectClass instanceof String)) {
 			objectClass = objectClass.getClass().getName();
 		}
-		System.out.println(COLOR_CODE.ANSI_YELLOW + objectClass + "." + functionName + COLOR_CODE.ANSI_RESET + " : "
-				+ log);
+		System.out.println(COLOR_CODE.ANSI_YELLOW + objectClass + "." + functionName + COLOR_CODE.ANSI_RESET + " : "+ log);
 		Date currentDate = new Date();
-
 		if (dumpToFile) {
-			dumpToFile(objectClass + "." + functionName + " : " + log, false, currentDate);
+			String s = String.format("%s.%s:%s", objectClass , functionName , log);
+			dumpToFile(s, false, currentDate);
 		}
 	}
 

@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeMap;
-import java.util.UUID;
 
 import rfx.core.model.Callback;
 import rfx.core.model.CallbackResult;
@@ -126,8 +125,6 @@ public class Utils {
         }
     }
 
-
-
     public static <S, T> T get(Map<S, T> m, S key, T def) {
         T ret = m.get(key);
         if(ret==null) {
@@ -168,8 +165,7 @@ public class Utils {
             ret.put(map.get(key), key);
         }
         return ret;
-    }
-    
+    }    
 
     
     public static Integer getInt(Object o) {
@@ -183,21 +179,6 @@ public class Utils {
             throw new IllegalArgumentException("Don't know how to convert " + o + " + to int");
         }
     }
-    
-    public static long secureRandomLong() {
-        return UUID.randomUUID().getLeastSignificantBits();
-    }
-    
-	public static final int randomActorId(int max) {
-		int min = 0;		
-		return randomNumber(min, max);
-	}
-	
-	public static final int randomNumber(int min, int max) {		
-		int num = min + (int) (Math.random() * ((max - min) + 1));
-		return num;
-	}
-
     
     public static TreeMap<Integer, Integer> integerDivided(int sum, int numPieces) {
         int base = sum / numPieces;

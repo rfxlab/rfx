@@ -32,7 +32,7 @@ import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 
 import java.net.URI;
 
-public class BootstrapTemplate {
+public class NettyBootstrapTemplate {
 	
 	public static ChannelFuture newBootstrapUDP(EventLoopGroup loopGroup, SimpleChannelInboundHandler<DatagramPacket> handler, int port){
 		return new Bootstrap().group(loopGroup)
