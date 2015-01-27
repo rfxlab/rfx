@@ -1,4 +1,4 @@
-package rfx.core.stream.connector;
+package rfx.core.stream.kafka;
 
 import java.io.File;
 import java.lang.reflect.Type;

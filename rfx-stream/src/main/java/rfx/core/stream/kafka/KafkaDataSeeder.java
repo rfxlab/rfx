@@ -7,26 +7,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import rfx.core.stream.connector.KafkaOffsetManager;
 import rfx.core.stream.kafka.KafkaDataQuery.QueryFilter;
 import rfx.core.stream.message.KafkaDataPayload;
 import rfx.core.util.StringUtil;
 import rfx.core.util.Utils;
 
 public class KafkaDataSeeder {
-    private static Map<String, KafkaOffsetManager> mapDbTopic = new HashMap<>();
+    private static Map<String, KafkaOffsetManager> topicOffsetMap = new HashMap<>();
 
     public static synchronized KafkaOffsetManager loadOffsetManagerForTopic(String topic, String workerName) {
-		KafkaOffsetManager connector = mapDbTopic.get(topic);
+		KafkaOffsetManager connector = topicOffsetMap.get(topic);
 		if (connector == null) {
 		    connector = new KafkaOffsetManager(topic,workerName);
-		    mapDbTopic.put(topic, connector);
+		    topicOffsetMap.put(topic, connector);
 		}
 		return connector;
     }
     
     public static synchronized void shutdownMapDB() {
-  		Collection<KafkaOffsetManager> connectors = mapDbTopic.values();
+  		Collection<KafkaOffsetManager> connectors = topicOffsetMap.values();
   		for (KafkaOffsetManager mapDbConnector : connectors) {
 		    mapDbConnector.shutdown();
 		}

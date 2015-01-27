@@ -77,6 +77,7 @@ jar {
     from(sourceSets.main.output) {
         include "**"
     }
+    version = ''
     baseName = 'rfx-core-master'
     manifest = project.manifest {
         from rfxCoreMasterManifest

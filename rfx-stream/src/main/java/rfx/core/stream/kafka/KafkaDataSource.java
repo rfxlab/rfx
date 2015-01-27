@@ -40,6 +40,7 @@ import rfx.core.util.Utils;
 public class KafkaDataSource {
 	
 	static final String TAG = KafkaDataSource.class.getSimpleName();
+	static String errorMsg = "OffsetOutOfRange: The requested offset is outside the range of offsets maintained by the server for the given topic/partition.";
 	
 	private List<String> m_replicaBrokers = new ArrayList<String>();
 
@@ -91,7 +92,7 @@ public class KafkaDataSource {
 			    short code = fetchResponse.errorCode(a_topic, a_partition);
 			    if(code == 1 || code == ErrorMapping.OffsetOutOfRangeCode()){
 			    	//https://cwiki.apache.org/KAFKA/a-guide-to-the-kafka-protocol.html#AGuideToTheKafkaProtocol-OffsetAPI
-			    	String errorMsg = "OffsetOutOfRange: The requested offset is outside the range of offsets maintained by the server for the given topic/partition.";
+			    	
 			    	LogUtil.e(TAG,"Error fetching data from the Broker:" + leaderHost + " Reason: " + errorMsg);
 			    	
 			    	//try 100 times  for searching valid offset			    	

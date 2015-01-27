@@ -102,6 +102,10 @@ public class DateTimeUtil {
 		return DB_HOUR_NAME_FORMAT.format(d);
 	}
 	
+	/**
+	 * @param Date
+	 * @return date string in format "yyyy-MM-dd-HH"
+	 */
 	public static String getDateHourString(Date d ){
 		return DATEHOUR_FORMAT.format(d);
 	}
