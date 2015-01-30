@@ -94,7 +94,7 @@ task clickTrackHttpServer(type: Jar) {
     manifest {
    		attributes ('Implementation-Title': 'ItemTrackHttpServer', 
         			'Implementation-Version': version ,
-        			'Main-Class': 'sample.server.item.track.ItemTrackHttpServer',
+        			'Main-Class': 'sample.server.item.track.SimpleTrackHttpServer',
         			'Class-Path' : getClasspathStringJars() + ' ./rfx-core-master.jar ; ./rfx-track-http-server.jar ; ' )
 	}
 }

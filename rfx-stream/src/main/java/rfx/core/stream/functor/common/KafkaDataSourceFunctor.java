@@ -24,7 +24,7 @@ public class KafkaDataSourceFunctor extends DataSourceFunctor {
 	}
 
 	//what data fields that this actor would send to next actor
-	static Fields fields = new Fields(EVENT,"topic","partitionId");
+	static Fields fields = new Fields(EVENT,"topic","partitionId","offsetId");
 	List<KafkaData> kafkaDatas;
 	
 	@Override
@@ -49,7 +49,7 @@ public class KafkaDataSourceFunctor extends DataSourceFunctor {
 						
 						int c = 0;
 						for (KafkaData kkData : kafkaDatas) {
-							Values values =  new Values(kkData.data(), topic, partitionId);						
+							Values values =  new Values(kkData.data(), topic, partitionId, kkData.offset());						
 							Tuple newTuple = new Tuple(fields, values);	
 							this.emit(newTuple, self());
 							if(c % maxSizeToSleep == 0){

@@ -4,6 +4,7 @@ import static rfx.core.stream.processor.HttpEventProcessor.COOKIE;
 import static rfx.core.stream.processor.HttpEventProcessor.IP;
 import static rfx.core.stream.processor.HttpEventProcessor.LOGGEDTIME;
 import static rfx.core.stream.processor.HttpEventProcessor.PARTITION_ID;
+import static rfx.core.stream.processor.HttpEventProcessor.OFFSET_ID;
 import static rfx.core.stream.processor.HttpEventProcessor.QUERY;
 import static rfx.core.stream.processor.HttpEventProcessor.TOPIC;
 import static rfx.core.stream.processor.HttpEventProcessor.USERAGENT;
@@ -19,7 +20,7 @@ import rfx.core.util.StringUtil;
 public class HttpEventLogTokenizing extends StreamProcessor {	
 		
 	//what data fields that this actor would send to next actor
-	public static final Fields outputFields = new Fields(QUERY, COOKIE,LOGGEDTIME, IP, USERAGENT, TOPIC, PARTITION_ID);
+	public static final Fields outputFields = new Fields(QUERY, COOKIE,LOGGEDTIME, IP, USERAGENT, TOPIC, PARTITION_ID, OFFSET_ID);
 	private HttpEventProcessor processor;
 	
 	public HttpEventLogTokenizing(DataFlowInfo dataFlowInfo, BaseTopology topology) {
@@ -29,7 +30,7 @@ public class HttpEventLogTokenizing extends StreamProcessor {
 
 	public void onReceive(Tuple inTuple) throws Exception {
 		this.doPreProcessing();		
-		Tuple outTuple = processor.process(inTuple, outputFields);			
+		Tuple outTuple = processor.process(inTuple, outputFields);		
 		if(outTuple != null){	
 			//output to next phase										
 			this.emit(outTuple, self());

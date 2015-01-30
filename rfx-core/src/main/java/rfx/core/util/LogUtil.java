@@ -138,7 +138,7 @@ public class LogUtil {
 				datetime = DateTimeUtil.formatDate(loggedDate, "yyyy-MM-dd");
 			}
 			String time = "[" + DateTimeUtil.formatDate(loggedDate, "yyyy-MM-dd HH:mm:ss") + "] ";
-			String data = time + logData + "\n";
+			String data = StringUtil.toString(time , logData , StringPool.NEW_LINE);
 			String path =  StringUtil.toString(debugLogByDatePath, prefixMode , datetime , suffixLogFile ,LOG_EXT);
 			//System.out.println(path);
 			logFileWriter.write(path, data);

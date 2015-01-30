@@ -210,6 +210,15 @@ public class StringUtil {
 		} catch (Throwable e) {	}
 		return n;
 	}
+	
+	public static double round(double value, int places) {
+	    if (places < 0) throw new IllegalArgumentException();
+
+	    long factor = (long) Math.pow(10, places);
+	    value = value * factor;
+	    long tmp = Math.round(value);
+	    return (double) tmp / factor;
+	}
 
 
 	public static double safeParseDouble(String s){
@@ -220,7 +229,7 @@ public class StringUtil {
 		try {
 			n = Double.parseDouble(s.trim());
 		} catch (Throwable e) {	}
-		return n;
+		return round(n,2);
 	}
 
 	public static String safeString(Object s, String defaultVal) {
@@ -278,6 +287,21 @@ public class StringUtil {
 		}		
 		try {
 			n = Long.parseLong(s.toString().trim());
+		} catch (Throwable e) {	}
+		return n;
+	}
+	
+	public static float safeParseFloat(String s){
+		return safeParseFloat(s,0);
+	}
+
+	public static float safeParseFloat(Object s, float defaultVal){
+		float n = defaultVal;
+		if(s == null){
+			return n;
+		}		
+		try {
+			n = Float.parseFloat(s.toString().trim());
 		} catch (Throwable e) {	}
 		return n;
 	}

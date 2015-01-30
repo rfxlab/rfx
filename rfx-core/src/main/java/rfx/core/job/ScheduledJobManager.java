@@ -59,7 +59,7 @@ public class ScheduledJobManager {
 					ScheduledJob autoTask = (ScheduledJob) clazz.newInstance();
 					autoTask.setScheduledJobsConfigs(config);
 					
-					if(config.getPeriod() == 0){
+					if(config.getPeriod() <= 0){
 						scheduledService.schedule(autoTask, config.getDelay()*1000L);
 					} else {
 						scheduledService.schedule(autoTask, config.getDelay()*1000L, config.getPeriod()*1000L);	

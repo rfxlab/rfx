@@ -16,6 +16,7 @@ import rfx.core.util.StringUtil;
 public class HttpEventProcessor extends Processor{
 
 	public static final String PARTITION_ID = "partitionId";
+	public static final String OFFSET_ID = "offsetId";
 	public static final String TOPIC = "topic";
 	public static final String USERAGENT = "useragent";
 	public static final String IP = "ip";
@@ -30,7 +31,8 @@ public class HttpEventProcessor extends Processor{
 	public Tuple process(Tuple inputTuple, Fields outFields) {
 		String logRow = inputTuple.getStringByField(DataSourceFunctor.EVENT);
     	String topic = inputTuple.getStringByField(TOPIC,_FROM_FILE);
-    	String partitionId = inputTuple.getStringByField(PARTITION_ID,_EMPTY);	    	
+    	String partitionId = inputTuple.getStringByField(PARTITION_ID,_EMPTY);
+    	String offsetId = inputTuple.getStringByField(OFFSET_ID,_EMPTY);
 		String[] logTokens = logRow.split(TAB_STRING);
 		if(logTokens.length == 5){
 			if(StringUtil.isNotEmpty(logTokens[0])
@@ -43,7 +45,7 @@ public class HttpEventProcessor extends Processor{
 				String useragent = StringUtil.safeString(logTokens[2]);
 				String query = logTokens[3];
 				String cookie = StringUtil.safeString(logTokens[4]);			
-				return new Tuple(outFields, new Values(query, cookie, loggedtime, ip, useragent, topic, partitionId));
+				return new Tuple(outFields, new Values(query, cookie, loggedtime, ip, useragent, topic, partitionId, offsetId));
 			}
 		}	
 		return null;

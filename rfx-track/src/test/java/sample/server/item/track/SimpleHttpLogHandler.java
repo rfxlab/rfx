@@ -9,6 +9,7 @@ import server.http.util.RedirectUtil;
 
 public class SimpleHttpLogHandler implements BaseHttpHandler {
 		
+	private static final String LOG_CLICK = "l";
 	private static final String PONG = "PONG";
 	private static final String DATA = "data";
 	private static final String FAVICON_ICO = "favicon.ico";
@@ -52,7 +53,7 @@ public class SimpleHttpLogHandler implements BaseHttpHandler {
 			//handle request for ITEM TRACKING				
 			KafkaLogHandlerUtil.logHttpRequestToKafka(req, logUserActivity);			
 		} 
-		else if(uri.startsWith(logUserClick)){
+		else if(uri.startsWith(LOG_CLICK)){
 			//handle request for ITEM TRACKING				
 			KafkaLogHandlerUtil.logHttpRequestToKafka(req, logUserClick);			
 		} 
