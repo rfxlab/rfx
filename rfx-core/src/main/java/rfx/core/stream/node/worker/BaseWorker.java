@@ -215,7 +215,7 @@ public abstract class BaseWorker {
 	                return true;
 	            }
 	        }.execute();
-	        beforeBeKilledByMyself();			
+	        onBeforeBeStopped();			
 			status = KILLED;
 			System.out.println("Bye, now exiting "+classnameWorker);
 			Utils.exitSystemAfterTimeout(1000);	
@@ -351,7 +351,7 @@ public abstract class BaseWorker {
 	}
 	
 	
-	protected void beforeBeKilledByMyself() {		
+	protected void onBeforeBeStopped() {		
 		System.out.println("beforeBeKilledByMyself "+classnameWorker);
 	}
 	
