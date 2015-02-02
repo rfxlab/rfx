@@ -30,12 +30,16 @@ import java.util.regex.Pattern;
  * @author Steve Jiang (@sjiang) <gh at iamsteve com>
  */
 public class DeviceParser {
+	private static final String MOBILE_TOKEN = "mobile";
+	public static final String GENERAL_TABLET = "General_Tablet";
+	public static final String GENERAL_MOBILE = "General_Mobile";
+	public static final String GENERAL_PC = "PC";
 	public static final Map<String, String> mobileDeviceTypeMap = new HashMap<String, String>();
 	static {
-		mobileDeviceTypeMap.put("iOS", "General_Mobile");
-		mobileDeviceTypeMap.put("Android", "General_Mobile");
-		mobileDeviceTypeMap.put("Windows Phone", "General_Mobile");
-		mobileDeviceTypeMap.put("BlackBerry OS", "General_Mobile");
+		mobileDeviceTypeMap.put("iOS", GENERAL_MOBILE);
+		mobileDeviceTypeMap.put("Android", GENERAL_MOBILE);
+		mobileDeviceTypeMap.put("Windows Phone", GENERAL_MOBILE);
+		mobileDeviceTypeMap.put("BlackBerry OS", GENERAL_MOBILE);
 	}
 	
 	List<DevicePattern> patterns;
@@ -54,15 +58,15 @@ public class DeviceParser {
 			}
 		}
 		if (device == null){			
-			device = "Other";
+			device = GENERAL_PC;
 		}
 
 		Device dv = new Device(device);
 		String deviceType = mobileDeviceTypeMap.get(os.family);
 		if(deviceType != null){
-			if(deviceType.equals("General_Mobile")){
-				if( ! agentString.toLowerCase().contains("mobile") ){
-					deviceType = "General_Tablet";
+			if(deviceType.equals(GENERAL_MOBILE)){
+				if( ! agentString.toLowerCase().contains(MOBILE_TOKEN) ){
+					deviceType = GENERAL_TABLET;
 				}
 			}
 			dv.setDeviceType(deviceType);	
@@ -128,7 +132,7 @@ public class DeviceParser {
 	
 	
 	public static String parseDeviceType(String ua){
-		boolean isIPhone = ua.toLowerCase().contains("mobile");
+		boolean isIPhone = ua.toLowerCase().contains(MOBILE_TOKEN);
 		boolean isAndroid = ua.toLowerCase().contains("android");
 		boolean isWindowPhone = ua.toLowerCase().contains("phone");
 		return "";
