@@ -18,10 +18,7 @@ public class ScheduledJobsConfigs {
 	private long period;
 	private int hoursGoBack = 2;
 	
-	public ScheduledJobsConfigs() {
-		
-	}
-	
+	public ScheduledJobsConfigs() {}	
 	
 	public  String getClasspath() {
 		return classpath;
@@ -55,7 +52,6 @@ public class ScheduledJobsConfigs {
 		this.hoursGoBack = hoursGoBack;
 	}
 
-
 	@Override
 	public String toString() {
 		StringBuilder s = new StringBuilder();
@@ -85,4 +81,3 @@ public class ScheduledJobsConfigs {
 		throw new IllegalArgumentException("Can not load "+SCHEDULED_JOBS_CONFIG_FILE);
 	}
 }
-

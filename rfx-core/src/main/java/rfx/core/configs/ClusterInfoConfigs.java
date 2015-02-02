@@ -6,6 +6,13 @@ import rfx.core.configs.loader.ParseConfigHandler;
 import rfx.core.configs.loader.ParseXmlObjectHandler;
 import rfx.core.nosql.jedis.RedisInfo;
 
+/**
+ * 
+ * the config for master node (admin)
+ * 
+ * @author trieunt
+ *
+ */
 public class ClusterInfoConfigs implements Configurable {
 	
 	@AutoInjectedConfig(injectable = true)

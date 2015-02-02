@@ -20,7 +20,7 @@ import rfx.core.nosql.jedis.Shardable;
 import rfx.core.util.StringUtil;
 
 /**
- * Redis Pool Configs for all Storm Topology
+ * Redis Pool Configs for all Topology
  * 
  * @author trieu
  * 
