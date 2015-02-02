@@ -24,19 +24,10 @@ public class WorkerConfigs implements Serializable, Configurable{
 	@AutoInjectedConfig(injectable = true)
 	static WorkerConfigs instance;
 	
-	String prefixWorkerName;
-	String hostName;
-	List<WorkerInfo> allocatedWorkers;
-	String allocatedCmdActorPortRanges;
+	String workerGroupName;
 	String startWorkerScriptPath;
-	String debugLogPath;
-	String kafkaOffsetDbPath;
-	String mainClass;
-	
-	
-    public String getMainClass() {
-        return mainClass;
-    }
+	String debugLogPath;		
+	List<WorkerInfo> allocatedWorkers;
 
     public List<WorkerInfo> getAllocatedWorkers() {
 		if(allocatedWorkers == null){
@@ -49,18 +40,6 @@ public class WorkerConfigs implements Serializable, Configurable{
 		this.allocatedWorkers = allocatedWorkers;
 	}
 	
-	public String getHostName() {
-		return hostName;
-	}
-	
-	public String getPrefixWorkerName() {
-		return prefixWorkerName;
-	}
-
-	public String getAllocatedCmdActorPortRanges() {
-		return allocatedCmdActorPortRanges;
-	}
-
 	public String getStartWorkerScriptPath() {
 		return startWorkerScriptPath;
 	}
@@ -69,8 +48,8 @@ public class WorkerConfigs implements Serializable, Configurable{
 		return debugLogPath;
 	}
 	
-	public String getKafkaOffsetDbPath() {
-		return kafkaOffsetDbPath;
+	public String getWorkerGroupName() {
+		return workerGroupName;
 	}
 
 	public static final WorkerConfigs load() {	
@@ -91,7 +70,6 @@ public class WorkerConfigs implements Serializable, Configurable{
 			public void injectFieldValue() {
 				try {
 					WorkerConfigs workerConfigs = (WorkerConfigs)configurableObj;
-					
 					Element node = xmlNode.select(field.getName()).first();
 					if( "list".equals(node.attr("type") )){
 						Elements workerNodes =  xmlNode.select(field.getName()+" worker");
@@ -99,8 +77,9 @@ public class WorkerConfigs implements Serializable, Configurable{
 						for (Element workerNode : workerNodes) {
 							int port = StringUtil.safeParseInt(workerNode.select("port").text());
 							String mainClass = StringUtil.safeString(workerNode.select("mainClass").text());
+							String hostName = StringUtil.safeString(workerNode.select("hostName").text());
 							String topology = StringUtil.safeString(workerNode.select("port").attr("topology"));
-							allocatedWorkers.add(new WorkerInfo(workerConfigs.hostName, port, topology, mainClass));
+							allocatedWorkers.add(new WorkerInfo(hostName, port, topology, mainClass));
 						}
 						workerConfigs.setAllocatedWorkers(allocatedWorkers);
 					} else {

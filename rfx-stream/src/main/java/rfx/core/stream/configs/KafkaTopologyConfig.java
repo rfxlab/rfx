@@ -24,6 +24,7 @@ public class KafkaTopologyConfig implements Serializable, Configurable{
 	String name;	
 	String brokerList;
 	String topology;	
+	String kafkaOffsetDbPath;
 	boolean autoStart = true;
 		
 	public boolean isAutoStart() {
@@ -124,6 +125,10 @@ public class KafkaTopologyConfig implements Serializable, Configurable{
 				
 			}
 		};
+	}
+	
+	public String getKafkaOffsetDbPath() {
+		return kafkaOffsetDbPath;
 	}
 	
 	@Override

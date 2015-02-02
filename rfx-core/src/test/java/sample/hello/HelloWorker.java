@@ -57,38 +57,7 @@ public class HelloWorker extends BaseWorker {
 
     @Override
     protected void onStartDone() {
-        System.out.println("Ready to do my work!");
-        ShardedJedisPool jedisPool = ClusterDataManager.getRedisClusterInfoPool();
-        new RedisCommand<Boolean>(jedisPool) {
-
-            @Override
-            protected Boolean build() throws JedisException {
-                jedis = shardedJedis.getShard(StringPool.BLANK);
-                String workerName = StringUtil.toString(publicHost.replaceAll("\\.", ""), "_", publicPort);
-                WorkerTimeLog timeLog = new Gson().fromJson(
-                        jedis.hget(ClusterDataManager.CLUSTER_WORKER_PREFIX, workerName
-                                + ClusterDataManager.WORKER_TIMELOG_POSTFIX), WorkerTimeLog.class);
-                if (timeLog == null) {
-                    timeLog = new WorkerTimeLog();
-                }
-                timeLog.addUpTime(System.currentTimeMillis());
-                jedis.hset(ClusterDataManager.CLUSTER_WORKER_PREFIX, workerName
-                        + ClusterDataManager.WORKER_TIMELOG_POSTFIX, new Gson().toJson(timeLog));
-                return true;
-            }
-        }.execute();
-        
-        for (int i = 0; i < 30000; i++) {
-            String test = "test";
-            test = test + i;
-        }
-        
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                ClusterDataManager.updateWorkerData(publicHost, publicPort);
-            }
-        }, 2000, 2000);
+        System.out.println("onStartDone Ready to do my work!");      
     }
 
     public static void main(String[] args) {

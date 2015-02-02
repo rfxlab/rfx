@@ -146,7 +146,7 @@ public class AsynFileWriter {
 				}				
 			} catch (Exception e) {			
 				LogUtil.e("RawLogData", e.getMessage() + " "+logFile);
-				e.printStackTrace();
+				//e.printStackTrace();
 			} finally {
 				if (bufferedWriter != null) {
 					try {

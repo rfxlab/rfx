@@ -40,10 +40,10 @@ public class SupervisorNode {
         if (workerInfoCache2.size() > 0) {
             return workerInfoCache2;
         }
-        WorkerConfigs workerConfigs = WorkerConfigs.load();
-        String host = workerConfigs.getHostName();
+        WorkerConfigs workerConfigs = WorkerConfigs.load();        
         List<WorkerInfo> tcpPorts = workerConfigs.getAllocatedWorkers();
         for (WorkerInfo w : tcpPorts) {
+        	String host = w.getHost();
             String name = StringUtil.toString(host.replaceAll("\\.", ""), "_", w.getPort());
             workerInfoCache2.put(name, new WorkerInfo(name, host, w.getPort(), w.getMainClass()));
         }
