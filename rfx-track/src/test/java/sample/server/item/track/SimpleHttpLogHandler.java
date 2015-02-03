@@ -2,6 +2,7 @@ package sample.server.item.track;
 
 import org.vertx.java.core.http.HttpServerRequest;
 
+import rfx.core.util.DateTimeUtil;
 import rfx.core.util.StringPool;
 import server.http.handler.BaseHttpHandler;
 import server.http.util.KafkaLogHandlerUtil;
@@ -19,6 +20,7 @@ public class SimpleHttpLogHandler implements BaseHttpHandler {
 	static final String logUserActivity = "u";
 	static final String logUserClick = "c";
 	static final String redirectClickPrefix = "r/";
+	static final String monitorDataPrefix = "md";
 
 	@Override
 	public void handle(HttpServerRequest req) {
@@ -43,6 +45,7 @@ public class SimpleHttpLogHandler implements BaseHttpHandler {
 		}
 		else if (uri.startsWith(redirectClickPrefix)) {
 			RedirectUtil.redirect(uri, req);
+			RealtimeTrackingUtil.updateKafkaLogEvent(DateTimeUtil.currentUnixTimestamp(), "click-redirect");
 		}		
 		//just for dev
 		else if(uri.startsWith(logItemTracking)){
@@ -55,8 +58,19 @@ public class SimpleHttpLogHandler implements BaseHttpHandler {
 		} 
 		else if(uri.startsWith(LOG_CLICK)){
 			//handle request for ITEM TRACKING				
-			KafkaLogHandlerUtil.logHttpRequestToKafka(req, logUserClick);			
+			KafkaLogHandlerUtil.logHttpRequestToKafka(req, logUserClick);	
+			RealtimeTrackingUtil.updateKafkaLogEvent(DateTimeUtil.currentUnixTimestamp(), "click-http");
 		} 
+		else if(uri.startsWith(monitorDataPrefix)){
+			String data;
+			if(req.params() != null){
+				String key = req.params().get("key");
+				data = RealtimeTrackingUtil.getAllKafkaLogEvents(key);
+			} else {
+				data = RealtimeTrackingUtil.getAllKafkaLogEvents(null);	
+			}
+			req.response().end(data);
+		}
 	}
 
 	@Override

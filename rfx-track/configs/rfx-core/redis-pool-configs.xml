@@ -3,10 +3,17 @@
 
 	<RedisPools fieldname="redisPools" >		
 		<!-- ############################# BEGIN ############################### -->		
+		
 		<!-- System Cluster and worker data, worker info, logged events -->
-		<RedisInfo host="127.0.0.1" port="6379" auth="">
+		<RedisInfo host="10.254.53.247" port="6481">
 			<access-key>clusterInfoRedis</access-key>
-		</RedisInfo>	
+		</RedisInfo>
+		
+		<!-- real-time report (total, daily, hourly, perMinute, perSecond) -->
+		<RedisInfo host="10.254.53.247" port="6483">
+			<access-key>realtimeDataStats</access-key>
+		</RedisInfo>
+			
 		<!-- ############################# END ############################### -->			
 	</RedisPools>
 	
