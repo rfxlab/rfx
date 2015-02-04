@@ -16,11 +16,11 @@ public class ScheduledJobNode extends BaseWorker {
 	public void start(String host, int port) {
 		Handler<HttpServerRequest> handler = new Handler<HttpServerRequest>() {
             public void handle(HttpServerRequest request) {
-                if (request.absoluteURI().getPath().equals("/cmd/kill")) {
-                    request.response().end("Exiting...");
+                if (request.absoluteURI().getPath().equals("/kill")) {
+                    request.response().end("Exiting after 5s ...");
                     killWorker();
                     return;
-                } else if (request.absoluteURI().getPath().equals("/cmd/ping")) {
+                } else if (request.absoluteURI().getPath().equals("/ping")) {
                     request.response().end("PONG");
                     return;
                 } else if (request.absoluteURI().getPath().equals("/job/trigger")) {
