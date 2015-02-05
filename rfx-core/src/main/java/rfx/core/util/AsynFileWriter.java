@@ -4,15 +4,13 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
-import rfx.core.util.LogUtil;
+import java.util.concurrent.ConcurrentMap;
 
 
 /**
@@ -26,7 +24,7 @@ public class AsynFileWriter {
 	long expiredTime = 960000L;//15 minutes
 	long timeToFlush = 10000;	
 	Timer timer = new Timer(true);
-	Map<String, LogData> fileMap = new HashMap<>();
+	ConcurrentMap<String, LogData> fileMap = new ConcurrentHashMap<>();
 		
 	public AsynFileWriter(long expiredTime, long timeToFlush) {
 		super();
@@ -135,18 +133,17 @@ public class AsynFileWriter {
 					file.createNewFile();
 				}
 				fileWritter = new FileWriter(file, true);
-				bufferedWriter = new BufferedWriter(fileWritter, BUFFER_SIZE);
-				String log = logQueue.poll();
-				while (log != null) {				 
-					bufferedWriter.write(log);					
+				bufferedWriter = new BufferedWriter(fileWritter, BUFFER_SIZE);				
+				while (! logQueue.isEmpty() ) {
+					String log = logQueue.poll();
 					log = logQueue.poll();
 					if(log == null){
 						break;
 					}
-				}				
+					bufferedWriter.write(log);	
+				}
 			} catch (Exception e) {			
 				LogUtil.e("RawLogData", e.getMessage() + " "+logFile);
-				//e.printStackTrace();
 			} finally {
 				if (bufferedWriter != null) {
 					try {
