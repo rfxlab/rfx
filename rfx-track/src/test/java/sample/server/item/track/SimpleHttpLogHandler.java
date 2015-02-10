@@ -1,15 +1,18 @@
 package sample.server.item.track;
 
+import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.http.HttpServerRequest;
 
 import rfx.core.util.DateTimeUtil;
 import rfx.core.util.StringPool;
+import rfx.core.util.StringUtil;
 import server.http.handler.BaseHttpHandler;
 import server.http.util.KafkaLogHandlerUtil;
 import server.http.util.RedirectUtil;
 
 public class SimpleHttpLogHandler implements BaseHttpHandler {
 		
+	private static final String REDIRECT_PREFIX = "/r/";
 	private static final String LOG_CLICK = "l";
 	private static final String PONG = "PONG";
 	private static final String DATA = "data";
@@ -19,7 +22,7 @@ public class SimpleHttpLogHandler implements BaseHttpHandler {
 	static final String logItemTracking = "tk";
 	static final String logUserActivity = "u";
 	static final String logUserClick = "c";
-	static final String redirectClickPrefix = "r/";
+	static final String redirectClickPrefix = "r";
 	static final String monitorDataPrefix = "md";
 
 	@Override
@@ -31,7 +34,8 @@ public class SimpleHttpLogHandler implements BaseHttpHandler {
 			uri = req.uri();
 		}
 		
-		System.out.println("URI: " + uri);		
+		System.out.println("URI: " + uri);
+		
 		//common
 		if(uri.startsWith(LOG_DATA)){			
 			String json = req.params().get(DATA);
@@ -44,21 +48,36 @@ public class SimpleHttpLogHandler implements BaseHttpHandler {
 			req.response().end(PONG);
 		}
 		else if (uri.startsWith(redirectClickPrefix)) {
-			RedirectUtil.redirect(uri, req);
+			MultiMap params = req.params();
+			String link = params.get("link");
+			int index = -1;
+			if(StringUtil.isNotEmpty(link)){
+				index = link.indexOf(REDIRECT_PREFIX);
+			}
+			
+			if( index > 0 ){
+				System.out.println("link "+link);
+				String clickUrl = link.substring(index+3);
+				System.out.println("clickUrl "+clickUrl);
+				KafkaLogHandlerUtil.log(req, logUserClick);
+				RedirectUtil.redirect(clickUrl, req);
+			} else {
+				RedirectUtil.redirect(uri, req);
+			}
 			RealtimeTrackingUtil.updateKafkaLogEvent(DateTimeUtil.currentUnixTimestamp(), "click-redirect");
 		}		
 		//just for dev
 		else if(uri.startsWith(logItemTracking)){
-			//handle request for ITEM TRACKING				
-			KafkaLogHandlerUtil.logHttpRequestToKafka(req, logItemTracking);
+			//handle log request				
+			KafkaLogHandlerUtil.logAndResponseImage1px(req, logItemTracking);
 		}	
 		else if(uri.startsWith(logUserActivity)){
-			//handle request for ITEM TRACKING				
-			KafkaLogHandlerUtil.logHttpRequestToKafka(req, logUserActivity);			
+			//handle log request				
+			KafkaLogHandlerUtil.logAndResponseImage1px(req, logUserActivity);			
 		} 
 		else if(uri.startsWith(LOG_CLICK)){
-			//handle request for ITEM TRACKING				
-			KafkaLogHandlerUtil.logHttpRequestToKafka(req, logUserClick);	
+			//handle log request				
+			KafkaLogHandlerUtil.logAndResponseImage1px(req, logUserClick);	
 			RealtimeTrackingUtil.updateKafkaLogEvent(DateTimeUtil.currentUnixTimestamp(), "click-http");
 		} 
 		else if(uri.startsWith(monitorDataPrefix)){

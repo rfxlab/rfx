@@ -12,8 +12,9 @@ import server.http.model.ClickBeaconData;
 
 public class RedirectUtil {
 	
-	public static void redirect(String uri, HttpServerRequest req){
+	public static void redirect(String uri, HttpServerRequest req){		
 		ClickBeaconData cd = RedirectUtil.decodeClickUri(uri);
+		
 		HttpServerResponse res = req.response();
 		if (cd != null) {
 			String redirect = cd.getRedirectUrl();			
@@ -24,6 +25,7 @@ public class RedirectUtil {
 				res.end();
 			}
 		} else {
+			System.err.println("ClickBeaconData is NULL, redirect to default URL");
 			res.setStatusCode(HttpResponseStatus.MOVED_PERMANENTLY.code());
 			res.headers().set(Names.LOCATION, "http://eclick.vn");
 			res.headers().set(Names.CONNECTION, "Close");
@@ -37,7 +39,10 @@ public class RedirectUtil {
 			String [] toks2 = toks[0].split("/");
 			
 			String redirectUrl = StringUtil.toString(toks2[toks2.length-1] , "://" , toks[1]);
+			System.out.println("["+redirectUrl+"]");
 			String beacon = toks2[toks2.length-2];
+			
+			System.out.println("redirectUrl "+redirectUrl);
 			
 			return new ClickBeaconData(redirectUrl, beacon);
 		} catch (Exception e) {
@@ -50,5 +55,6 @@ public class RedirectUtil {
 		}
 		return null;
 	}
-
+	
+	
 }

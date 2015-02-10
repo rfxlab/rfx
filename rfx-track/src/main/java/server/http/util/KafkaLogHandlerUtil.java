@@ -39,14 +39,18 @@ public class KafkaLogHandlerUtil {
 		return result;
 	}
 	
-	public static void logHttpRequestToKafka(final HttpServerRequest req, String producerKey){
-		trackingResponse(req);
+	public static void log(final HttpServerRequest req, String producerKey){		
 		HttpEventKafkaHandler kafkaHandler = HttpEventKafkaHandler.loadHandler(producerKey);
 		if (kafkaHandler != null) {
 			kafkaHandler.writeLogToKafka(req);
 		} else {
 			System.err.println("No KafkaLogHandler found for " + producerKey);
 		}		
+	}
+	
+	public static void logAndResponseImage1px(final HttpServerRequest req, String producerKey){
+		log(req, producerKey);
+		trackingResponse(req);
 	}
 	
 	public static void logDataToKafka(HttpServerRequest req, String json){

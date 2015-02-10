@@ -20,7 +20,7 @@ public class KafkaHttpEventLogHandler implements BaseHttpHandler {
 		String kp = StringUtil.safeString(req.params().get(KAFKA_PRODUCER_NAME));
 		if(kafkaProducerConfigs.get(kp) != null){
 			//log request to Kafka 		
-			KafkaLogHandlerUtil.logHttpRequestToKafka(req, kp);			
+			KafkaLogHandlerUtil.logAndResponseImage1px(req, kp);			
 		} 
 	}
 
