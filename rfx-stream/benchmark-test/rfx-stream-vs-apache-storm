@@ -1,4 +1,3 @@
- 5287 root      15   0 90196 3472 2700 S 51.7  0.0  10:35.80 sshd
 18988 root      21   0 4465m 302m  11m S 47.7  1.3   2:23.29 rfxstream
 18986 root      20   0 4461m 288m  11m S 47.0  1.2   2:22.41 rfxstream
 18990 root      20   0 4469m 309m  11m S 45.0  1.3   2:28.71 rfxstream
@@ -7,16 +6,12 @@
 18992 root      25   0 4447m 292m  11m S 40.1  1.2   2:21.09 rfxstream
 18989 root      20   0 4516m 289m  11m S 38.8  1.2   2:18.69 rfxstream
 18991 root      24   0 4517m 291m  11m S 37.4  1.2   2:19.27 rfxstream
-21429 root      15   0  343m 266m  916 S 21.9  1.1 481:57.74 redis-server
+
 10861 root      25   0 4800m 676m  12m S 14.6  2.8  14:09.27 storm
 10860 root      25   0 4803m 709m  12m S 13.6  2.9  14:13.32 storm
 10879 root      24   0 4864m 477m  12m S  4.0  2.0   3:33.86 storm
-31427 root      15   0  879m 129m  968 S  2.6  0.5  10488:43 redis-server
 10859 root      25   0 4805m 700m  12m S  2.3  2.9  14:28.67 storm
 10909 root      25   0 4744m 493m  12m S  2.3  2.0   1:51.45 storm
 10857 root      25   0 4794m 696m  12m S  1.7  2.9  14:21.11 storm
 10858 root      25   0 4796m 675m  12m S  1.7  2.8  14:14.68 storm
 10862 root      25   0 4807m 682m  12m S  1.7  2.8  14:08.00 storm
-14526 root      15   0 90196 3464 2700 S  1.0  0.0   0:00.25 sshd
-10818 root      19   0 6702m 139m  12m S  0.3  0.6   0:11.83 storm
-21625 root      19   0 6693m 132m  12m S  0.3  0.6   0:05.80 storm
