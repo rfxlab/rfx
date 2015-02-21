@@ -1,0 +1,53 @@
+<h4>Example: Logic</h4>
+
+<p>
+    In Handlebars you can use 'if', 'else' and 'unless' helpers.
+    The 'if' helper will display whatever is inside it (and before the '/if' helper) if the variable is "truthy". Basically,
+    is it is not <code>false</code> or <code>undefined</code> or <code>0</code>.
+</p>
+
+<p>
+    Example: the value of <code>&#123;&#123;upIsUpd&#125;&#125;</code> is: <b>{{upIsUp}}</b>, so if I use it in an 'if' helper,
+    this gets displayed:
+
+    <code><pre>
+ &#123;&#123;#if upIsUp&#125;&#125;
+
+ Yes, up is up.
+
+&#123;&#123;/if&#125;&#125;
+</pre></code>
+    <br>
+    <br>
+    The result:
+
+    {{#if upIsUp}}
+        Yes, up is up.
+    {{/if}}
+</p>
+
+<p>
+    Similarly, you can use <code>&#123;&#123;else&#125;&#125;</code> inside an  &#123;&#123;#if&#125;&#125;, which does what you'd expect.
+    The value of <code>&#123;&#123;upIsDown&#125;&#125;</code> is: <b>{{upIsDown}}</b> (false), so if I use it in an 'if' helper with an 'else', like so:
+
+    <code><pre>
+ &#123;&#123;#if upIsDown&#125;&#125;
+
+ Yes, up is the same as down.
+
+  &#123;&#123;else&#125;&#125;
+
+  No, up is not the same down. Up is up.
+
+&#123;&#123;/if&#125;&#125;
+</pre></code>
+    <Br>
+    <br>
+    The result:
+
+    {{#if upIsDown}}
+        Yes, up is the same as down.
+    {{else}}
+        No, up is not the same down. Up is up.
+    {{/if}}
+</p>

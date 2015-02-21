@@ -11,6 +11,7 @@
 **/.settings/*
 **/.idea/*
 **/releases/*
+**/node_modules/*
 **/contiperf-report/*
 
 # Package Files #
