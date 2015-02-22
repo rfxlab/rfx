@@ -1,8 +1,12 @@
 var express = require('express');
 var app = express();
 var expressHbs = require('express-handlebars');
+var serveStatic = require('serve-static');
 
-app.engine('hbs', expressHbs({extname:'hbs', defaultLayout:'main.hbs'}));
+// New call to compress content
+app.use(serveStatic('public'));
+
+app.engine('hbs', expressHbs({extname:'hbs', defaultLayout:'admin.hbs'}));
 app.set('view engine', 'hbs');
 
 app.get('/', function(req, res){
