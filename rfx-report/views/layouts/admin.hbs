@@ -46,7 +46,9 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="index.html">RFX Admin</a>
+
+            <a class="navbar-brand" href="index.html">{{{dashboard_title}}}</a>
+
         </div>
         <!-- Top Menu Items -->
         <ul class="nav navbar-right top-nav">
@@ -73,7 +75,7 @@
                 </ul>
             </li>
             <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> John Smith <b
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> Admin <b
                         class="caret"></b></a>
                 <ul class="dropdown-menu">
                     <li>
@@ -100,21 +102,20 @@
                     <a href="index.html"><i class="fa fa-fw fa-dashboard"></i> Dashboard</a>
                 </li>
                 <li>
-                    <a href="charts.html"><i class="fa fa-fw fa-bar-chart-o"></i> Heatmap Monitor</a>
+                    <a href="charts.html"><i class="fa fa-fw fa-bar-chart-o"></i> Real-time Monitor</a>
                 </li>
                 <li>
                     <a href="javascript:;" data-toggle="collapse" data-target="#demo"><i
-                            class="fa fa-fw fa-arrows-v"></i> Dropdown <i class="fa fa-fw fa-caret-down"></i></a>
+                            class="fa fa-fw fa-arrows-v"></i> Message <i class="fa fa-fw fa-caret-down"></i></a>
                     <ul id="demo" class="collapse">
                         <li>
-                            <a href="#">Dropdown Item</a>
+                            <a href="#">Building</a>
                         </li>
                         <li>
-                            <a href="#">Dropdown Item</a>
+                            <a href="#">Delivering</a>
                         </li>
                     </ul>
                 </li>
-
             </ul>
         </div>
         <!-- /.navbar-collapse -->
@@ -139,7 +140,7 @@
             </div>
             <!-- /.row -->
 
-
+            {{{body}}}
 
         </div>
         <!-- /.container-fluid -->
