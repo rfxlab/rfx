@@ -33,6 +33,7 @@ public class HttpEventKafkaHandlerImpl extends HttpEventKafkaHandler {
 	
 	void writeLogToKafka(String ip, String userAgent, String logDetails, String cookieString){		
 		countingToDebug();
+		System.out.println("cookieString "+cookieString);
 		EventData data = new HttpDataLog(ip, userAgent, logDetails, cookieString);		
 		if( KafkaProducerHandler.KAFKA_ENABLED){
 			kafkaProducerHandler.writeData(data);

@@ -13,6 +13,7 @@ import server.http.util.RedirectUtil;
 public class SimpleHttpLogHandler implements BaseHttpHandler {
 		
 	private static final String REDIRECT_PREFIX = "/r/";
+	
 	private static final String LOG_CLICK = "l";
 	private static final String PONG = "PONG";
 	private static final String DATA = "data";
@@ -53,14 +54,14 @@ public class SimpleHttpLogHandler implements BaseHttpHandler {
 			int index = -1;
 			if(StringUtil.isNotEmpty(link)){
 				index = link.indexOf(REDIRECT_PREFIX);
-			}
-			
+			}			
 			if( index > 0 ){
 				System.out.println("link "+link);
 				String clickUrl = link.substring(index+3);
 				System.out.println("clickUrl "+clickUrl);
 				KafkaLogHandlerUtil.log(req, logUserClick);
 				RedirectUtil.redirect(clickUrl, req);
+				//KafkaLogHandlerUtil.trackingResponse(req);
 			} else {
 				RedirectUtil.redirect(uri, req);
 			}

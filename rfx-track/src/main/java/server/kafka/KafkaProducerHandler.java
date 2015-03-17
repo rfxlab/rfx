@@ -69,7 +69,7 @@ public class KafkaProducerHandler {
 				String partioner =  jsonProducerConfig.get("partioner");
 				if (partioner == null ) {
 					partioner = defaultPartitioner;
-				}							
+				}
 				Properties configs = KafkaProducerUtil.createProducerProperties(brokerList, partioner,MAX_KAFKA_TO_SEND);
 				kafkaProducers.put(key, new KafkaProducerHandler(new ProducerConfig(configs), topic));
 				LogUtil.i("KafkaHandler.init-loaded: "+ key + " => "+jsonProducerConfig);
@@ -133,7 +133,7 @@ public class KafkaProducerHandler {
 		try {
 			SendLogBufferTask task = logBufferList.get(index);
 			if(task != null){				
-				//System.out.println("log " + log);
+				System.out.println("log " + data.toStringMessage());
 				task.addToBufferQueue(data);
 			} else {
 				LogUtil.e(topic, "writeLogToKafka: FlushLogToKafkaTask IS NULL");

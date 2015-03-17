@@ -13,8 +13,7 @@ import server.http.model.ClickBeaconData;
 public class RedirectUtil {
 	
 	public static void redirect(String uri, HttpServerRequest req){		
-		ClickBeaconData cd = RedirectUtil.decodeClickUri(uri);
-		
+		ClickBeaconData cd = RedirectUtil.decodeClickUri(uri);		
 		HttpServerResponse res = req.response();
 		if (cd != null) {
 			String redirect = cd.getRedirectUrl();			
