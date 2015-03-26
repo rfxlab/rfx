@@ -25,20 +25,19 @@ public class StressTestRfxTrackServer {
 	@PerfTest(invocations = 30000, threads = 300)
 	@Required(max = 4000, average = 100)
 	public void testPing() throws Exception {
-		final String url = "http://localhost:8080/ping";
-		final String PONG = "PONG";
-		
+		final String url = "http://log.eclick.vn/ping";
+		final String PONG = "PONG";		
 		String rs = HttpClientCaller.executeGet(url);
 		if (rs.equals(PONG)) {
 			int c = validCount.incrementAndGet();
-			//System.out.println("c = "+c);
+			System.out.println("c = "+c);
 		} else {
-			System.out.println(rs);
+			//System.out.println(rs);
 			invalidCount.incrementAndGet();
 		}
 	}
 	
-	@Test
+	
 	@PerfTest(invocations = 30000, threads = 300)
 	@Required(max = 4000, average = 100)
 	public void testTracking() throws Exception {

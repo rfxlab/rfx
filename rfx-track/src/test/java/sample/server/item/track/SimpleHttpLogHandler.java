@@ -90,6 +90,8 @@ public class SimpleHttpLogHandler implements BaseHttpHandler {
 				data = RealtimeTrackingUtil.getAllKafkaLogEvents(null);	
 			}
 			req.response().end(data);
+		} else {
+			req.response().end("Not handler found for uri:"+uri);
 		}
 	}
 

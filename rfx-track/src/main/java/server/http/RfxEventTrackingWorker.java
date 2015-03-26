@@ -9,9 +9,9 @@ import org.apache.http.HttpStatus;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpServerRequest;
 
-import rfx.core.configs.WorkerConfigs;
 import rfx.core.stream.node.worker.BaseWorker;
 import rfx.core.util.StringPool;
+import rfx.core.util.StringUtil;
 import server.http.handler.BaseHttpHandler;
 import server.http.handler.Http404Handler;
 import server.http.handler.PingHttpHandler;
@@ -32,11 +32,25 @@ public class RfxEventTrackingWorker extends BaseWorker {
 		return RfxEventTrackingWorker.class.getSimpleName() + "_" + host + "_" + port;
 	}
 	
+	/**
+	 * Create new Customized HTTP Log Server instance with implemented routes
+	 * 
+	 * @param host
+	 * @param port
+	 * @param routes
+	 */
 	public static void createHttpLogCollector(String host, int port,Set<BaseHttpHandler> routes) {		
 		BaseWorker worker = new RfxEventTrackingWorker(getName(host, port), routes);
 		worker.start(host, port);		
 	}
 	
+	/**
+	 * Create new Customized HTTP Log Server instance with implemented httpHandler
+	 * 
+	 * @param host
+	 * @param port
+	 * @param httpHandler
+	 */
 	public static void createHttpLogCollector(String host, int port,BaseHttpHandler httpHandler) {		
 		Set<BaseHttpHandler> routes = new HashSet<>(1);
 		routes.add(httpHandler);
@@ -44,6 +58,12 @@ public class RfxEventTrackingWorker extends BaseWorker {
 		worker.start(host, port);		
 	}
 	
+	/**
+	 * Create default HTTP Log Server instance
+	 * 
+	 * @param host
+	 * @param port
+	 */
 	public static void createHttpLogCollector(String host, int port)  {		
 		Set<BaseHttpHandler> routes = new HashSet<>(2);
 		routes.add(new PingHttpHandler());
@@ -105,9 +125,11 @@ public class RfxEventTrackingWorker extends BaseWorker {
 		
 	public static void main(String[] args) throws Exception {
 		//LogUtil.setDebug(true);
-		WorkerConfigs configs = WorkerConfigs.load();
-		String host = configs.getHostName();
-		int port = configs.getAllocatedWorkers().get(0).getPort();		
+		if(args.length == 0 ){
+			args = new String[]{"127.0.0.1","8080"};
+		}		
+		String host = args[0];
+		int port = StringUtil.safeParseInt(args[1]);		
 		RfxEventTrackingWorker.createHttpLogCollector(host, port);		 
 	}	
 }
