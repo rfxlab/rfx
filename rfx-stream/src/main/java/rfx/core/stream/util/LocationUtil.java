@@ -41,7 +41,15 @@ public class LocationUtil {
     private static NavigableMap<Long, LocationCacheObj> COUNTRYCACHE = new TreeMap<Long, LocationCacheObj>();
     static int cachedTime = 30;
     
-     
+	public static Long getHashedNumber(String dottedIP) {
+	    String[] addrArray = dottedIP.split("\\.");        
+	    long num = 0;        
+	    for (int i=0;i<addrArray.length;i++) {            
+	        int power = 3-i;            
+	        num += ((Integer.parseInt(addrArray[i]) % 256) * Math.pow(256,power));        
+	    }        
+	    return num;    
+	}
 
     /**
      * Lookup province ip, có cache các dãy IP của HCM, HA NOI (request lớn) ---> improve performance đáng kể
@@ -54,7 +62,7 @@ public class LocationUtil {
     	LocationCacheObj locationCacheObj = null;
         long ipLong = 0;
         try {
-        	ipLong = StringUtil.Dot2LongIP(ipAdress);
+        	ipLong = getHashedNumber(ipAdress);
             LocationCacheObj floorCacheObj 	  = LOCATIONCACHE.get(LOCATIONCACHE.floorKey(ipLong)); 
             LocationCacheObj ceilCacheObj     = LOCATIONCACHE.get(LOCATIONCACHE.ceilingKey(ipLong));
             if (floorCacheObj.getProvince() != LOCATION_UNDEFINED) {
@@ -77,11 +85,14 @@ public class LocationUtil {
             if (floors.size() == 1 && ceils.size() == 1) {
                 String floor = floors.iterator().next();
                 String ceil = ceils.iterator().next();
+                
                 String f0, f1, c0, c1 = "";
-                f0 = floor.split("-")[0];
-                f1 = floor.split("-")[1];
-                c0 = ceil.split("-")[0];
-                c1 = ceil.split("-")[1];
+                String[] floor_toks = floor.split("-");
+				f0 = floor_toks[0];
+                f1 = floor_toks[1];
+                String[] ceil_toks = ceil.split("-");
+				c0 = ceil_toks[0];
+                c1 = ceil_toks[1];
                 
                 if ( (f0.equals(c1) && f1.equals(c0))  || (f0.equals(c0) && f1.equals(c1)) ) {
 
@@ -148,7 +159,7 @@ public class LocationUtil {
     	LocationCacheObj locationCacheObj = null;
         long ipLong = 0;
         try {
-        	ipLong = StringUtil.Dot2LongIP(ipAdress);
+        	ipLong = getHashedNumber(ipAdress);
             LocationCacheObj floorCacheObj 	  = COUNTRYCACHE.get(COUNTRYCACHE.floorKey(ipLong)); 
             LocationCacheObj ceilCacheObj     = COUNTRYCACHE.get(COUNTRYCACHE.ceilingKey(ipLong));
             if (floorCacheObj.getCountryCode() != null) {
@@ -172,10 +183,12 @@ public class LocationUtil {
                 String ceil = ceils.iterator().next();
 
                 String f0, f1, c0, c1 = "";
-                f0 = floor.split("-")[0];
-                f1 = floor.split("-")[1];
-                c0 = ceil.split("-")[0];
-                c1 = ceil.split("-")[1];
+                String[] floor_toks = floor.split("-");
+				f0 = floor_toks[0];
+                f1 = floor_toks[1];
+                String[] ceil_toks = ceil.split("-");
+				c0 = ceil_toks[0];
+                c1 = ceil_toks[1];
 
                 if ( (f0.equals(c1) && f1.equals(c0)) || (f0.equals(c0) && f1.equals(c1)) ) {
 

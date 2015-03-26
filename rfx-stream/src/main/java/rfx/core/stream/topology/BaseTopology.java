@@ -394,7 +394,7 @@ public abstract class BaseTopology {
 	}
 	
 	public void start(){
-		this.scheduleEmittingData(1600);
+		this.scheduleEmittingData(999);
 	}
 	
 	public void start(long period){
