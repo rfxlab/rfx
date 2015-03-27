@@ -31,11 +31,10 @@ public class HttpEventKafkaHandlerImpl extends HttpEventKafkaHandler {
 		kafkaProducerHandler = KafkaProducerHandler.getKafkaHandler(producerKey);
 	}	
 	
-	void writeLogToKafka(String ip, String userAgent, String logDetails, String cookieString){		
-		countingToDebug();
-		System.out.println("cookieString "+cookieString);
+	void writeLogToKafka(String ip, String userAgent, String logDetails, String cookieString){
 		EventData data = new HttpDataLog(ip, userAgent, logDetails, cookieString);		
 		if( KafkaProducerHandler.KAFKA_ENABLED){
+			countingToDebug();	
 			kafkaProducerHandler.writeData(data);
 		} else {			
 			LogUtil.d("Skip writeLogToKafka: "+data.toStringMessage());

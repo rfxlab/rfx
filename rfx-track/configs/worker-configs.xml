@@ -1,29 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <WorkerConfigs classpath="rfx.core.configs.WorkerConfigs" type="object" >
-	
-	<allocatedCmdActorPortRanges></allocatedCmdActorPortRanges>
+
+	<workerGroupName>local</workerGroupName>
 	
 	<!-- the shell-script for start workers -->
 	<startWorkerScriptPath>		
 		deploy/start-worker.sh
 	</startWorkerScriptPath>
+		
+	<!-- where the debug/info/error logs store -->
+	<debugLogPath>/data/log</debugLogPath>
 	
-	<prefixWorkerName>localhost</prefixWorkerName>
-	<hostName>127.0.0.1</hostName>	
-	
-	<!-- the allocated TCP for workers -->	
-	<allocatedWorkers type="list" >			
-		<!-- empty workers -->
-		<worker id="trackingHttpWorker">
+	<!-- the allocated port for workers -->	
+	<allocatedWorkers type="list" >		
+		<worker>
+			<hostName>127.0.0.1</hostName>
 			<port>8080</port>
 			<mainClass>server.http.RfxEventTrackingWorker</mainClass>
-		</worker>	
+		</worker>		
 	</allocatedWorkers>
-	
-	<!-- where the debug/info/error logs store -->
-	<debugLogPath>log</debugLogPath>
-	
-	<!-- where the worker in cluster will store mapDB offset -->
-	<kafkaOffsetDbPath></kafkaOffsetDbPath>
-
+		
 </WorkerConfigs>
