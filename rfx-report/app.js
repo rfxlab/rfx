@@ -10,8 +10,8 @@ app.engine('hbs', expressHbs({extname:'hbs', defaultLayout:'admin.hbs'}));
 app.set('view engine', 'hbs');
 
 app.get('/', function(req, res){
-    var data = {numTreatments: 101};
-    data.dashboard_title = 'RFX Admin';
+    var data = {numTests: 5};
+    data.dashboard_title = 'RFX - AB Testing';
 
     res.render('summary', data);
 });

@@ -32,7 +32,9 @@
         "mongodb": "~2.0",
         "redback": "*",
         "node-cache": "~1.0.2",
-        "rx": "*"
+        "rx": "*",
+        "mem-shm" : "*",
+        "redis" : "*"
     },
     "engine": {
         "node": ">=0.8"
