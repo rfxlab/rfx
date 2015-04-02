@@ -6,43 +6,21 @@
 		<!-- ############################# BEGIN ############################### -->
 		
 		 <!-- System Cluster and worker data, worker info, logged events -->
-                <RedisInfo host="10.254.53.247" port="6481" >
-                        <access-key>clusterInfoRedis</access-key>
-                </RedisInfo>
+         <RedisInfo host="127.0.0.1" port="6379" >
+                 <access-key>clusterInfoRedis</access-key>
+         </RedisInfo>
 
-                <!-- real-time report (total, daily, hourly, perMinute, perSecond) -->
-                <RedisInfo host="10.254.53.247" port="6481" >
-                        <access-key>realtimeDataStats</access-key>
-                </RedisInfo>
+         <!-- real-time report (total, daily, hourly, perMinute, perSecond) -->
+         <RedisInfo host="127.0.0.1" port="6379" >
+                 <access-key>realtimeDataStats</access-key>
+         </RedisInfo>
 
-                <!-- true impression -->
-                <RedisInfo host="10.254.53.247" port="6483" >
-                        <access-key>trueImpStats</access-key>
-                </RedisInfo>
+         <!-- location -->
+         <RedisInfo host="127.0.0.1" port="6481" >
+                 <access-key>locationData</access-key>
+         </RedisInfo>
 
-                <!-- pageview and impression -->
-                <RedisInfo host="10.254.53.247" port="6483" >
-                        <access-key>pageviewImpStats1</access-key>
-                </RedisInfo>
-                <RedisInfo host="10.254.53.247" port="6483" >
-                        <access-key>pageviewImpStats2</access-key>
-                </RedisInfo>
-
-                <!--revenue -->
-                <RedisInfo host="180.148.141.253" port="6483" >
-                        <access-key>revenueStats</access-key>
-                </RedisInfo>
-
-                <!--CPC and CPM click -->
-                <RedisInfo host="180.148.141.253" port="6483" >
-                        <access-key>clickStats</access-key>
-                </RedisInfo>
-
-               	<!-- creative booking and user budget -->
-                <RedisInfo host="10.254.53.247" port="6483" >
-                        <access-key>bookingBudgetData</access-key>
-                </RedisInfo>
-
+               
 	
 		<!-- ############################# END ############################### -->
 			

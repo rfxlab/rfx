@@ -321,5 +321,24 @@ public class LocationUtil {
 			return new Gson().toJson(this);
 		}
     }
+    
+    public static void main(String[] args) {
+    	String ip = "88.152.43.112";
+		LocationCacheObj locObj = LocationUtil.getVNProvinceFromIp(ip );
+		int locProvince = locObj.getProvince();
+		int locZone = locObj.getZone();
+		if( locProvince == LocationUtil.LOCATION_UNDEFINED ){
+			LocationCacheObj countryObj = LocationUtil.getCountryFromIp(ip);
+			locObj.setCountryCode(countryObj.getCountryCode());
+			locProvince = 9999;
+		}
+		else{
+			locObj.setCountryCode("vn");
+		}
+		
+		String locCountry = locObj.getCountryCode(); 
+		String location = StringUtil.join("-",locProvince, locZone, locCountry);
+		System.out.println(location);
+	}
 
 }
