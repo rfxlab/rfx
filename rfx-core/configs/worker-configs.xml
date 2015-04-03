@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <WorkerConfigs classpath="rfx.core.configs.WorkerConfigs" type="object" >
-
-	<workerGroupName>local</workerGroupName>
 	
 	<!-- the shell-script for start workers -->
 	<startWorkerScriptPath>		
-		deploy/start-worker.sh
+		./start-worker.sh
 	</startWorkerScriptPath>
 		
 	<!-- where the debug/info/error logs store -->
@@ -24,5 +22,12 @@
 			<mainClass>sample.hello.OtherWorker</mainClass>
 		</worker>
 	</allocatedWorkers>
+		
+	<!-- the custom configs for workers -->
+	<customConfigs type="map" >
+		<config name="fullIP2LocationPath">
+			./geoip-data/IP-COUNTRY-REGION-CITY-LATITUDE-LONGITUDE-ISP-DOMAIN-MOBILE.BIN
+		</config>		
+	</customConfigs>
 		
 </WorkerConfigs>

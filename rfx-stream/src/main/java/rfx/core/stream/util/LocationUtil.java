@@ -323,7 +323,7 @@ public class LocationUtil {
     }
     
     public static void main(String[] args) {
-    	String ip = "88.152.43.112";
+    	String ip = "172.30.113.160";
 		LocationCacheObj locObj = LocationUtil.getVNProvinceFromIp(ip );
 		int locProvince = locObj.getProvince();
 		int locZone = locObj.getZone();

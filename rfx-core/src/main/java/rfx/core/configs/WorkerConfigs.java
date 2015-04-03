@@ -2,7 +2,9 @@ package rfx.core.configs;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -24,10 +26,10 @@ public class WorkerConfigs implements Serializable, Configurable{
 	@AutoInjectedConfig(injectable = true)
 	static WorkerConfigs instance;
 	
-	String workerGroupName;
 	String startWorkerScriptPath;
 	String debugLogPath;		
 	List<WorkerInfo> allocatedWorkers;
+	Map<String,String> customConfigs = new HashMap<>();
 
     public List<WorkerInfo> getAllocatedWorkers() {
 		if(allocatedWorkers == null){
@@ -48,10 +50,14 @@ public class WorkerConfigs implements Serializable, Configurable{
 		return debugLogPath;
 	}
 	
-	public String getWorkerGroupName() {
-		return workerGroupName;
+	public void setCustomConfig(String name, String value) {
+		this.customConfigs.put(name, value);
 	}
-
+	
+	public String getCustomConfig(String name) {
+		return StringUtil.safeString(customConfigs.get(name));
+	}
+	
 	public static final WorkerConfigs load() {	
 		if(instance == null){
 			ConfigAutoLoader.loadAll();
@@ -82,7 +88,16 @@ public class WorkerConfigs implements Serializable, Configurable{
 							allocatedWorkers.add(new WorkerInfo(hostName, port, topology, mainClass));
 						}
 						workerConfigs.setAllocatedWorkers(allocatedWorkers);
-					} else {
+					} 
+					else if( "map".equals(node.attr("type") )){
+						Elements configNodes =  xmlNode.select(field.getName()+" config");
+						for (Element configNode : configNodes) {
+							String name= configNode.attr("name");
+							String value= configNode.text().trim();
+							workerConfigs.setCustomConfig(name, value);
+						}
+					}					
+					else {
 						field.set(configurableObj, node.text());
 					}
 				} catch (Exception e) {
