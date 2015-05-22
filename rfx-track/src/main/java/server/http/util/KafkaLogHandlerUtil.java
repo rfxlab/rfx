@@ -1,16 +1,7 @@
 package server.http.util;
 
-import static io.netty.handler.codec.http.HttpHeaders.Names.CONNECTION;
-import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_LENGTH;
-import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_TYPE;
-import static io.netty.handler.codec.http.HttpHeaders.Names.USER_AGENT;
-
-import org.vertx.java.core.MultiMap;
-import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.json.impl.Base64;
 
-import rfx.core.util.SecurityUtil;
 import rfx.core.util.StringUtil;
 import server.http.handler.kafka.HttpEventKafkaHandler;
 import server.http.model.HttpEventKafkaLog;
@@ -18,26 +9,6 @@ import server.http.model.HttpEventKafkaLog;
 import com.google.gson.Gson;
 
 public class KafkaLogHandlerUtil {
-		
-	public static final String GIF = "image/gif";
-	public static final String HEADER_CONNECTION_CLOSE = "Close";
-	
-	public final static void trackingResponse(final HttpServerRequest req) {
-		String BASE64_GIF_BLANK = "R0lGODlhAQABAIAAAAAAAAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==";	
-		Buffer buffer = new Buffer(Base64.decode(BASE64_GIF_BLANK));
-		MultiMap headers = req.response().headers();
-		headers.set(CONTENT_TYPE, GIF);
-		headers.set(CONTENT_LENGTH, String.valueOf(buffer.length()));
-		headers.set(CONNECTION, HEADER_CONNECTION_CLOSE);
-		req.response().end(buffer);
-	}
-
-	public static String generateUUID(MultiMap headers) {
-		String userAgent = headers.get(USER_AGENT);
-		String logDetails = headers.get(io.netty.handler.codec.http.HttpHeaders.Names.HOST);
-		String result = SecurityUtil.sha1(userAgent + logDetails + System.currentTimeMillis());
-		return result;
-	}
 	
 	public static void log(final HttpServerRequest req, String producerKey){		
 		HttpEventKafkaHandler kafkaHandler = HttpEventKafkaHandler.loadHandler(producerKey);
@@ -50,11 +21,11 @@ public class KafkaLogHandlerUtil {
 	
 	public static void logAndResponseImage1px(final HttpServerRequest req, String producerKey){
 		log(req, producerKey);
-		trackingResponse(req);
+		HttpTrackingUtil.trackingResponse(req);
 	}
 	
 	public static void logDataToKafka(HttpServerRequest req, String json){
-		KafkaLogHandlerUtil.trackingResponse(req);
+		HttpTrackingUtil.trackingResponse(req);
 		logRequestToKafka(json);
 	}
 	

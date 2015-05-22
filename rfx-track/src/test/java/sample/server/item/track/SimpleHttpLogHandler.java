@@ -7,6 +7,7 @@ import rfx.core.util.DateTimeUtil;
 import rfx.core.util.StringPool;
 import rfx.core.util.StringUtil;
 import server.http.handler.BaseHttpHandler;
+import server.http.util.HttpTrackingUtil;
 import server.http.util.KafkaLogHandlerUtil;
 import server.http.util.RedirectUtil;
 
@@ -43,7 +44,7 @@ public class SimpleHttpLogHandler implements BaseHttpHandler {
 			KafkaLogHandlerUtil.logDataToKafka(req,json);
 		} 
 		else if (uri.equalsIgnoreCase(FAVICON_ICO)) {
-			KafkaLogHandlerUtil.trackingResponse(req);
+			HttpTrackingUtil.trackingResponse(req);
 		}
 		else if (uri.equalsIgnoreCase(PING)) {
 			req.response().end(PONG);
