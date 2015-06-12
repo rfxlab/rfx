@@ -7,7 +7,7 @@ RFX, the full-stack framework for reactive real-time analytics
 
 Official website
 ===
-http://www.mc2ads.org/p/rfx-framework.html
+http://www.rfxlab.com
 
 Core Concepts
 ===
