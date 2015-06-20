@@ -1,5 +1,6 @@
 package rfx.core.stream.topology;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
@@ -19,6 +20,7 @@ public class Pipeline {
 	int defaultPoolSize = 5000;
 	BaseTopology topology;
 	private Queue<Class<?>> functorQueue = new LinkedList<Class<?>>();
+	private Map<Class<?>, DataFlowInfo> senderinfoMap = new HashMap<Class<?>, DataFlowInfo>();
 	
 	public Pipeline(int defaultPoolSize, BaseTopology topology) {
 		super();
@@ -38,15 +40,17 @@ public class Pipeline {
 	public static Pipeline create(BaseTopology topology){
 		return new Pipeline(topology);
 	}
-	
+		
 	void addFunctorToTopology(Class<?> functorClass, int poolSize){
 		DataFlowInfo dfInfo = new DataFlowInfo(functorClass);
+		senderinfoMap.put(functorClass, dfInfo);
 		Map<String, ActorRef> actorsPool = topology.createActorPool(functorClass,dfInfo, poolSize);
 		
 		if(senderinfo == null){
 			//the first will be received logs from Kafka Data Seeders
 			topology.setReceiverFromEmitter(functorClass, actorsPool);
 		} else {
+			//the current functor is the receiver from previous functor
 			senderinfo.addReceiverActorPool(functorClass, actorsPool);
 		}
 		senderinfo = dfInfo;	
@@ -54,6 +58,16 @@ public class Pipeline {
 		
 	public Pipeline apply(Class<?> functorClass){
 		functorQueue.add(functorClass);
+		return this;
+	}
+	
+	public Pipeline applyFromXtoY(Class<?> fromFunctor, Class<?> toFunctor){
+		//TODO
+		return this;
+	}
+	
+	public Pipeline joinAndApply(Class<?> ... functors){
+		//TODO
 		return this;
 	}
 	

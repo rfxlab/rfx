@@ -6,13 +6,10 @@ import java.util.List;
 
 public class CommonUtil {
 
-	// config files for akka actor
-	public static final String ACTOR_CONFIG_TEMPLATE_FILE = "./configs/rfx-core/actor-config-template.txt";
-	public static final String ACTOR_SYSTEM_CONFIG_FILE = "./configs/rfx-core/actor-system.conf";
-
-	static final String REDIS_CONNECTION_POOL_CONFIG_FILE = "rfx-core/redis-connection-pool-configs.json";	
-	static final String SQL_DB_CONFIG_FILE = "rfx-core/database-configs.json";	
-	static final String KAFKA_PRODUCER_CONFIG_FILE = "rfx-core/kafka-producer-configs.json";
+	static final String REDIS_CONNECTION_POOL_CONFIG_FILE = "redis-connection-pool-configs.json";
+	static final String REDIS_CONFIG_FILE = "redis-configs.json";
+	static final String SQL_DB_CONFIG_FILE = "database-configs.json";	
+	static final String KAFKA_PRODUCER_CONFIG_FILE = "kafka-producer-configs.json";
 	
 	static String baseConfig = "configs/";
 	public static void setBaseConfig(String baseConfig) {
@@ -21,6 +18,10 @@ public class CommonUtil {
 	
 	public static String getRedisPoolConnectionConfigFile(){
 		return StringUtil.toString(baseConfig,REDIS_CONNECTION_POOL_CONFIG_FILE);
+	}
+	
+	public static String getRedisConfigFile(){
+		return StringUtil.toString(baseConfig,REDIS_CONFIG_FILE);
 	}
 	
 	public static String getSqlDbConfigFile(){

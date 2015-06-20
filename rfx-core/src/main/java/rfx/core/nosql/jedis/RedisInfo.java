@@ -5,6 +5,7 @@ import java.util.List;
 
 import redis.clients.jedis.JedisShardInfo;
 import redis.clients.jedis.ShardedJedisPool;
+import rfx.core.configs.RedisConnectionPoolConfig;
 
 public class RedisInfo {
 	public static final String LOCALHOST_STR = "localhost";
@@ -43,6 +44,18 @@ public class RedisInfo {
 	
 	public String getAuth() {
 		return auth;
+	}
+	
+	public void setHost(String host) {
+		this.host = host;
+	}
+
+	public void setPort(int port) {
+		this.port = port;
+	}
+
+	public void setAuth(String auth) {
+		this.auth = auth;
 	}
 
 	@Override

@@ -1,4 +1,4 @@
-package rfx.core.nosql.jedis;
+package rfx.core.configs;
 
 import redis.clients.jedis.JedisPoolConfig;
 import rfx.core.util.CommonUtil;

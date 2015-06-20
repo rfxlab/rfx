@@ -1,13 +1,14 @@
 package system.starter;
 
-import rfx.core.configs.ClusterInfoConfigs;
+import rfx.core.configs.WorkerConfigs;
 import rfx.core.configs.loader.ConfigAutoLoader;
+import rfx.core.model.WorkerInfo;
 import rfx.core.stream.node.MasterNode;
 
 public class MasterNodeStarter {	
 	public static void main(String[] args) {
 		ConfigAutoLoader.loadAll();
-		ClusterInfoConfigs configs = ClusterInfoConfigs.load();
-		new MasterNode(configs.getMasterHostname(), configs.getMasterHttpPort(),configs.getMasterWebSocketPort()).run();
+		WorkerInfo workerInfo = WorkerConfigs.load().getAllocatedWorkers().get(0);
+		new MasterNode(workerInfo.getHost(), workerInfo.getPort(),workerInfo.getPort()+1).run();
 	}
 }

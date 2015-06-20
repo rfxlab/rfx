@@ -14,7 +14,7 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Pipeline;
 import redis.clients.jedis.ShardedJedis;
 import redis.clients.jedis.ShardedJedisPool;
-import rfx.core.configs.ClusterInfoConfigs;
+import rfx.core.configs.RedisConfigs;
 import rfx.core.configs.WorkerConfigs;
 import rfx.core.model.WorkerData;
 import rfx.core.model.WorkerInfo;
@@ -35,11 +35,10 @@ public class ClusterDataManager {
     public static final String WORKER_TIMELOG_POSTFIX = ".timelog";
 
     // ------------ configs ------------
-    static final ClusterInfoConfigs clusterInfoConfigs = ClusterInfoConfigs.load();
+    //static final ClusterInfoConfigs clusterInfoConfigs = ClusterInfoConfigs.load();
     static final WorkerConfigs workerConfigs = WorkerConfigs.load();
 
-    static ShardedJedisPool commonClusterRedisPool = clusterInfoConfigs.getClusterInfoRedis()
-            .getShardedJedisPool();
+    static ShardedJedisPool commonClusterRedisPool = RedisConfigs.load().get("clusterInfoRedis").getShardedJedisPool();
 
     public static ShardedJedisPool getRedisClusterInfoPool() {
         return commonClusterRedisPool;

@@ -37,6 +37,10 @@ app.get('/', function (req, res) {
     }
 })
 
+app.get('/ping', function (req, res) {
+    res.send("PONG");
+});
+
 app.get('/reload-shm', function (req, res) {
     mem = new memShm(shmFolderPath,"test-shm");
     res.send("reload-shm ok ");

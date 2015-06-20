@@ -5,8 +5,10 @@ import rfx.core.stream.topology.BaseTopology;
 import rfx.core.stream.topology.Pipeline;
 import rfx.core.util.LogUtil;
 import rfx.core.util.Utils;
-import rfx.sample.social.tracking.functor.SocialTrendsFinding;
-import rfx.sample.social.tracking.functor.UserSocialActivityCounting;
+import rfx.sample.social.tracking.functor.AlertingUserAboutHotContents;
+import rfx.sample.social.tracking.functor.FindingKeywords;
+import rfx.sample.social.tracking.functor.ParsingLog;
+import rfx.sample.social.tracking.functor.FindingSocialTrends;
 
 
 /**
@@ -19,9 +21,10 @@ public class TrackingUserTopology extends BaseTopology  {
 	@Override
 	public BaseTopology buildTopology(){				
 		return Pipeline.create(this)
-				.apply(HttpEventLogTokenizing.class)
-				.apply(UserSocialActivityCounting.class)
-				.apply(SocialTrendsFinding.class)	
+				.apply(HttpEventLogTokenizing.class).apply(ParsingLog.class)
+				.applyFromXtoY(ParsingLog.class, FindingSocialTrends.class )
+				.applyFromXtoY(ParsingLog.class , FindingKeywords.class)
+				.joinAndApply(FindingSocialTrends.class , FindingKeywords.class, AlertingUserAboutHotContents.class )
 				.done();
 	}
 	

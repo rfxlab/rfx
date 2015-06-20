@@ -13,6 +13,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import rfx.core.annotation.AutoInjectedConfig;
+import rfx.core.configs.RedisConfigs;
 import rfx.core.util.CommonUtil;
 import rfx.core.util.LogUtil;
 
@@ -39,9 +40,7 @@ public class ConfigAutoLoader {
 							assignedInstance = true;
 						}				
 					}				
-				} else {
-									
-				}
+				} 
 			}
 		}	
 	}
@@ -113,15 +112,10 @@ public class ConfigAutoLoader {
 	        ex.printStackTrace();
 	    }		
 	    CommonUtil.setBaseConfig(configBasePath);
-	    String coreXmlConfigPath = configBasePath+"rfx-core/";
-	    File dir = new File(coreXmlConfigPath);
-	    if( ! dir.isDirectory() ){
-	    	throw new IllegalArgumentException("Not valid path "+ coreXmlConfigPath);
-	    }
 		
-	    load( coreXmlConfigPath + "redis-pool-configs.xml" );
-	    load( coreXmlConfigPath + "cluster-info-configs.xml" );
-	    load( configBasePath + "worker-configs.xml" );
+	    RedisConfigs.load();
+	    
+	    load( configBasePath + "workers.xml" );
 	    
 		loadAll = true;
 	}
