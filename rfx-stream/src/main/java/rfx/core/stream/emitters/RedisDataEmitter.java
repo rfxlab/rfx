@@ -7,13 +7,12 @@ import org.slf4j.LoggerFactory;
 
 import redis.clients.jedis.ShardedJedisPool;
 import redis.clients.jedis.exceptions.JedisException;
-import rfx.core.configs.ClusterInfoConfigs;
+import rfx.core.configs.RedisConfigs;
 import rfx.core.nosql.jedis.RedisCommand;
 import rfx.core.nosql.jedis.Subscriber;
 import rfx.core.stream.model.DataFlowInfo;
 
-public abstract class RedisDataEmitter implements Runnable {
-	static ClusterInfoConfigs configs = ClusterInfoConfigs.load(); 
+public abstract class RedisDataEmitter implements Runnable {	
 	static Logger logger = LoggerFactory.getLogger(RedisDataEmitter.class);	 
 	private static AtomicLong count = new AtomicLong();
 	
@@ -28,7 +27,8 @@ public abstract class RedisDataEmitter implements Runnable {
 
 	@Override
 	public void run() {	
-    	ShardedJedisPool jedisPool = configs.getClusterInfoRedis().getShardedJedisPool();		
+		//FIXME
+    	ShardedJedisPool jedisPool = RedisConfigs.load().get("clusterInfoRedis").getShardedJedisPool();
 		(new RedisCommand<Void>(jedisPool) {				
 			@Override
 			public Void build() throws JedisException {

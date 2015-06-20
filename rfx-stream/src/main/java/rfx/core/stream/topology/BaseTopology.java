@@ -19,7 +19,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import rfx.core.configs.loader.ConfigAutoLoader;
 import rfx.core.model.Callback;
 import rfx.core.model.CallbackResult;
-import rfx.core.stream.configs.ActorConfigs;
 import rfx.core.stream.configs.KafkaTopologyConfig;
 import rfx.core.stream.emitters.DataEmitter;
 import rfx.core.stream.emitters.DataFileEmitter;
@@ -39,8 +38,6 @@ import akka.actor.ActorSystem;
 import akka.actor.Cancellable;
 import akka.actor.Props;
 
-import com.typesafe.config.Config;
-
 /**
  * The BaseTopology for distributed processing
  * 
@@ -50,9 +47,7 @@ import com.typesafe.config.Config;
 public abstract class BaseTopology {
 
 	private static final String CONFIGS_KAFKA_TOPOLOGY_CONFIGS_XML = "configs/kafka-topology-configs.xml";
-
-	static Config actorConfig = ActorConfigs.getDefault(); 
-	
+		
 	protected ActorSystem system;
 	protected String topologyName;
 	private int totalActors = 0;
@@ -92,8 +87,9 @@ public abstract class BaseTopology {
 	
 	private void init(String topologyName){		
 		ConfigAutoLoader.load( CONFIGS_KAFKA_TOPOLOGY_CONFIGS_XML );
-		this.topologyName = topologyName;		
-		system = ActorSystem.create(this.topologyName,actorConfig);		
+		this.topologyName = topologyName;	
+		//ConfigFactory.parseFile(new File(CommonUtil.ACTOR_SYSTEM_CONFIG_FILE));
+		system = ActorSystem.create();		
 	}
 	
 	public BaseTopology addDataFile(String path){

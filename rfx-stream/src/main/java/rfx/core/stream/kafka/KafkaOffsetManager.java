@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import rfx.core.configs.WorkerConfigs;
+import rfx.core.stream.configs.KafkaTopologyConfig;
 import rfx.core.util.FileUtils;
 import rfx.core.util.StringUtil;
 
@@ -38,7 +38,7 @@ public class KafkaOffsetManager {
 	}
 	
 	private void init(){
-		kafkaOffsetPath = StringUtil.toString(WorkerConfigs.load().getKafkaOffsetDbPath(), "/" , topic, "-", workerName);		
+		kafkaOffsetPath = StringUtil.toString(KafkaTopologyConfig.getBaseKafkaOffsetDbPath(), "/" , topic, "-", workerName);		
 		offsetMap = new ConcurrentHashMap<>();
 		File file = new File(kafkaOffsetPath);
 		if(file.isFile()){

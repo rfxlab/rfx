@@ -11,7 +11,7 @@ import java.util.TreeMap;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.ShardedJedis;
 import redis.clients.jedis.ShardedJedisPool;
-import rfx.core.configs.RedisPoolConfigs;
+import rfx.core.configs.RedisConfigs;
 import rfx.core.util.LogUtil;
 import rfx.core.util.StringPool;
 import rfx.core.util.StringUtil;
@@ -30,7 +30,7 @@ public class LocationUtil {
     private static Map<String, Boolean> countryCacheMap = new HashMap<>() ; // {VN:true,US:true}
     final static ShardedJedisPool jedisPool;
     static {    	
-    	jedisPool = RedisPoolConfigs.load().get("locationData").getShardedJedisPool();
+    	jedisPool = RedisConfigs.load().get("locationData").getShardedJedisPool();
     	provinceCacheMap.put(24, true);
     	provinceCacheMap.put(29, true);
     	countryCacheMap.put(VN, true);

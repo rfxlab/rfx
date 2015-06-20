@@ -1,7 +1,5 @@
 package rfx.core.stream.util;
 
-import java.io.File;
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -22,8 +20,6 @@ import rfx.core.stream.exception.WorkerInfoException;
 import rfx.core.stream.message.Tuple;
 import rfx.core.stream.model.DataFlowInfo;
 import rfx.core.stream.topology.BaseTopology;
-import rfx.core.util.CommonUtil;
-import rfx.core.util.FileUtils;
 import rfx.core.util.RandomUtil;
 import rfx.core.util.StringUtil;
 import rfx.core.util.Utils;
@@ -34,39 +30,36 @@ import akka.actor.ActorSystem;
 import akka.actor.Cancellable;
 import akka.actor.Props;
 
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
-
 public class ActorUtil {
 	static WorkerConfigs workerConfigs = WorkerConfigs.load();	
 	
-	public static Config getActorPoolConfig(){
-		return ConfigFactory.parseFile(new File(CommonUtil.ACTOR_CONFIG_TEMPLATE_FILE));
-	}
-	
-	public static Config getCmdActorConfig(String host, int port) throws IOException{	
-		String s = FileUtils.readFileAsString(CommonUtil.ACTOR_CONFIG_TEMPLATE_FILE);
-		s = s.replace("_HostName_", host);
-		s = s.replace("_CmdActorPort_", ""+port);
-		//System.out.println(s);
-		return ConfigFactory.parseString(s);
-	}
-	
-	public static Config getWorkerNodeConfig(WorkerInfo workerInfo) throws IOException{	
-		String s = FileUtils.readFileAsString(CommonUtil.ACTOR_CONFIG_TEMPLATE_FILE);
-		s = s.replace("_WorkerName_", workerInfo.getName());
-		s = s.replace("_HostName_", workerInfo.getHost());
-		s = s.replace("_WorkerPort_", ""+workerInfo.getPort());
-		//System.out.println(s);
-		return ConfigFactory.parseString(s);
-	}
+//	public static Config getActorPoolConfig(){
+//		return ConfigFactory.parseFile(new File(CommonUtil.ACTOR_CONFIG_TEMPLATE_FILE));
+//	}
+//	
+//	public static Config getCmdActorConfig(String host, int port) throws IOException{	
+//		String s = FileUtils.readFileAsString(CommonUtil.ACTOR_CONFIG_TEMPLATE_FILE);
+//		s = s.replace("_HostName_", host);
+//		s = s.replace("_CmdActorPort_", ""+port);
+//		//System.out.println(s);
+//		return ConfigFactory.parseString(s);
+//	}
+//	
+//	public static Config getWorkerNodeConfig(WorkerInfo workerInfo) throws IOException{	
+//		String s = FileUtils.readFileAsString(CommonUtil.ACTOR_CONFIG_TEMPLATE_FILE);
+//		s = s.replace("_WorkerName_", workerInfo.getName());
+//		s = s.replace("_HostName_", workerInfo.getHost());
+//		s = s.replace("_WorkerPort_", ""+workerInfo.getPort());
+//		//System.out.println(s);
+//		return ConfigFactory.parseString(s);
+//	}
 	
 	public static String buildRemotePath(String workerName, String host, int port){
 		return StringUtil.toString("akka.tcp://WorkerNode@" , host , ":" , port , "/user/" , workerName);
 	}
 
 	public static int getPortGernaralCommandActor(){
-		String[] toks = workerConfigs.getAllocatedCmdActorPortRanges().split("-");
+		String[] toks = "30000-31000".split("-");
 	    int minPort = StringUtil.safeParseInt(toks[0]); 
 	    int maxPort = StringUtil.safeParseInt(toks[1]); 
 	    int portNumber = minPort + (int)(Math.random() * ((maxPort - minPort) + 1));
@@ -196,8 +189,8 @@ public class ActorUtil {
 	}
 	
 	static List<Future<WorkerInfo>> checkWorkerResource(String workerTypeName){
-		String prefixWorkerName = workerConfigs.getPrefixWorkerName();
-		String host = workerConfigs.getHostName();
+		String prefixWorkerName = "";
+		String host = "localhost";
 		List<WorkerInfo> allocatedWorkers = workerConfigs.getAllocatedWorkers();
 		ExecutorService es = Executors.newFixedThreadPool(allocatedWorkers.size());
 		List<Future<WorkerInfo>> futures = new ArrayList<>(allocatedWorkers.size());
@@ -239,8 +232,8 @@ public class ActorUtil {
 				e.printStackTrace();
 			}
 		}
-		String prefixWorkerName = workerConfigs.getPrefixWorkerName();
-		String host = workerConfigs.getHostName();
+		String prefixWorkerName = "";
+		String host = "localhost";
 		List<WorkerInfo> tcpPorts = workerConfigs.getAllocatedWorkers();
 		throw new WorkerInfoException("No TCP Port available for "+prefixWorkerName +" at "+ host + " in " + tcpPorts );
 	}

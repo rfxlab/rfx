@@ -21,6 +21,12 @@ public class KafkaTopologyConfig implements Serializable, Configurable{
 	
 	private static Map<String,KafkaTopologyConfig> kafkaTopologyConfigs = new HashMap<String, KafkaTopologyConfig>();
 	
+	static String baseKafkaOffsetDbPath = "data/kafka-offset";
+	
+	public static String getBaseKafkaOffsetDbPath() {
+		return baseKafkaOffsetDbPath;
+	}
+	
 	String name;	
 	String brokerList;
 	String topology;	

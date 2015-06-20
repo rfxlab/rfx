@@ -4,8 +4,7 @@
 	<!-- sample demo for how to use the Rfx Stream Processor Framework -->	
 	<topic name="social-activity" topology="rfx.sample.social.tracking.TrackingUserTopology" >	
 		<brokers>127.0.0.1:9092</brokers>
-	</topic>
-	
+	</topic>	
 	
 	<!-- BEGIN: Real-time reactive marketing  -->
 	<topic name="item-tracking" topology="rfx.sample.item.tracking.TrackingItemTopology" >	

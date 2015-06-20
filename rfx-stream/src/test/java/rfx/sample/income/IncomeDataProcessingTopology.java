@@ -27,7 +27,7 @@ public class IncomeDataProcessingTopology extends PipelineTopology  {
 	
 	//https://docs.google.com/document/d/1nwvnF71TZ1zRZ8NtGVfB52AT3kRO5FmYQ1Ofhfjp_4I/edit?usp=sharing
 	//http://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data
-	final static String SAMPLE_DATA_PATH = "file:////home/trieu/data/user-income.txt";
+	final static String SAMPLE_DATA_PATH = "/home/trieu/data/user-income.txt";
 	public static void main(String[] args) throws IOException, URISyntaxException {
 		System.out.println("Start !!!! at " + new Date());
 		System.out.println(new URI(SAMPLE_DATA_PATH).getScheme());		
@@ -47,9 +47,9 @@ public class IncomeDataProcessingTopology extends PipelineTopology  {
 			public void cronJob() {
 				if(done.get()){
 					//seed new data files into topology
-					System.out.println("addDataFile !!!! at " + new Date());
-					topology.addDataFile(keyEmitter, SAMPLE_DATA_PATH);
-					done.set(false);
+//					System.out.println("addDataFile !!!! at " + new Date());
+//					topology.addDataFile(keyEmitter, SAMPLE_DATA_PATH);
+//					done.set(false);
 				}
 			}
 		});

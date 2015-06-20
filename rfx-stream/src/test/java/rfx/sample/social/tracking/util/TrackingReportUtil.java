@@ -7,11 +7,11 @@ import java.util.Set;
 import redis.clients.jedis.ShardedJedisPool;
 import redis.clients.jedis.Tuple;
 import redis.clients.jedis.exceptions.JedisException;
-import rfx.core.configs.ClusterInfoConfigs;
+import rfx.core.configs.RedisConfigs;
 import rfx.core.nosql.jedis.RedisCommand;
 
 public class TrackingReportUtil {
-	static ShardedJedisPool jedisPool = ClusterInfoConfigs.load().getClusterInfoRedis().getShardedJedisPool();
+	static ShardedJedisPool jedisPool = RedisConfigs.load().get("realtimeDataStats").getShardedJedisPool();
 
 	public static List<String> getTrendingKeywords(final String minuteStr){
 		List<String> trendingKeywords = (new RedisCommand<List<String>>(jedisPool) {

@@ -1,0 +1,11 @@
+{
+	clusterInfoRedis : [
+		{ host : "127.0.0.1",port: 6379 }
+	],
+	realtimeDataStats : [
+		{ host : "127.0.0.1", port: 6379 }
+	],
+	locationData : [
+		{ host : "127.0.0.1", port: 6381 }
+	] 
+}

@@ -5,7 +5,7 @@ import java.util.Date;
 import redis.clients.jedis.Pipeline;
 import redis.clients.jedis.ShardedJedisPool;
 import redis.clients.jedis.exceptions.JedisException;
-import rfx.core.configs.ClusterInfoConfigs;
+import rfx.core.configs.RedisConfigs;
 import rfx.core.nosql.jedis.RedisCommand;
 import rfx.core.stream.functor.BaseFunctor;
 import rfx.core.stream.message.Tuple;
@@ -23,7 +23,7 @@ import rfx.core.util.DateTimeUtil;
  */
 public class FindingSocialTrends extends BaseFunctor {
 
-	static ShardedJedisPool jedisPool = ClusterInfoConfigs.load().getClusterInfoRedis().getShardedJedisPool();
+	static ShardedJedisPool jedisPool = RedisConfigs.load().get("realtimeDataStats").getShardedJedisPool();
 	
 	protected FindingSocialTrends(DataFlowInfo dataFlowInfo, BaseTopology topology) {
 		super(dataFlowInfo, topology);

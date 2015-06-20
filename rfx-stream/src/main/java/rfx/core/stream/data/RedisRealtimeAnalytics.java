@@ -13,7 +13,7 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Pipeline;
 import redis.clients.jedis.ShardedJedisPool;
 import redis.clients.jedis.exceptions.JedisException;
-import rfx.core.configs.RedisPoolConfigs;
+import rfx.core.configs.RedisConfigs;
 import rfx.core.nosql.jedis.RedisCommand;
 import rfx.core.stream.data.metric.MetricStatisticsData;
 import rfx.core.util.DateTimeUtil;
@@ -28,7 +28,7 @@ public class RedisRealtimeAnalytics {
 	public static final String DATE_HOUR_MINUTE_FORMAT_PATTERN = "yyyy-MM-dd-HH-mm";
 	public static final String DATE_HOUR_MINUTE_SECOND_FORMAT_PATTERN = "yyyy-MM-dd-HH-mm-ss";
 		
-	static ShardedJedisPool poolRealtimeDataStats = RedisPoolConfigs.load().get("realtimeDataStats").getShardedJedisPool();
+	static ShardedJedisPool poolRealtimeDataStats = RedisConfigs.load().get("realtimeDataStats").getShardedJedisPool();
 	
 	static final int EXPIRED_2_DAYS = 172800;
 	static final int EXPIRED_8_DAYS = EXPIRED_2_DAYS * 4;	
