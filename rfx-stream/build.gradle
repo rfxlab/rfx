@@ -30,7 +30,7 @@ dependencies {
     		,'commons-dbcp:commons-dbcp:1.4'
     		,'commons-io:commons-io:2.4'
     		,'org.apache.commons:commons-math3:3.4.1'    		
-    		,'org.apache.kafka:kafka_2.10:0.8.1.1'
+    		,'org.apache.kafka:kafka_2.10:0.8.2.1'    		
     		,'org.yaml:snakeyaml:1.14'    		,
     		,'org.mongodb:mongo-java-driver:3.0.2'
     		,'org.twitter4j:twitter4j-core:4.0.2'
