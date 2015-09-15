@@ -20,33 +20,24 @@ public abstract class RedisCommand<T> {
 		this.jedisPool = jedisPool;		
 	}
 
-	public T execute() {
-		boolean commited = false;
+	public T execute() {		
 		T rs = null;
 		try {
 			shardedJedis = jedisPool.getResource();
 			if (shardedJedis != null) {				
 				jedis = shardedJedis.getShard(StringPool.BLANK);
-				rs = build();
-				commited = true;
+				rs = build();				
 			}
 		} catch (Exception e) {			
 			LogUtil.e("JedisPool: "+jedisPool.toString(), e.toString());
 		} finally {			
-			freeRedisResource(jedisPool, shardedJedis, commited);
+			if (jedisPool != null) {
+				jedisPool.close();
+			}
 		}
 		return rs;
 	}
 	
-	public static void freeRedisResource(ShardedJedisPool jedisPool, ShardedJedis shardedJedis, boolean isCommited){
-		if (shardedJedis != null && jedisPool != null) {
-			if (isCommited) {
-				jedisPool.returnResource(shardedJedis);
-			} else {
-				jedisPool.returnBrokenResource(shardedJedis);
-			}
-		}
-	}
 	
 	//define the logic at implementer
 	protected abstract T build() throws JedisException;

@@ -12,6 +12,10 @@ import java.util.Set;
 
 import org.jsoup.Jsoup;
 
+
+
+import com.google.gson.Gson;
+
 public class StringUtil {
 	static final String TAG = "storm.StringUtil";
 
@@ -146,8 +150,12 @@ public class StringUtil {
 		}
 		return false;
 	}
-
-	public static String join(String[] array, String joinStr){
+	
+	public static String join(String[] array, String joinStr){		
+		return join(array, joinStr);
+	}
+	
+	public static String join(Object[] array, String joinStr){
 		StringBuilder s = new StringBuilder();
 		int l = array.length, n = l -1;
 		for (int i=0; i<l;i++) {
@@ -158,6 +166,13 @@ public class StringUtil {
 			}
 		}
 		return s.toString();
+	}
+
+	public static String convertObjectToJson(Object arg) {
+		if(arg != null){
+			return new Gson().toJson(arg);
+		}
+		return StringPool.BLANK;
 	}
 
 	public static String joinString(String[] toks, String delimiter){

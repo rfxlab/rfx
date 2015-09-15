@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 import redis.clients.jedis.Pipeline;
 import redis.clients.jedis.ShardedJedisPool;
 import redis.clients.jedis.exceptions.JedisException;
-import rfx.core.configs.RedisPoolConfigs;
+import rfx.core.configs.RedisConfigs;
 import rfx.core.nosql.jedis.RedisCommand;
 import rfx.core.util.DateTimeUtil;
 
@@ -26,7 +26,7 @@ public class RealtimeTrackingUtil {
 	private static final int AFTER_2_DAYS = 86400 * 2;
 	private static final int AFTER_4_DAYS = 86400 * 4;
 		
-	static ShardedJedisPool jedisPool = RedisPoolConfigs.load().get("realtimeDataStats").getShardedJedisPool();
+	static ShardedJedisPool jedisPool = RedisConfigs.load().get("realtimeDataStats").getShardedJedisPool();
 	
 	public static boolean updateKafkaLogEvent(int unixtime, final String event){
 		Date date = new Date(unixtime*1000L);

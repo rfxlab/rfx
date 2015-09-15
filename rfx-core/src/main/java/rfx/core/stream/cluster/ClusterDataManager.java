@@ -66,7 +66,7 @@ public class ClusterDataManager {
         } catch (Exception e) {
             LogUtil.error(e);
         } finally {
-            RedisCommand.freeRedisResource(jedisPool, shardedJedis, ok);
+            if(jedisPool != null) jedisPool.close();
         }
         return ok;
     }
@@ -101,7 +101,7 @@ public class ClusterDataManager {
         } catch (Exception e) {
             LogUtil.error(e);
         } finally {
-            RedisCommand.freeRedisResource(jedisPool, shardedJedis, ok);
+        	if(jedisPool != null) jedisPool.close();
         }
         return mapWorkerInfo == null ? new HashMap<String, WorkerInfo>() : mapWorkerInfo;
     }
@@ -178,7 +178,7 @@ public class ClusterDataManager {
 //            LogUtil.error(e);
             throw new RuntimeException(e);
         } finally {
-            RedisCommand.freeRedisResource(jedisPool, shardedJedis, ok);
+        	if(jedisPool != null) jedisPool.close();
         }
         return datas == null ? new ArrayList<WorkerData>(0) : datas;
     }
@@ -213,7 +213,7 @@ public class ClusterDataManager {
         } catch (Exception e) {
             LogUtil.error(e);
         } finally {
-            RedisCommand.freeRedisResource(jedisPool, shardedJedis, isCommited);
+        	if(jedisPool != null) jedisPool.close();
         }
     }
     

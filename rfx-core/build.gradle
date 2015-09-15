@@ -18,7 +18,7 @@ dependencies {
 		,'org.jsoup:jsoup:1.8.2'    		
 		,'org.apache.commons:commons-lang3:3.3.2'
 		,'commons-net:commons-net:3.3'    		
-		,'redis.clients:jedis:2.7.2'
+		,'redis.clients:jedis:2.7.3'
 		,'org.apache.httpcomponents:httpclient:4.5'
     )
     testCompile (

@@ -33,7 +33,7 @@ public class SqlDbConfigs implements Serializable {
 	public final static String MY_SQL = "mysql";
 	public final static String SQL_SERVER = "sqlserver";
 	public final static String ORACLE = "oracle";
-	public final static String ORACLE_TIMESTEN = "timedb";
+	public final static String MONGO_DB = "mongodb";
 	
 	
 	public static class SqlDbConfigsMap {
@@ -139,9 +139,8 @@ public class SqlDbConfigs implements Serializable {
 			s.append(this.getHost());
 			s.append(":").append(this.getPort()).append(":");
 			s.append(this.getDatabase());
-		} else if(ORACLE_TIMESTEN.equals(this.getDbdriver())){
-			//DriverManager.getConnection("jdbc:timedb://localhost:3601", "db-username", "db-password");
-			s.append("jdbc:").append(ORACLE_TIMESTEN).append("://");
+		} else if(MONGO_DB.equals(this.getDbdriver())){			
+			s.append(MONGO_DB).append("://");
 			s.append(this.getHost());
 			s.append(":").append(this.getPort()).append(":");
 			s.append(this.getDatabase());

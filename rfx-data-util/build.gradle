@@ -1,0 +1,116 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+sourceCompatibility = 1.8
+
+version = '1.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile (    
+    	'io.vertx:vertx-core:2.1.5'
+		,'com.typesafe.akka:akka-actor_2.10:2.3.11'
+		,'com.google.code.gson:gson:2.3'    		
+		,'log4j:log4j:1.2.17'
+		,'org.jsoup:jsoup:1.8.2'    		
+		,'org.apache.commons:commons-lang3:3.3.2'
+		,'commons-net:commons-net:3.3'    		
+		,'redis.clients:jedis:2.7.3'
+		,'org.apache.httpcomponents:httpclient:4.5'
+		, fileTree(dir: 'lib', include: '**/*.jar')
+    		 	
+    	//deps of data util	 	
+    	,'javax.inject:javax.inject:1'    	
+		,'org.aspectj:aspectjrt:1.8.7'
+		,'org.aspectj:aspectjweaver:1.8.7'		
+		,'org.reflections:reflections:0.9.10'
+		,'mysql:mysql-connector-java:5.1.36'
+		,'commons-dbcp:commons-dbcp:1.4'
+										    		 	
+		,'org.springframework:spring-context:4.2.1.RELEASE'
+		,'org.springframework:spring-jdbc:4.2.1.RELEASE'
+		,'org.springframework:spring-aop:4.2.1.RELEASE'
+    )
+    testCompile (
+    	'junit:junit:4.12' 
+    )
+}
+
+ext.rfxDataUtilManifest = manifest {
+   attributes ('Implementation-Title': 'rfx.core.data.util', 
+        			'Implementation-Version': version ,        			
+        			'Class-Path' : getClasspathStringJars() )
+}
+
+
+// ------------ tasks for build src ---------------------
+
+task listJars << {
+    configurations.compile.each { File file -> println file.name }
+}
+
+def getClasspathStringJars() {
+	def baseFolder = 'deps/'
+    def fileNames = []
+    configurations.compile.each { File file -> fileNames.add(baseFolder + file.name) }
+    
+    def classpath = fileNames.join(" ; ")    
+    return '. ; ' + classpath + ' ; '
+}
+
+task printClasspathStringJars << {   
+    println getClasspathStringJars()
+}
+
+
+jar {	 
+   dependsOn classes
+    from(sourceSets.main.output) {
+        include "**"
+    }    
+    baseName = 'rfx-data-util'
+    manifest = project.manifest {
+        from rfxDataUtilManifest
+    }
+}
+
+// ------------ copy tasks for core deployment ---------------------
+task rfxCopyRuntimeLibs(type: Copy) {  
+  into "build/libs/deps"  
+  from configurations.compile  
+}
+
+task rfxCopyConfigs(type: Copy) {  
+  into "build/libs/configs"  
+  from files('configs')
+}
+
+task rfxCopyResources(type: Copy) {  
+  into "build/libs/resources"  
+  from files('resources')
+}
+
+task rfxCopyToRelease(type: Copy) {
+    from('build/libs')
+    into('../releases/rfx-core')
+    include('**')
+}
+// ------------------------------------------------------------------
+
+task buildLibrary(type: Jar) {	
+	dependsOn classes
+    from(sourceSets.main.output) {
+        include "**"
+    }    
+    baseName = 'rfx-data-util'
+    manifest = project.manifest {
+        from rfxDataUtilManifest
+    }
+}
+
+
+
+

@@ -60,6 +60,8 @@ public abstract class BaseWorker {
 	protected String classnameWorker = getClass().getName();
 	protected int status = -1;
 	protected boolean autoStart = true;
+	protected Vertx vertxInstance;
+	protected HttpServer httpServerInstance;
 	
 	protected Timer timer = new Timer(true);
 	
@@ -138,12 +140,12 @@ public abstract class BaseWorker {
 			this.publicPort = port;
 			
 			//refer http://vertx.io/manual.html#performance-tuning
-			Vertx vertx = VertxFactory.newVertx();
-			HttpServer server = vertx.createHttpServer();
-			server.setAcceptBacklog(10000).setUsePooledBuffers(true);
-			server.setSendBufferSize(4 * 1024);
-			server.setReceiveBufferSize(4 * 1024);
-			return server;
+			vertxInstance = VertxFactory.newVertx();
+			httpServerInstance = vertxInstance.createHttpServer();
+			httpServerInstance.setAcceptBacklog(10000).setUsePooledBuffers(true);
+			httpServerInstance.setSendBufferSize(4 * 1024);
+			httpServerInstance.setReceiveBufferSize(4 * 1024);
+			return httpServerInstance;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

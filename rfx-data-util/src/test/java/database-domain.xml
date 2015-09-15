@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="
+    	http://www.springframework.org/schema/beans 
+    	http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+    	http://www.springframework.org/schema/context
+    	http://www.springframework.org/schema/context/spring-context-4.0.xsd
+        http://www.springframework.org/schema/aop 
+        http://www.springframework.org/schema/aop/spring-aop-4.0.xsd">
+	
+	<!-- Enable auto inject Spring Beans by Annotation(javax.inject.Inject) --> 
+	<context:annotation-config/>
+	
+	<!-- Enable AspectJ style of Spring AOP -->
+	<aop:aspectj-autoproxy />
+	
+	<!-- database data source config -->
+	<bean id="placeholderConfig" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location" value="file:///${user.dir}/configs/sql-host-configs.properties" />        
+    </bean>    
+	
+	<!-- default data source -->
+	<bean id="dataSource" destroy-method="close" class="org.apache.commons.dbcp.BasicDataSource" >
+	
+		<!-- connection database -->        
+        <property name="driverClassName"><value>${master_DB.driver}</value></property>        
+        <property name="url"><value>${master_DB.url}?autoReconnect=true</value></property>        
+        <property name="username"><value>${master_DB.username}</value></property>        
+        <property name="password"><value>${master_DB.password}</value></property>
+		
+		<!-- connection pool -->      
+        <property name="poolPreparedStatements" value="false" />
+        <property name="maxActive" value="20" />
+        <property name="maxIdle" value="10" />
+        <property name="maxWait" value="120" />
+        <property name="testWhileIdle" value="true" />
+        <property name="validationQuery" value="select 1" />        
+    </bean>		
+        
+    <!-- the AOP object manage caching for all DAO (default) -->
+	<bean name="cacheManagerForAllDAO" class="sample.pollapp.cache.CacheManagerForAllDAO" />
+    
+    <!-- common DAO to access database -->
+    <bean id="commonSpringDAO" class="rfx.data.util.sql.CommonSpringDAO" />
+    
+    <!-- All Data Access Objects -->
+	<bean id="pollAppDAO" class="sample.pollapp.business.dao.PollAppDAOImpl" />
+	
+</beans>
