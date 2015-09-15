@@ -30,7 +30,7 @@ public class Device {
 	private String deviceType = "General_Desktop";
 
 	public Device(String family) {
-		this.family = family;		
+		this.family = family.split(" ")[0];			
 	}
 
 	public static Device fromMap(Map<String, Object> m) {
