@@ -1,4 +1,4 @@
-package rfx.server.util.json;
+package rfx.data.util.json;
 
 /**
  * The JSONException is thrown by the JSON.org classes when things are amiss.

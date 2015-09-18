@@ -1,4 +1,4 @@
-package rfx.server.util.json;
+package rfx.data.util.json;
 
 /**
  * The <code>JSONString</code> interface allows a <code>toJSONString()</code>

@@ -11,9 +11,9 @@ import javax.sql.DataSource;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import rfx.server.util.json.JSONArray;
-import rfx.server.util.json.JSONException;
-import rfx.server.util.json.JSONObject;
+import rfx.data.util.json.JSONArray;
+import rfx.data.util.json.JSONException;
+import rfx.data.util.json.JSONObject;
 
 /**
  * refer more at http://docs.spring.io/spring/docs/current/spring-framework-reference/html/jdbc.html
