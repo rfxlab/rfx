@@ -5,14 +5,18 @@
 # Runtime and IDE folders #
 **/bin/*
 **/build/*
-**/data/*
-**/log/*
 **/.gradle/*
 **/.settings/*
 **/.idea/*
 **/releases/*
 **/node_modules/*
 **/contiperf-report/*
+
+# log and test data
+rfx-stream/log/*
+rfx-stream/data/*
+rfx-track/log/*
+rfx-track/data/*
 
 # Package Files #
 *.jar

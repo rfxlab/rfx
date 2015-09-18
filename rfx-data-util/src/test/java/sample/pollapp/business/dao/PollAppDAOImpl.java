@@ -64,6 +64,12 @@ public class PollAppDAOImpl extends CommonSpringDAO implements PollAppDAO {
 		return poll;
 	}
 	
+	@Override
+	public boolean save(Poll poll) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
 	public static void main(String[] args) {
 		ApplicationContext context = DatabaseDomainUtil.getContext();
 		PollAppDAO pollAppDAO = context.getBean(PollAppDAO.class);
@@ -76,5 +82,7 @@ public class PollAppDAOImpl extends CommonSpringDAO implements PollAppDAO {
 		});
 		//System.out.println(new Gson().toJson(polls));
 	}
+
+	
 
 }
