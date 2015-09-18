@@ -14,4 +14,6 @@ public interface PollAppDAO {
 	
 	@Cachable
 	public Poll getPoll(int id);
+	
+	public boolean save(Poll poll);
 }
