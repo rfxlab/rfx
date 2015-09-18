@@ -1,4 +1,4 @@
-package rfx.server.util.json;
+package rfx.data.util.json;
 
 /*
  Copyright (c) 2002 JSON.org

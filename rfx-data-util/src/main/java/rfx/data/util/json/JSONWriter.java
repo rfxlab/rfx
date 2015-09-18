@@ -1,4 +1,4 @@
-package rfx.server.util.json;
+package rfx.data.util.json;
 
 import java.io.IOException;
 import java.io.Writer;
