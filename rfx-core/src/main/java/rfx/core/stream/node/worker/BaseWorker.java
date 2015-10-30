@@ -360,4 +360,8 @@ public abstract class BaseWorker {
 	protected void onPause() {
 		System.out.println("onPause "+classnameWorker);
 	}	
+	
+	final public Vertx getVertxInstance() {
+		return vertxInstance;
+	}
 }
