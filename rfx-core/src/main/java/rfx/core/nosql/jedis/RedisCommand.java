@@ -28,11 +28,12 @@ public abstract class RedisCommand<T> {
 				jedis = shardedJedis.getShard(StringPool.BLANK);
 				rs = build();				
 			}
-		} catch (Exception e) {			
+		} catch (Exception e) {		
+			e.printStackTrace();
 			LogUtil.e("JedisPool: "+jedisPool.toString(), e.toString());
 		} finally {			
-			if (jedisPool != null) {
-				jedisPool.close();
+			if(shardedJedis != null){
+				shardedJedis.close();
 			}
 		}
 		return rs;
