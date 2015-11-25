@@ -135,15 +135,14 @@ public class AsynFileWriter {
 				fileWritter = new FileWriter(file, true);
 				bufferedWriter = new BufferedWriter(fileWritter, BUFFER_SIZE);				
 				while (! logQueue.isEmpty() ) {
-					String log = logQueue.poll();
-					log = logQueue.poll();
+					String log = logQueue.poll();					
 					if(log == null){
 						break;
 					}
 					bufferedWriter.write(log);	
 				}
 			} catch (Exception e) {			
-				LogUtil.e("RawLogData", e.getMessage() + " "+logFile);
+				LogUtil.e("LogData", e.getMessage() + " "+logFile);
 			} finally {
 				if (bufferedWriter != null) {
 					try {
