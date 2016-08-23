@@ -1,17 +1,23 @@
+group 'rfx'
+version '1.0'
+
 apply plugin: 'java'
 apply plugin: 'eclipse'
+apply plugin: 'maven'
 
 sourceCompatibility = 1.8
 
-version = '1.0'
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
 dependencies {
-    compile (   		 	
-			'io.vertx:vertx-core:2.1.5'
+    compile (   		 
+    		'rfx:rfx-core:1.0'
+    		   	
+			,'io.vertx:vertx-core:2.1.5'
     		,'com.typesafe.akka:akka-actor_2.10:2.3.8'
     		,'com.google.code.gson:gson:2.3'    		
     		,'log4j:log4j:1.2.17'    	
@@ -76,9 +82,8 @@ jar {
 	dependsOn classes
     from(sourceSets.main.output) {
         include "**"
-    }
-    version = ''
-    baseName = 'rfx-track-http-server'
+    }    
+    baseName = 'rfx-track'
     manifest = project.manifest {
         from rfxTrackManifest
     }

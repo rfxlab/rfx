@@ -1,5 +1,9 @@
+group 'rfx'
+version '1.0'
+
 apply plugin: 'java'
 apply plugin: 'eclipse'
+apply plugin: 'maven'
 
 sourceCompatibility = 1.8
 
@@ -7,6 +11,7 @@ version = '1.0'
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
 dependencies {
@@ -80,9 +85,8 @@ jar {
    	dependsOn classes
     from(sourceSets.main.output) {
         include "**"
-    }
-    version = ''
-    baseName = 'rfx-core-master'
+    }    
+    baseName = 'rfx-core'
     manifest = project.manifest {
         from rfxCoreMasterManifest
     }
