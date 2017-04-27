@@ -6,9 +6,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.http.HttpStatus;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.http.HttpServerRequest;
 
+import io.vertx.core.Handler;
+import io.vertx.core.http.HttpServerRequest;
 import rfx.core.stream.node.worker.BaseWorker;
 import rfx.core.util.StringPool;
 import rfx.core.util.StringUtil;

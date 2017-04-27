@@ -1,9 +1,9 @@
 package server.http;
 
 import org.apache.http.HttpStatus;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.http.HttpServerRequest;
 
+import io.vertx.core.Handler;
+import io.vertx.core.http.HttpServerRequest;
 import rfx.core.stream.node.worker.BaseWorker;
 import server.http.handler.BaseHttpHandler;
 

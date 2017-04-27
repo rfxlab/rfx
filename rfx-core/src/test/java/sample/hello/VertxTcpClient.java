@@ -1,18 +1,17 @@
 package sample.hello;
 
-import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.VertxFactory;
-import org.vertx.java.core.buffer.Buffer;
-import org.vertx.java.core.net.NetClient;
-import org.vertx.java.core.net.NetSocket;
-
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.net.NetClient;
+import io.vertx.core.net.NetSocket;
 import rfx.core.util.Utils;
 
 public class VertxTcpClient {
 
 	public static void main(String[] args) throws Exception {
-		NetClient client = VertxFactory.newVertx().createNetClient();
+		NetClient client = Vertx.vertx().createNetClient();
 		client.connect(14003, "localhost",
 				new Handler<AsyncResult<NetSocket>>() {
 					@Override
@@ -23,7 +22,7 @@ public class VertxTcpClient {
 							System.out.println("sending ...");
 							event.result()
 									.write("This is a message from client")
-									.dataHandler(new Handler<Buffer>() {
+									.handler(new Handler<Buffer>() {
 										@Override
 										public void handle(Buffer event) {
 											System.out

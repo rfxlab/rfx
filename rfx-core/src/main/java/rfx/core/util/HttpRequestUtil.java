@@ -1,19 +1,11 @@
 package rfx.core.util;
 
-import static io.netty.handler.codec.http.HttpHeaders.Names.SET_COOKIE;
-import io.netty.handler.codec.http.Cookie;
-import io.netty.handler.codec.http.CookieDecoder;
-import io.netty.handler.codec.http.HttpHeaders.Names;
-import io.netty.handler.codec.http.ServerCookieEncoder;
 
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.net.URLDecoder;
-import java.util.HashSet;
-import java.util.Set;
 
-import org.vertx.java.core.MultiMap;
-import org.vertx.java.core.http.HttpServerRequest;
+import io.vertx.core.MultiMap;
+import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.net.SocketAddress;
 
 /**
  * Util for getting param from org.vertx.java.core.http.HttpServerRequest

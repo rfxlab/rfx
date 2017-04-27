@@ -1,16 +1,19 @@
 package server.http.util;
 
-import io.netty.handler.codec.http.HttpHeaders.Names;
+
+
+
+import static io.netty.handler.codec.http.HttpHeaderNames.*;
+
 import io.netty.handler.codec.http.HttpResponseStatus;
-
-import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.http.HttpServerResponse;
-
+import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.http.HttpServerResponse;
 import rfx.core.util.LogUtil;
 import rfx.core.util.StringUtil;
 import server.http.model.ClickBeaconData;
 
 public class RedirectUtil {
+
 	
 	public static void redirect(String uri, HttpServerRequest req){		
 		ClickBeaconData cd = RedirectUtil.decodeClickUri(uri);		
@@ -19,15 +22,15 @@ public class RedirectUtil {
 			String redirect = cd.getRedirectUrl();			
 			if (redirect.startsWith("http")) {
 				res.setStatusCode(HttpResponseStatus.MOVED_PERMANENTLY.code());
-				res.headers().set(Names.LOCATION, redirect);
-				res.headers().set(Names.CONNECTION, "Close");
+				res.headers().set(LOCATION, redirect);
+				res.headers().set(CONNECTION, "Close");
 				res.end();
 			}
 		} else {
 			System.err.println("ClickBeaconData is NULL, redirect to default URL");
 			res.setStatusCode(HttpResponseStatus.MOVED_PERMANENTLY.code());
-			res.headers().set(Names.LOCATION, "http://eclick.vn");
-			res.headers().set(Names.CONNECTION, "Close");
+			res.headers().set(LOCATION, "http://eclick.vn");
+			res.headers().set(CONNECTION, "Close");
 			res.end();
 		}
 	}

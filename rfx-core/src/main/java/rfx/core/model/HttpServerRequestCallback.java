@@ -3,10 +3,10 @@ package rfx.core.model;
 import java.util.Map;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.vertx.java.core.MultiMap;
-import org.vertx.java.core.VoidHandler;
-import org.vertx.java.core.http.HttpServerRequest;
 
+import io.vertx.core.Handler;
+import io.vertx.core.MultiMap;
+import io.vertx.core.http.HttpServerRequest;
 import rfx.core.util.StringPool;
 
 public abstract class HttpServerRequestCallback implements Callback<String> {
@@ -63,16 +63,16 @@ public abstract class HttpServerRequestCallback implements Callback<String> {
 		try {
 			if(filterValidRequest()){
 				if(isHttpPost){
-					request.endHandler(new VoidHandler() {
-					    public void handle() {
-					        // The request has been all ready so now we can look at the form attributes
-					    	String rs = onHttpPostOk(request.formAttributes());
+					request.endHandler(new Handler<Void>() {
+						@Override
+						public void handle(Void event) {
+							String rs = onHttpPostOk(request.formAttributes());
 					    	if(rs != null){
 					    		request.response().end(rs);
 					    	} else {
 					    		request.response().end(StringPool.BLANK);
 					    	}
-					    }
+						}
 					});
 					return null;
 				} else {

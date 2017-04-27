@@ -2,9 +2,10 @@ package sample.hello;
 
 import java.util.TimerTask;
 
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.http.HttpServerRequest;
+import com.google.gson.Gson;
 
+import io.vertx.core.Handler;
+import io.vertx.core.http.HttpServerRequest;
 import redis.clients.jedis.ShardedJedisPool;
 import redis.clients.jedis.exceptions.JedisException;
 import rfx.core.model.WorkerTimeLog;
@@ -13,8 +14,6 @@ import rfx.core.stream.cluster.ClusterDataManager;
 import rfx.core.stream.node.worker.BaseWorker;
 import rfx.core.util.StringPool;
 import rfx.core.util.StringUtil;
-
-import com.google.gson.Gson;
 
 public class OtherWorker extends BaseWorker {
 
@@ -26,11 +25,12 @@ public class OtherWorker extends BaseWorker {
         Handler<HttpServerRequest> handler = new Handler<HttpServerRequest>() {
 
             public void handle(HttpServerRequest request) {
-                if (request.absoluteURI().getPath().equals("/cmd/kill")) {
+            	
+                if (request.path().equals("/cmd/kill")) {
                     request.response().end("Exiting...");
                     killWorker();
                     return;
-                } else if (request.absoluteURI().getPath().equals("/cmd/ping")) {
+                } else if (request.path().equals("/cmd/ping")) {
                     request.response().end("PONG");
                     return;
                 }

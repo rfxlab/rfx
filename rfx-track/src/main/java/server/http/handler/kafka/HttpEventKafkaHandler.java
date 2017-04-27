@@ -3,8 +3,7 @@ package server.http.handler.kafka;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.vertx.java.core.http.HttpServerRequest;
-
+import io.vertx.core.http.HttpServerRequest;
 import server.http.model.HttpEventKafkaLog;
 
 public abstract class HttpEventKafkaHandler {

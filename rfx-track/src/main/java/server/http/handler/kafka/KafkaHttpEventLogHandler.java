@@ -2,8 +2,7 @@ package server.http.handler.kafka;
 
 import java.util.Map;
 
-import org.vertx.java.core.http.HttpServerRequest;
-
+import io.vertx.core.http.HttpServerRequest;
 import rfx.core.util.StringUtil;
 import server.http.configs.KafkaProducerConfigs;
 import server.http.handler.BaseHttpHandler;

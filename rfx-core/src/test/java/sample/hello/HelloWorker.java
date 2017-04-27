@@ -1,22 +1,10 @@
 package sample.hello;
 
-import java.util.TimerTask;
-
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.buffer.Buffer;
-import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.net.NetSocket;
-
-import redis.clients.jedis.ShardedJedisPool;
-import redis.clients.jedis.exceptions.JedisException;
-import rfx.core.model.WorkerTimeLog;
-import rfx.core.nosql.jedis.RedisCommand;
-import rfx.core.stream.cluster.ClusterDataManager;
+import io.vertx.core.Handler;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.net.NetSocket;
 import rfx.core.stream.node.worker.BaseWorker;
-import rfx.core.util.StringPool;
-import rfx.core.util.StringUtil;
-
-import com.google.gson.Gson;
 
 public class HelloWorker extends BaseWorker {
 
@@ -29,7 +17,7 @@ public class HelloWorker extends BaseWorker {
     	 registerWorkerTcpHandler(host, port+1, new Handler<NetSocket>() {
  			@Override
  			public void handle(final NetSocket event) {
- 				event.dataHandler(new Handler<Buffer>() {
+ 				event.handler(new Handler<Buffer>() {
  					public void handle(Buffer buffer) {
  						System.out.println(buffer.toString());
  						event.write("ok");
@@ -41,11 +29,13 @@ public class HelloWorker extends BaseWorker {
         Handler<HttpServerRequest> handler = new Handler<HttpServerRequest>() {
 
             public void handle(HttpServerRequest request) {
-                if (request.absoluteURI().getPath().equals("/cmd/kill")) {
+                String absoluteURI = request.path();
+                System.out.println(absoluteURI);
+				if (absoluteURI.equals("/cmd/kill")) {
                     request.response().end("Exiting...");
                     killWorker();
                     return;
-                } else if (request.absoluteURI().getPath().equals("/cmd/ping")) {
+                } else if (absoluteURI.equals("/cmd/ping")) {
                     request.response().end("PONG");
                     return;
                 }

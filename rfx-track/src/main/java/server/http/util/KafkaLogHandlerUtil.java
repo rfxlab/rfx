@@ -1,12 +1,11 @@
 package server.http.util;
 
-import org.vertx.java.core.http.HttpServerRequest;
+import com.google.gson.Gson;
 
+import io.vertx.core.http.HttpServerRequest;
 import rfx.core.util.StringUtil;
 import server.http.handler.kafka.HttpEventKafkaHandler;
 import server.http.model.HttpEventKafkaLog;
-
-import com.google.gson.Gson;
 
 public class KafkaLogHandlerUtil {
 	

@@ -1,6 +1,6 @@
 package server.http.handler;
 
-import org.vertx.java.core.http.HttpServerRequest;
+import io.vertx.core.http.HttpServerRequest;
 
 public class PingHttpHandler implements BaseHttpHandler{
 	private static final String PONG = "PONG";

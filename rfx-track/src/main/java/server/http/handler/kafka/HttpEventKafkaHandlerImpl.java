@@ -1,14 +1,11 @@
 package server.http.handler.kafka;
-import static io.netty.handler.codec.http.HttpHeaders.Names.COOKIE;
-import static io.netty.handler.codec.http.HttpHeaders.Names.REFERER;
-import static io.netty.handler.codec.http.HttpHeaders.Names.USER_AGENT;
 
+import static io.vertx.core.http.HttpHeaders.*;
 import java.net.URLDecoder;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.vertx.java.core.MultiMap;
-import org.vertx.java.core.http.HttpServerRequest;
-
+import io.vertx.core.MultiMap;
+import io.vertx.core.http.HttpServerRequest;
 import rfx.core.util.HttpRequestUtil;
 import rfx.core.util.LogUtil;
 import rfx.core.util.StringPool;

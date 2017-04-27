@@ -6,16 +6,16 @@ import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.core.VertxFactory;
-import org.vertx.java.core.http.HttpServer;
-import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.http.HttpServerResponse;
-import org.vertx.java.core.http.RouteMatcher;
-import org.vertx.java.core.net.NetServer;
-import org.vertx.java.core.net.NetSocket;
+import com.google.gson.Gson;
 
+import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
+import io.vertx.core.http.HttpServer;
+import io.vertx.core.http.HttpServerOptions;
+import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.http.HttpServerResponse;
+import io.vertx.core.net.NetServer;
+import io.vertx.core.net.NetSocket;
 import redis.clients.jedis.ShardedJedisPool;
 import redis.clients.jedis.exceptions.JedisException;
 import rfx.core.model.WorkerTimeLog;
@@ -24,8 +24,6 @@ import rfx.core.stream.cluster.ClusterDataManager;
 import rfx.core.util.StringPool;
 import rfx.core.util.StringUtil;
 import rfx.core.util.Utils;
-
-import com.google.gson.Gson;
 
 /**
  * the base class for worker implementation <br>
@@ -140,11 +138,14 @@ public abstract class BaseWorker {
 			this.publicPort = port;
 			
 			//refer http://vertx.io/manual.html#performance-tuning
-			vertxInstance = VertxFactory.newVertx();
-			httpServerInstance = vertxInstance.createHttpServer();
-			httpServerInstance.setAcceptBacklog(10000).setUsePooledBuffers(true);
-			httpServerInstance.setSendBufferSize(4 * 1024);
-			httpServerInstance.setReceiveBufferSize(4 * 1024);
+			vertxInstance = Vertx.vertx();
+			
+			HttpServerOptions options = new HttpServerOptions();
+			options.setAcceptBacklog(10000).setUsePooledBuffers(true);
+			options.setSendBufferSize(4 * 1024);
+			options.setReceiveBufferSize(4 * 1024);
+			httpServerInstance = vertxInstance.createHttpServer(options);
+			
 			return httpServerInstance;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -161,7 +162,7 @@ public abstract class BaseWorker {
 		try {
 			this.privateHost = host;
 			this.privatePort = port;			
-			return VertxFactory.newVertx().createNetServer();
+			return Vertx.vertx().createNetServer();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -178,15 +179,6 @@ public abstract class BaseWorker {
 		registerWorkerNodeIntoCluster();		
 	}
 	
-	final protected void registerWorkerHttpHandler(String host, int port, RouteMatcher routeMatcher) {
-		HttpServer server = checkAndCreateHttpServer(host, port);
-		if(server == null){
-			System.err.println("registerWorkerHttpHandler return NULL value");
-			return;
-		}
-		server.requestHandler(routeMatcher).listen(port, host);
-		registerWorkerNodeIntoCluster();		
-	}
 	
 	final protected void registerWorkerTcpHandler(String host, int port, Handler<NetSocket> handler) {
 		NetServer server = checkAndCreateNetServer(host, port);
@@ -205,8 +197,7 @@ public abstract class BaseWorker {
 	        ShardedJedisPool jedisPool =  ClusterDataManager.getRedisClusterInfoPool();
 	        new RedisCommand<Boolean>(jedisPool) {
 	            @Override
-	            protected Boolean build() throws JedisException {
-	                jedis = shardedJedis.getShard(StringPool.BLANK);
+	            protected Boolean build() throws JedisException {	                
 	                String workerName = StringUtil.toString(publicHost.replaceAll("\\.", ""), "_", publicPort);
 	                WorkerTimeLog timeLog = new Gson().fromJson(jedis.hget(ClusterDataManager.CLUSTER_WORKER_PREFIX, workerName + ClusterDataManager.WORKER_TIMELOG_POSTFIX), WorkerTimeLog.class);
 	                if (timeLog == null) {
@@ -293,7 +284,7 @@ public abstract class BaseWorker {
 	 * @return true if processed | false if no handler found
 	 */
 	final protected boolean handleRequestToBaseWorker(HttpServerRequest request){
-		String uri = request.absoluteURI().getPath();
+		String uri = request.path();
 		HttpServerResponse res = request.response();
 		if (uri.equalsIgnoreCase(URI_PING)) {
         	res.end("PONG");

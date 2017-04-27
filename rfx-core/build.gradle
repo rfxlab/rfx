@@ -16,21 +16,25 @@ repositories {
 
 dependencies {
     compile (
-		     'io.netty:netty-all:4.0.32.Final'    	    		    		 	
-  			,'io.vertx:vertx-core:2.1.6'
-			,'com.typesafe.akka:akka-actor_2.10:2.3.11'
-			,'com.google.code.gson:gson:2.4'    		
+			'io.netty:netty-all:4.1.9.Final'    	    		    		 	
+  			,'io.vertx:vertx-core:3.4.1'
+			,'com.typesafe.akka:akka-actor_2.10:2.3.16'
+			,'com.google.code.gson:gson:2.8.0'    		
 			,'log4j:log4j:1.2.17'
 			,'org.jsoup:jsoup:1.8.3'					
 			,'org.apache.commons:commons-lang3:3.3.2'
 			,'commons-net:commons-net:3.3'    		
-			,'redis.clients:jedis:2.7.3'
-			,'org.apache.httpcomponents:httpclient:4.5.1'
+			,'redis.clients:jedis:2.9.0'
+			,'org.apache.httpcomponents:httpclient:4.5.3'
     )
     testCompile (
     	'junit:junit:4.12'    	
     	,'org.mockito:mockito-core:1.+'	
     )
+}
+
+tasks.withType(Jar) {
+	destinationDir = file("$rootDir/BUILD-OUTPUT")
 }
 
 ext.rfxCoreMasterManifest = manifest {
@@ -56,9 +60,6 @@ ext.rfxScheduledJobManifest = manifest {
 
 // ------------ tasks for build src ---------------------
 
-task listJars << {
-    configurations.compile.each { File file -> println file.name }
-}
 
 def getClasspathStringJars() {
 	def baseFolder = 'deps/'
@@ -67,10 +68,6 @@ def getClasspathStringJars() {
     
     def classpath = fileNames.join(" ; ")    
     return '. ; ' + classpath + ' ; '
-}
-
-task printClasspathStringJars << {   
-    println getClasspathStringJars()
 }
 
 uploadArchives {

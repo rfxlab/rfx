@@ -1,7 +1,9 @@
 package rfx.core.util;
 
-import static io.netty.handler.codec.http.HttpHeaders.Names.SET_COOKIE;
-import static io.netty.handler.codec.http.HttpHeaders.Names.USER_AGENT;
+import static io.vertx.core.http.HttpHeaders.COOKIE;
+import static io.vertx.core.http.HttpHeaders.HOST;
+import static io.vertx.core.http.HttpHeaders.SET_COOKIE;
+import static io.vertx.core.http.HttpHeaders.USER_AGENT;
 
 import java.net.URLDecoder;
 import java.util.HashMap;
@@ -9,16 +11,14 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.http.HttpServerResponse;
-
-import io.netty.handler.codec.http.Cookie;
-import io.netty.handler.codec.http.CookieDecoder;
-import io.netty.handler.codec.http.DefaultCookie;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.ServerCookieEncoder;
-import io.netty.handler.codec.http.HttpHeaders.Names;
+import io.netty.handler.codec.http.cookie.Cookie;
+import io.netty.handler.codec.http.cookie.DefaultCookie;
+import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
+import io.netty.handler.codec.http.cookie.ServerCookieEncoder;
+import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.http.HttpServerResponse;
 
 
 
@@ -75,7 +75,7 @@ public class HttpCookieUtil {
 	}
 
 	public static void setAnomyousCookie(Cookie cookie,	FullHttpResponse response) {
-		response.headers().add(SET_COOKIE, ServerCookieEncoder.encode(cookie));
+		response.headers().add(SET_COOKIE, ServerCookieEncoder.STRICT.encode(cookie));
 	}
 
 	
@@ -107,7 +107,7 @@ public class HttpCookieUtil {
 
 	public static String generateFospAID(HttpRequest request) {		
 		String userAgent = request.headers().get(USER_AGENT);
-		String logDetails = request.headers().get(io.netty.handler.codec.http.HttpHeaders.Names.HOST);
+		String logDetails = request.headers().get(HOST);
 		String result = SecurityUtil.sha1(userAgent + logDetails + System.currentTimeMillis());
 		return result.substring(0, 16);
 	}
@@ -138,10 +138,10 @@ public class HttpCookieUtil {
 
 	public static Set<Cookie> getCookies(HttpServerRequest req) {
 		try {
-			String cookieString = req.headers().get(Names.COOKIE);		
+			String cookieString = req.headers().get(COOKIE);		
 			if (cookieString != null) {
 				cookieString = URLDecoder.decode(cookieString, StringPool.UTF_8);				
-				return CookieDecoder.decode(cookieString);
+				return  ServerCookieDecoder.STRICT.decode(cookieString);
 			}
 		} catch (Exception e) {			
 			e.printStackTrace();
@@ -151,13 +151,13 @@ public class HttpCookieUtil {
 	
 	public static Map<String,Cookie> getCookieMap(HttpServerRequest req) {
 		try {
-			String cookieString = req.headers().get(Names.COOKIE);		
+			String cookieString = req.headers().get(COOKIE);		
 			if (cookieString != null) {
 				cookieString = URLDecoder.decode(cookieString, StringPool.UTF_8);				
-				Set<Cookie> cookies = CookieDecoder.decode(cookieString);
+				Set<Cookie> cookies = ServerCookieDecoder.STRICT.decode(cookieString);
 				Map<String,Cookie> map = new HashMap<String,Cookie>(cookies.size());
 				for (Cookie cookie : cookies) {
-					map.put(cookie.getName(), cookie);
+					map.put(cookie.name(), cookie);
 				}
 				return map;
 			}
@@ -177,7 +177,7 @@ public class HttpCookieUtil {
 			cookie.setDomain(domain);
 			cookie.setPath(path);			
 			cookie.setMaxAge(maxAge);
-			res.headers().add(SET_COOKIE,ServerCookieEncoder.encode(cookie));
+			res.headers().add(SET_COOKIE,ServerCookieEncoder.STRICT.encode(cookie));
 		} catch (Exception e) {			
 			e.printStackTrace();
 		}

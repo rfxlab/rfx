@@ -1,8 +1,9 @@
 package rfx.core.job;
 
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.http.HttpServerRequest;
 
+
+import io.vertx.core.Handler;
+import io.vertx.core.http.HttpServerRequest;
 import rfx.core.stream.node.worker.BaseWorker;
 import rfx.core.util.LogUtil;
 
@@ -16,14 +17,15 @@ public class ScheduledJobNode extends BaseWorker {
 	public void start(String host, int port) {
 		Handler<HttpServerRequest> handler = new Handler<HttpServerRequest>() {
             public void handle(HttpServerRequest request) {
-                if (request.absoluteURI().getPath().equals("/kill")) {
+                String path = request.path().toLowerCase();
+				if (path.equals("/kill")) {
                     request.response().end("Exiting after 5s ...");
                     killWorker();
                     return;
-                } else if (request.absoluteURI().getPath().equals("/ping")) {
+                } else if (path.equals("/ping")) {
                     request.response().end("PONG");
                     return;
-                } else if (request.absoluteURI().getPath().equals("/job/trigger")) {
+                } else if (path.equals("/job/trigger")) {
                 	String jobClasspath =  request.params().get("classpath");
                 	boolean ok = ScheduledJobManager.getInstance().triggerJob(jobClasspath);
                     request.response().end("triggerJob "+ jobClasspath + " : "+ok);

@@ -5,11 +5,9 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.core.VertxFactory;
-import org.vertx.java.core.http.HttpServerRequest;
-
+import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
+import io.vertx.core.http.HttpServerRequest;
 import rfx.core.model.Callback;
 import rfx.core.model.CallbackResult;
 import rfx.core.model.HttpServerRequestCallback;
@@ -40,7 +38,7 @@ public class MasterNode {
     public void run() {
         try {
             final HttpHandlerMapper mapper = HttpHandlerMapper.get(MasterNodeHttpHandlers.class);
-            Vertx vertx = VertxFactory.newVertx();
+            Vertx vertx = Vertx.vertx();
             vertx.createHttpServer().requestHandler(new Handler<HttpServerRequest>() {
 
                 public void handle(HttpServerRequest request) {
@@ -48,8 +46,8 @@ public class MasterNode {
                     String contentType = StringPool.MediaType.HTML;
                     String path = request.path();
                     boolean isPost = false;
-                    if ("POST".equals(request.method().toUpperCase())) {
-                        request.expectMultiPart(true);
+                    if ("POST".equals(request.method().name().toUpperCase())) {
+                        request.setExpectMultipart(true);
                         isPost = true;
                     }
 

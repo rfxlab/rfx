@@ -1,7 +1,7 @@
 [    
     {
-        classpath : "system.job.heartbeat.MonitorMasterNode"
-        ,delay : 2
-        ,period : 10
+        "classpath" : "system.job.heartbeat.MonitorMasterNode"
+        ,"delay" : 2
+        ,"period" : 10
     }
 ]

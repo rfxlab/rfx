@@ -1,7 +1,9 @@
 package server.http.handler;
 
 import org.apache.http.HttpStatus;
-import org.vertx.java.core.http.HttpServerRequest;
+
+import io.vertx.core.http.HttpServerRequest;
+
 
 public class Http404Handler implements BaseHttpHandler{
 	private static final String s404 = "Not found for uri: %s";

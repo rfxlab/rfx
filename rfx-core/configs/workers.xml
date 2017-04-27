@@ -7,7 +7,7 @@
 	</startWorkerScriptPath>
 		
 	<!-- where the debug/info/error logs store -->
-	<debugLogPath>/home/trieunt/data/log</debugLogPath>
+	<debugLogPath>/home/hungnt/data/logs</debugLogPath>
 	
 	<!-- the allocated port for workers -->	
 	<allocatedWorkers type="list" >		

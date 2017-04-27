@@ -3,13 +3,13 @@ package rfx.core.stream.node.handler;
 import java.util.Date;
 
 import org.apache.commons.net.util.Base64;
-import org.vertx.java.core.MultiMap;
 
+import com.google.gson.Gson;
+
+import io.vertx.core.MultiMap;
 import rfx.core.model.HttpServerRequestCallback;
 import rfx.core.stream.cluster.ClusterDataManager;
 import rfx.core.util.FileUtils;
-
-import com.google.gson.Gson;
 
 /**
  * the HTTP Request Handlers for Master Node
@@ -24,7 +24,6 @@ public class MasterNodeHttpHandlers extends HttpHandlerMapper {
     @Override
     public HttpHandlerMapper buildCallbackHandlers() {
         when("/server-time", new HttpServerRequestCallback() {
-
             @Override
             protected String onHttpGetOk() {
                 return new Date().toString();
@@ -32,7 +31,6 @@ public class MasterNodeHttpHandlers extends HttpHandlerMapper {
         });
 
         when("/json/deploy-topology", new HttpServerRequestCallback() {
-
             @Override
             protected String onHttpPostOk(MultiMap formData) {
                 String base64data = formData.get("base64data");
@@ -44,7 +42,6 @@ public class MasterNodeHttpHandlers extends HttpHandlerMapper {
             }
         });
         when("/json/get-workers", new HttpServerRequestCallback() {
-
             @Override
             protected String onHttpGetOk() {
                 return new Gson().toJson(ClusterDataManager.getWorkerData());

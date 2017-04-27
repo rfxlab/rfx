@@ -17,23 +17,24 @@ dependencies {
     compile (   		 
     		'rfx:rfx-core:1.0'
     		   	
-			,'io.vertx:vertx-core:2.1.5'
-    		,'com.typesafe.akka:akka-actor_2.10:2.3.8'
-    		,'com.google.code.gson:gson:2.3'    		
-    		,'log4j:log4j:1.2.17'    	
-    		,'org.jsoup:jsoup:1.8.1'    		
-    		,'org.apache.commons:commons-lang3:3.3.2'
-    		,'commons-net:commons-net:3.3'
-    		,'redis.clients:jedis:2.7.3'
-    		,'org.apache.httpcomponents:httpclient:4.3.6'
+			,'io.netty:netty-all:4.1.9.Final'    	    		    		 	
+  			,'io.vertx:vertx-core:3.4.1'
+			,'com.typesafe.akka:akka-actor_2.10:2.3.16'
+			,'com.google.code.gson:gson:2.8.0'    		
+			,'log4j:log4j:1.2.17'
+			,'org.jsoup:jsoup:1.8.3'					
+			,'org.apache.commons:commons-lang3:3.3.2'
+			,'commons-net:commons-net:3.3'    		
+			,'redis.clients:jedis:2.9.0'
+			,'org.apache.httpcomponents:httpclient:4.5.3'
 
     		, fileTree(dir: 'lib', include: '**/*.jar')    		
-    		,'org.apache.kafka:kafka_2.10:0.8.1.1'
-    		,'com.google.guava:guava:18.0'
+    		,'org.apache.kafka:kafka_2.10:0.8.2.2'  
+    		,'com.google.guava:guava:20.0'
     		,'org.databene:contiperf:2.3.4'
     		
     		)
-    testCompile group: 'junit', name: 'junit', version: '4.11'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
 ext.rfxTrackManifest = manifest {
@@ -51,12 +52,8 @@ uploadArchives {
     }
 }
 
-task listJars << {
-    configurations.compile.each { File file -> println file.name }
-}
-
-task printClasspathStringJars << {   
-    println getClasspathStringJars()
+tasks.withType(Jar) {
+	destinationDir = file("$rootDir/BUILD-OUTPUT")
 }
 
 def getClasspathStringJars() {
