@@ -10,6 +10,7 @@ import com.google.gson.Gson;
 
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import io.vertx.core.VertxOptions;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.http.HttpServerRequest;
@@ -34,6 +35,7 @@ import rfx.core.util.Utils;
  */
 public abstract class BaseWorker {
 	
+	public final long MAX_TIMEOUT_WORKER = 10000000000L;
 	private static final String URI_GET_SERVER_TIME = "/get/server-time";
 	private static final String URI_GET_HOST = "/get/host";
 	private static final String URI_GET_NAME = "/get/name";
@@ -47,6 +49,7 @@ public abstract class BaseWorker {
 	public final int RUNNING = 2;
 	public final int PAUSED = 3;
 	public final int KILLED = 4;
+	
 	
 	static BaseWorker _worker;
 	
@@ -138,13 +141,16 @@ public abstract class BaseWorker {
 			this.publicPort = port;
 			
 			//refer http://vertx.io/manual.html#performance-tuning
-			vertxInstance = Vertx.vertx();
+			//DeploymentOptions options = new DeploymentOptions().setWorker(true);
+			VertxOptions options = new VertxOptions(); 
+			options.setMaxEventLoopExecuteTime(MAX_TIMEOUT_WORKER);			
+			vertxInstance = Vertx.vertx(options);
 			
-			HttpServerOptions options = new HttpServerOptions();
-			options.setAcceptBacklog(10000).setUsePooledBuffers(true);
-			options.setSendBufferSize(4 * 1024);
-			options.setReceiveBufferSize(4 * 1024);
-			httpServerInstance = vertxInstance.createHttpServer(options);
+			HttpServerOptions httpOptions = new HttpServerOptions();
+			httpOptions.setAcceptBacklog(10000).setUsePooledBuffers(true);
+			httpOptions.setSendBufferSize(4 * 1024);
+			httpOptions.setReceiveBufferSize(4 * 1024);
+			httpServerInstance = vertxInstance.createHttpServer(httpOptions);
 			
 			return httpServerInstance;
 		} catch (Exception e) {
