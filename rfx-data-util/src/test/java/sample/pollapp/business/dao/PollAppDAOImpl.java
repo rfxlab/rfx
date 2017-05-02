@@ -10,8 +10,6 @@ import java.util.function.Consumer;
 import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
-import rfx.core.util.Utils;
-import rfx.data.util.cache.Cachable;
 import rfx.data.util.sql.CommonSpringDAO;
 import rfx.data.util.sql.DatabaseDomainUtil;
 import rfx.data.util.sql.SqlTemplateString;
@@ -45,10 +43,11 @@ public class PollAppDAOImpl extends CommonSpringDAO implements PollAppDAO {
 			choice.setVotes(rowSet.getInt("votes"));
 			poll.addChoice(choice);
 		}
+		System.out.println("Miss cache, do DB query");
 		return new ArrayList<Poll>(polls.values());
 	}
 	
-	@Cachable
+	
 	public Poll getPoll(int id) {
 		System.out.println("..."+id);
 		Poll poll = new Poll();
@@ -59,8 +58,7 @@ public class PollAppDAOImpl extends CommonSpringDAO implements PollAppDAO {
 		choices.add(new Choice(1, id, "eat", 1));
 		choices.add(new Choice(2, id, "sleep", 22));
 		poll.setChoices(choices );
-		System.out.println(poll);
-		Utils.sleep(2000);
+		System.out.println(poll);		
 		return poll;
 	}
 	
@@ -70,16 +68,24 @@ public class PollAppDAOImpl extends CommonSpringDAO implements PollAppDAO {
 		return false;
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		ApplicationContext context = DatabaseDomainUtil.getContext();
 		PollAppDAO pollAppDAO = context.getBean(PollAppDAO.class);
 		List<Poll> polls = pollAppDAO.getAllPolls();
+		Thread.sleep(1000);
+		polls = pollAppDAO.getAllPolls();
 		polls.parallelStream().forEach(new Consumer<Poll>(){
 			@Override
 			public void accept(Poll t) {
-				System.out.println(t);
+//				System.out.println(t);
 			} 
 		});
+		
+		Poll poll = pollAppDAO.getPoll(1);
+		Thread.sleep(1000);
+		poll = pollAppDAO.getPoll(1);
+		
+		
 		//System.out.println(new Gson().toJson(polls));
 	}
 

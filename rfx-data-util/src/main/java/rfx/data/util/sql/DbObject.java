@@ -3,8 +3,6 @@ package rfx.data.util.sql;
 import java.util.HashMap;
 import java.util.Map;
 
-import rfx.core.util.StringUtil;
-
 import com.google.gson.Gson;
 
 /**
@@ -58,15 +56,24 @@ public class DbObject {
 	}
 	
 	public int getInt(String field){
-		return StringUtil.safeParseInt(get(field));
+		try {
+			return Integer.parseInt(get(field)+"");
+		} catch (Exception e) {	}
+		return 0;
 	}
 	
 	public long getLong(String field){
-		return StringUtil.safeParseLong(get(field));
+		try {
+			return Long.parseLong(get(field)+"");
+		} catch (Exception e) {}
+		return 0;
 	}
 	
 	public double getDouble(String field){
-		return StringUtil.safeParseDouble(get(field)+"");
+		try {
+			return Double.parseDouble(get(field)+"");
+		} catch (Exception e) {}
+		return 0;
 	}
 	
 	

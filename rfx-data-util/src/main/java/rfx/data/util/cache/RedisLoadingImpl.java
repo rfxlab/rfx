@@ -2,7 +2,7 @@ package rfx.data.util.cache;
 
 import java.util.concurrent.ExecutionException;
 
-import rfx.core.util.StringUtil;
+import rfx.data.util.StringUtil;
 
 public class RedisLoadingImpl extends NoSqlCacheLoading{
 	String poolname;

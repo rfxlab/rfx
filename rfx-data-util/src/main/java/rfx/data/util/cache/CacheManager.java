@@ -11,9 +11,9 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
 import org.reflections.Reflections;
 
-import rfx.core.util.StringUtil;
-
 import com.google.common.cache.LoadingCache;
+
+import rfx.data.util.StringUtil;
 
 public abstract class CacheManager {
 	protected final static Map<String, CachePool> signatureConfigCache = new HashMap<>();
@@ -30,11 +30,12 @@ public abstract class CacheManager {
 			System.out.println("...Data Access Object: " + implKey);
 			if (clazz.isAnnotationPresent(CacheConfig.class) ) {
 				Method[] methods = clazz.getMethods();
-				Map<String, Long> cachableMethods = new HashMap<>(methods.length);
-				for (Method method : methods) {
+				Map<String, Long> cachableMethods = new HashMap<>(methods.length);				
+				for (Method method : methods) {					
 					if(method.isAnnotationPresent(CachableMethod.class)){
 						Annotation am = method.getAnnotation(CachableMethod.class);
-						CachableMethod cachable = (CachableMethod) am;						
+						CachableMethod cachable = (CachableMethod) am;
+//						System.out.println("CachableMethod "+cachable);
 						String mkey;
 						if( cachable.keyPrefix().isEmpty() ){
 							mkey = method.getName(); 
@@ -47,19 +48,21 @@ public abstract class CacheManager {
 						cachableMethods.put(mkey, cachable.expireAfter());
 					}
 				}
+				
 				Annotation annotation = clazz.getAnnotation(CacheConfig.class);
 				CacheConfig cacheConfig = (CacheConfig) annotation;
 				
 				long maximumSize = cacheConfig.maximumSize() > 0 ? cacheConfig.maximumSize() : 1000000;
 				long expireAfter = cacheConfig.expireAfter() > 0 ? cacheConfig.expireAfter() : 10;
-				String keyPrefix = cacheConfig.keyPrefix();
 				int type = cacheConfig.type();
+				String keyPrefix = cacheConfig.keyPrefix();
+				
 				
 				if(type == CacheConfig.LOCAL_CACHE_ENGINE){	
 					LoadingCache<String, Object> cacheImpl = GuavaCacheUtil.getLoadingCache(implKey, maximumSize, expireAfter );
 					signatureConfigCache.put(implKey, new CachePool(cacheImpl, keyPrefix, cachableMethods, expireAfter));
 				} 
-				//TODO support memcache later
+				//TODO add support Redis
 				
 				System.out.println("...registered signatureConfigCache:" + implKey);
 			}			
@@ -74,17 +77,19 @@ public abstract class CacheManager {
 			Object value = null;
 //	        System.out.println(" ---------Before invoking ---------- ");
 	        
-	        //String key = pJoinPoint.getSignature().getName() + HashUtil.hashUrlCrc64(Arrays.toString(pJoinPoint.getArgs()));
+//	        String key = pJoinPoint.getSignature().getName() + HashUtil.hashUrlCrc64(Arrays.toString(pJoinPoint.getArgs()));
 		
 			Signature method = pJoinPoint.getSignature();
 			String methodName = method.getName();
 			Object[] args = pJoinPoint.getArgs();
-			long expireAfter = cachePool.getExpireAfter(methodName);
+			long expireAfter = cachePool.getExpireAfter(methodName);			
+			System.out.println("==>cachePool:"+cachePool + " methodName:"+methodName + " expireAfter:" + expireAfter);
 			if(expireAfter > 0){
-				//System.out.println(className +" " +methodName + " " + cachePool);
+//				System.out.println(className +" " +methodName + " " + cachePool);
 				String key = cachePool.buildKey(methodName, args);
 		        LoadingCache<String, Object> cache = cachePool.getCache();
 	        	value = cache.get(key);	
+//	        	System.out.println("cache.get " + value);
 	        	
 	        	if(StringUtil.isEmpty(value)){	        		
 	                value = pJoinPoint.proceed();	 
@@ -99,10 +104,11 @@ public abstract class CacheManager {
 	        	} else {
 	        		System.out.println("Hit cache by key: " + key );
 	        	}		
-			} else {
+			} 
+			else {
 				value = pJoinPoint.proceed();
 			}				
-        	//System.out.println(" value: "+value);
+        	System.out.println(" value: "+value);
         	
 	        return value;	
 		}

@@ -2,8 +2,6 @@ package rfx.data.util.sql;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import rfx.core.util.LogUtil;
-
 
 
 public abstract class DbCommand<T>  {
@@ -29,7 +27,7 @@ public abstract class DbCommand<T>  {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			LogUtil.error(e);
+			System.err.println(e);
 		}
 		return rs;
 	}

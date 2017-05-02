@@ -2,10 +2,10 @@ package rfx.data.util.cache;
 
 import java.util.Map;
 
-import rfx.core.util.StringPool;
-import rfx.core.util.StringUtil;
-
 import com.google.common.cache.LoadingCache;
+
+import rfx.data.util.StringPool;
+import rfx.data.util.StringUtil;
 
 /**
  * @author trieu
@@ -48,10 +48,11 @@ public class CachePool {
 		return StringUtil.toString(keyPrefix, StringPool.UNDERLINE, StringUtil.join(args,StringPool.UNDERLINE));
 	}
 	
-	public long getExpireAfter(String methodName){
+	public long getExpireAfter(String methodName){		
 		if(cachableMethods != null){
-			return cachableMethods.getOrDefault(methodName, 0L);
-		}
+			long c = cachableMethods.getOrDefault(methodName, 0L);
+			return c;
+		}		
 		return defaultExpire;
 	}
 	
