@@ -12,7 +12,7 @@ import rfx.core.stream.message.Tuple;
 import rfx.core.stream.model.DataFlowInfo;
 import rfx.core.stream.topology.BaseTopology;
 import rfx.core.stream.util.HashUtil;
-import rfx.core.stream.util.SocialAnalyticsUtil;
+
 import rfx.core.util.DateTimeUtil;
 
 /**
@@ -44,7 +44,7 @@ public class FindingSocialTrends extends BaseFunctor {
 	            	Pipeline p = jedis.pipelined();
 	            
 	            	//get Facebook like count from Facebook API
-	            	int fbLike = SocialAnalyticsUtil.getFacebookLikeCount(reading_url);	
+	            	int fbLike = 0;//FIXME SocialAnalyticsUtil.getFacebookLikeCount(reading_url);	
 	            	long hash = HashUtil.hashUrlCrc64(reading_url);
 	            	
 	            	p.hset("url:"+hash, "facebook-like", fbLike+"");	    			

@@ -1,10 +1,13 @@
 package rfx.core.stream.worker;
 
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.MultiMap;
-import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.http.HttpServerResponse;
 
+
+import com.google.gson.Gson;
+
+import io.vertx.core.Handler;
+import io.vertx.core.MultiMap;
+import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.http.HttpServerResponse;
 import rfx.core.configs.loader.ConfigAutoLoader;
 import rfx.core.stream.model.KafkaTaskDef;
 import rfx.core.stream.model.TaskDef;
@@ -12,8 +15,6 @@ import rfx.core.stream.node.worker.BaseWorker;
 import rfx.core.stream.topology.BaseTopology;
 import rfx.core.util.LogUtil;
 import rfx.core.util.StringUtil;
-
-import com.google.gson.Gson;
 
 public abstract class StreamProcessingWorker extends BaseWorker {
 	
@@ -36,7 +37,7 @@ public abstract class StreamProcessingWorker extends BaseWorker {
 		if (handleRequestToBaseWorker(req)) {
             return true;
         }
-		String uri = req.absoluteURI().getPath();
+		String uri = req.path();
 		HttpServerResponse res = req.response();
 		MultiMap params = req.params();
 		if (uri.equals("/set/task")) {
