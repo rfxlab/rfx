@@ -72,10 +72,12 @@ public abstract class BaseWorker {
 	
 	protected static void setWorker(BaseWorker worker){
 		_worker = worker;
-	}			
+	}		
+	
 	
 	public BaseWorker(String name) {
 		super();
+		
 		this.name = name;
 		this.classnameWorker = getClass().getName();
 		status = STARTING;
@@ -139,6 +141,9 @@ public abstract class BaseWorker {
 		try {
 			this.publicHost = host;
 			this.publicPort = port;
+			
+			// disable the creation of file-cache folders ".vertx"
+			System.setProperty("vertx.disableFileCPResolving", "true");
 			
 			//refer http://vertx.io/manual.html#performance-tuning
 			//DeploymentOptions options = new DeploymentOptions().setWorker(true);
