@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.Date;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.log4j.Logger;
 
 import rfx.core.configs.WorkerConfigs;
 import rfx.core.util.CommonUtil.COLOR_CODE;
@@ -54,8 +53,6 @@ public class LogUtil {
 	public static void i(Object tag, Object log) {
 		i(tag, String.valueOf(log), false);
 	}
-
-	static Logger logger = Logger.getRootLogger();
 
 	public static void i(Object tag, String log, boolean dumpToFile) {
 		if (!(tag instanceof String)) {
@@ -111,7 +108,6 @@ public class LogUtil {
 			}
 		}
 	}
-
 	
 	static String getDebugFolderPath(){
 		if(debugLogFolderPath.isEmpty()){
