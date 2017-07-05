@@ -1,7 +1,7 @@
 package rfx.core.ua;
 
-import rfx.core.stream.util.ua.Client;
-import rfx.core.stream.util.ua.Parser;
+import rfx.core.util.useragent.Client;
+import rfx.core.util.useragent.Parser;
 
 public class TestUserAgentParser {
 

@@ -16,11 +16,11 @@ import rfx.core.stream.message.Tuple;
 import rfx.core.stream.model.DataFlowInfo;
 import rfx.core.stream.topology.BaseTopology;
 import rfx.core.stream.util.ParamUtil;
-import rfx.core.stream.util.ua.Client;
-import rfx.core.stream.util.ua.Parser;
 import rfx.core.util.DateTimeUtil;
 import rfx.core.util.LogUtil;
 import rfx.core.util.StringUtil;
+import rfx.core.util.useragent.Client;
+import rfx.core.util.useragent.Parser;
 
 public class ItemLogParsingFunctor extends BaseFunctor  {
 	

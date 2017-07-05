@@ -12,10 +12,10 @@ import rfx.core.stream.functor.StreamProcessor;
 import rfx.core.stream.message.Tuple;
 import rfx.core.stream.model.DataFlowInfo;
 import rfx.core.stream.topology.BaseTopology;
-import rfx.core.stream.util.ua.Parser;
 import rfx.core.util.DateTimeUtil;
 import rfx.core.util.LogUtil;
 import rfx.core.util.StringUtil;
+import rfx.core.util.useragent.Parser;
 
 public class UserTrackingProcessing extends StreamProcessor  {
 	

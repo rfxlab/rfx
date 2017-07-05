@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package rfx.core.stream.util.ua;
+package rfx.core.util.useragent;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -25,8 +25,9 @@ import java.util.Map;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 
-import rfx.core.stream.util.ua.DeviceParser.DevicePattern;
-import rfx.core.stream.util.ua.OSParser.OSPattern;
+import rfx.core.util.useragent.DeviceParser.DevicePattern;
+import rfx.core.util.useragent.OSParser.OSPattern;
+
 
 /**
  * Java implementation of <a href="https://github.com/tobie/ua-parser">UA Parser</a>

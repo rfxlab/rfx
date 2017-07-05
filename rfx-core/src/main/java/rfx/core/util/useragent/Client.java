@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package rfx.core.stream.util.ua;
+package rfx.core.util.useragent;
 
 
 /**

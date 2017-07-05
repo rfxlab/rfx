@@ -15,8 +15,8 @@ import rfx.core.stream.functor.BaseFunctor;
 import rfx.core.stream.message.Tuple;
 import rfx.core.stream.model.DataFlowInfo;
 import rfx.core.stream.topology.BaseTopology;
-import rfx.core.stream.util.HashUtil;
 import rfx.core.util.DateTimeUtil;
+import rfx.core.util.HashUtil;
 import rfx.core.util.HttpClientUtil;
 
 /**

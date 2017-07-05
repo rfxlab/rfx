@@ -1,4 +1,4 @@
-package rfx.core.stream.util;
+package rfx.core.util;
 
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
