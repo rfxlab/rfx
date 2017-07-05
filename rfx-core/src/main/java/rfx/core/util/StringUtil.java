@@ -61,7 +61,7 @@ public class StringUtil {
 					try {
 						return java.net.URLDecoder.decode( safeString(s),StringPool.UTF_8);
 					} catch (Exception e1) {
-						LogUtil.e(TAG, e1.getClass()  + ", fail to decodeUrlUTF8 " + s);
+						e1.printStackTrace();
 					}
 				}
 			}
@@ -73,7 +73,7 @@ public class StringUtil {
 		try {
 			return java.net.URLEncoder.encode( safeString(s),StringPool.UTF_8);
 		} catch (Throwable e) {
-			LogUtil.e(TAG, "fail to encodeUrlUTF8 " + s);
+			e.printStackTrace();
 		}
 		return StringPool.BLANK;
 	}
@@ -83,7 +83,9 @@ public class StringUtil {
 		for (byte b : hash) {
 			formatter.format("%02x", b);
 		}
-		return formatter.toString();
+		String s = formatter.toString();
+		formatter.close();
+		return s;
 	}
 
 	public static String SHA1(byte[] convertme) {

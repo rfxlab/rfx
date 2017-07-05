@@ -141,8 +141,9 @@ public class AsynFileWriter {
 					}
 					bufferedWriter.write(log);	
 				}
-			} catch (Exception e) {			
-				LogUtil.e("LogData", e.getMessage() + " "+logFile);
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.err.println("FAIL writeToFile "+logFile);				
 			} finally {
 				if (bufferedWriter != null) {
 					try {

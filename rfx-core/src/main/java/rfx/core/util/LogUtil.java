@@ -19,7 +19,7 @@ public class LogUtil {
 	static boolean debug = false;
 	static String debugLogFolderPath = "";
 
-	static AsynFileWriter logFileWriter = new AsynFileWriter(2000);
+//	static AsynFileWriter logFileWriter = new AsynFileWriter(2000);
 		
 	public static void setDebug(boolean debug) {
 		LogUtil.debug = debug;
@@ -30,7 +30,7 @@ public class LogUtil {
 	}
 
 	public static void shutdownLogThreadPools() {
-		logFileWriter.shutdownTimer();		
+//		logFileWriter.shutdownTimer();		
 	}
 
 	public static void setSuffixLogFile(String suffixLogFile) {
@@ -137,7 +137,8 @@ public class LogUtil {
 			String data = StringUtil.toString(time , logData , StringPool.NEW_LINE);
 			String path =  StringUtil.toString(debugLogByDatePath, prefixMode , datetime , suffixLogFile ,LOG_EXT);
 			//System.out.println(path);
-			logFileWriter.write(path, data);
+			
+//			FIXME logFileWriter.write(path, data);
 		}
 
 	}
@@ -157,6 +158,7 @@ public class LogUtil {
 	}
 
 	public static void error(Exception e) {
+		e.printStackTrace();
 		dumpToFile(ExceptionUtils.getStackTrace(e), true, new Date());
 	}
 }
