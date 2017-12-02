@@ -12,9 +12,6 @@ public class RedisConnectionPoolConfig {
 	protected static RedisConnectionPoolConfig _instance = null;
 	
 	public static RedisConnectionPoolConfig theInstance() {
-		return _instance;
-	}
-	public static JedisPoolConfig getJedisPoolConfigInstance(){
 		if(_instance == null){
 			try {
 				String json = FileUtils.readFileAsString(CommonUtil.getRedisPoolConnectionConfigFile());
@@ -30,9 +27,13 @@ public class RedisConnectionPoolConfig {
 				}
 			}
 		}
-		return _instance.getJedisPoolConfig();
+		return _instance;
+	}
+	public static JedisPoolConfig getJedisPoolConfigInstance(){		
+		return theInstance().getJedisPoolConfig();
 	}
 	
+	int connectionTimeout = 0;
 	int maxTotal = 20;
 	int maxIdle = 10;
 	int minIdle = 1;
@@ -113,6 +114,14 @@ public class RedisConnectionPoolConfig {
 	public void setTimeBetweenEvictionRunsMillis(int timeBetweenEvictionRunsMillis) {
 		this.timeBetweenEvictionRunsMillis = timeBetweenEvictionRunsMillis;
 	}
+	
+	public int getConnectionTimeout() {
+		return connectionTimeout;
+	}
+	
+	public void setConnectionTimeout(int connectionTimeout) {
+		this.connectionTimeout = connectionTimeout;
+	}
 
 	public String toJson() {
 		return new Gson().toJson(this);
@@ -128,7 +137,7 @@ public class RedisConnectionPoolConfig {
 		config.setTestOnBorrow(this.testOnBorrow);
 		config.setTestOnReturn(this.testOnReturn);
 		config.setTestWhileIdle(this.testWhileIdle);
-		config.setTimeBetweenEvictionRunsMillis(this.timeBetweenEvictionRunsMillis);
+		config.setTimeBetweenEvictionRunsMillis(this.timeBetweenEvictionRunsMillis);		
 		return config;
 	}
 }

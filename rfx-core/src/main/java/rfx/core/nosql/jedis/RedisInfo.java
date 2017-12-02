@@ -3,6 +3,7 @@ package rfx.core.nosql.jedis;
 import java.util.ArrayList;
 import java.util.List;
 
+import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.JedisShardInfo;
 import redis.clients.jedis.ShardedJedisPool;
 import rfx.core.configs.RedisConnectionPoolConfig;
@@ -11,14 +12,15 @@ public class RedisInfo {
 	public static final String LOCALHOST_STR = "localhost";
 
 	private String host;
-	private int port;
-	private String auth;
+	private int port;	
+	private String auth;	
 	private ShardedJedisPool shardedJedisPool; 
 	
-	protected void initThePool(){
+	protected void initThePool(){		
+		RedisConnectionPoolConfig connectionConfig = RedisConnectionPoolConfig.theInstance();
 		List<JedisShardInfo> shardInfos = new ArrayList<JedisShardInfo>(1);
-		shardInfos.add(new JedisShardInfo(getHost(), getPort(), 0));
-		shardedJedisPool = new ShardedJedisPool(RedisConnectionPoolConfig.getJedisPoolConfigInstance(), shardInfos);
+		shardInfos.add(new JedisShardInfo(getHost(), getPort(), connectionConfig.getConnectionTimeout()));
+		shardedJedisPool = new ShardedJedisPool(connectionConfig.getJedisPoolConfig(), shardInfos);
 	}
 
 	public RedisInfo(String host, int port) {

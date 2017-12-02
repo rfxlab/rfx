@@ -36,7 +36,7 @@ public class HttpTrackingUtil {
 	
 	public static String generateUUID(MultiMap headers) {
 		String userAgent = headers.get(USER_AGENT);
-		String logDetails = headers.get(io.netty.handler.codec.http.HttpHeaders.Names.HOST);
+		String logDetails = headers.get(io.netty.handler.codec.http.HttpHeaderNames.HOST);
 		String result = SecurityUtil.sha1(userAgent + logDetails + System.currentTimeMillis());
 		return result;
 	}
