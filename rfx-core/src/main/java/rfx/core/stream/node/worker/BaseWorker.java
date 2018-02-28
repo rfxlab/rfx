@@ -17,6 +17,7 @@ import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetSocket;
+import io.vertx.ext.web.Router;
 import redis.clients.jedis.ShardedJedisPool;
 import redis.clients.jedis.exceptions.JedisException;
 import rfx.core.model.WorkerTimeLog;
@@ -77,10 +78,19 @@ public abstract class BaseWorker {
 	
 	public BaseWorker(String name) {
 		super();
-		
 		this.name = name;
 		this.classnameWorker = getClass().getName();
 		status = STARTING;
+		
+		// disable the creation of file-cache folders ".vertx"
+		System.setProperty("vertx.disableFileCPResolving", "true");
+		
+		//refer http://vertx.io/manual.html#performance-tuning
+		//DeploymentOptions options = new DeploymentOptions().setWorker(true);
+		VertxOptions options = new VertxOptions(); 
+		options.setMaxEventLoopExecuteTime(MAX_TIMEOUT_WORKER);			
+		vertxInstance = Vertx.vertx(options);
+		
 		initBeforeStart();
 	}
 	
@@ -142,14 +152,7 @@ public abstract class BaseWorker {
 			this.publicHost = host;
 			this.publicPort = port;
 			
-			// disable the creation of file-cache folders ".vertx"
-			System.setProperty("vertx.disableFileCPResolving", "true");
-			
-			//refer http://vertx.io/manual.html#performance-tuning
-			//DeploymentOptions options = new DeploymentOptions().setWorker(true);
-			VertxOptions options = new VertxOptions(); 
-			options.setMaxEventLoopExecuteTime(MAX_TIMEOUT_WORKER);			
-			vertxInstance = Vertx.vertx(options);
+		
 			
 			HttpServerOptions httpOptions = new HttpServerOptions();
 			httpOptions.setAcceptBacklog(10000).setUsePooledBuffers(true);
@@ -187,6 +190,16 @@ public abstract class BaseWorker {
 			return;
 		}
 		server.requestHandler(handler).listen(port, host);
+		registerWorkerNodeIntoCluster();		
+	}
+	
+	final protected void registerWorkerHttpRouter(String host, int port, Router router) {
+		HttpServer server = checkAndCreateHttpServer(host, port);
+		if(server == null){
+			System.err.println("registerWorkerHttpRouter return NULL value");
+			return;
+		}
+		server.requestHandler(router::accept).listen(port, host);
 		registerWorkerNodeIntoCluster();		
 	}
 	

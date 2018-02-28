@@ -15,8 +15,9 @@ repositories {
 dependencies {
     compile (
     		//rfx-core
-			'io.vertx:vertx-core:3.4.2'			
-			,'com.google.code.gson:gson:2.8.1'    		
+			 'io.vertx:vertx-core:3.5.1'			
+  			,'io.vertx:vertx-web:3.5.1'		
+			,'com.google.code.gson:gson:2.8.2'    		
 			,'log4j:log4j:1.2.17'
 			,'org.jsoup:jsoup:1.10.3'					
 			,'org.apache.commons:commons-lang3:3.3.2'
