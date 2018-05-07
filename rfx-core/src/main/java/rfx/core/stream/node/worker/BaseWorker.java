@@ -17,7 +17,6 @@ import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetSocket;
-import io.vertx.ext.web.Router;
 import redis.clients.jedis.ShardedJedisPool;
 import redis.clients.jedis.exceptions.JedisException;
 import rfx.core.model.WorkerTimeLog;
@@ -142,7 +141,7 @@ public abstract class BaseWorker {
 		return false;
 	}
 	
-	private HttpServer checkAndCreateHttpServer(String host, int port){
+	protected HttpServer checkAndCreateHttpServer(String host, int port){
 		if(isAddressAlreadyInUse(host, port)){
 			System.err.println(host+":"+port + " isAddressAlreadyInUse!");
 			Utils.exitSystemAfterTimeout(200);
@@ -193,15 +192,7 @@ public abstract class BaseWorker {
 		registerWorkerNodeIntoCluster();		
 	}
 	
-	final protected void registerWorkerHttpRouter(String host, int port, Router router) {
-		HttpServer server = checkAndCreateHttpServer(host, port);
-		if(server == null){
-			System.err.println("registerWorkerHttpRouter return NULL value");
-			return;
-		}
-		server.requestHandler(router::accept).listen(port, host);
-		registerWorkerNodeIntoCluster();		
-	}
+	
 	
 	
 	final protected void registerWorkerTcpHandler(String host, int port, Handler<NetSocket> handler) {

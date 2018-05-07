@@ -15,8 +15,7 @@ repositories {
 
 dependencies {
     compile (  	
-			'io.vertx:vertx-core:3.5.1'			
-  			,'io.vertx:vertx-web:3.5.1'		
+			'io.vertx:vertx-core:3.4.1'
 			,'com.google.code.gson:gson:2.8.2'    		
 			,'log4j:log4j:1.2.17'
 			,'org.jsoup:jsoup:1.11.2'					
