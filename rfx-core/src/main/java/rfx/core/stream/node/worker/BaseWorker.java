@@ -87,7 +87,8 @@ public abstract class BaseWorker {
 		//refer http://vertx.io/manual.html#performance-tuning
 		//DeploymentOptions options = new DeploymentOptions().setWorker(true);
 		VertxOptions options = new VertxOptions(); 
-		options.setMaxEventLoopExecuteTime(MAX_TIMEOUT_WORKER);			
+		options.setMaxEventLoopExecuteTime(MAX_TIMEOUT_WORKER);		
+		options.setBlockedThreadCheckInterval(200000000);		
 		vertxInstance = Vertx.vertx(options);
 		
 		initBeforeStart();

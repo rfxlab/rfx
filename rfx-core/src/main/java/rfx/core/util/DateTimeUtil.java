@@ -138,7 +138,11 @@ public class DateTimeUtil {
 	}
 	
 	public static int currentUnixTimestamp(){
-		return (int)(System.currentTimeMillis()/1000L);
+		return (int)(currentUnixTimestampInLong());
+	}
+	
+	public static long currentUnixTimestampInLong(){
+		return System.currentTimeMillis()/1000L;
 	}
 	
 	public static String getFormatedDateForLog(){
