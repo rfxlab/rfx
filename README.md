@@ -6,8 +6,6 @@ RFX, the full-stack framework for reactive real-time analytics
 * Real-time Information Dashboard with HTML5 WebSocket( thanks to http://nvd3.org and http://startbootstrap.com/template-categories/admin-dashboard )
 
 Official website
-===
-http://www.rfxlab.com
 
 Core Concepts
 ===
