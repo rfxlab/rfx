@@ -5,8 +5,6 @@ RFX, the full-stack framework for reactive real-time analytics
 * Simple Data Pipeline Model for Stream Processing ( Inspired by Actor Model at http://akka.io and MillWheel: Fault-Tolerant Stream Processing at Internet Scale http://research.google.com/pubs/pub41378.html )
 * Real-time Information Dashboard with HTML5 WebSocket( thanks to http://nvd3.org and http://startbootstrap.com/template-categories/admin-dashboard )
 
-Official website
-
 Core Concepts
 ===
 ![alt tag](http://2.bp.blogspot.com/-qvY6yHo4Rt0/VJTxnnO9biI/AAAAAAAADQE/bQbNsSoLuSw/s1600/Real-time-Reactive-Marketing-Platform%2B-%2BNew%2BPage%2B(1).png)
