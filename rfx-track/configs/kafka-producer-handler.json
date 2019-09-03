@@ -1,25 +1,25 @@
 {    
-	writeKafkaLogEnable : 1,
-	    
-    numberBatchJob : 2,
-    sendKafkaThreadPerBatchJob : 3,
-    kafkaProducerAsyncEnabled : 0,
-    kafkaProducerAckEnabled : 1,
-    timeSendKafkaPerBatchJob : 5000,
-    sendKafkaMaxRetries : 2,    
-    defaultPartitioner: "server.kafka.SimplePartitioner",        
-    kafkaProducerList : {
-        tk : {
-            kafkaTopic : "item-tracking",
-            brokerList : "127.0.0.1:9092"
+	"writeKafkaLogEnable" : 0,
+
+    "numberBatchJob" : 2,
+    "sendKafkaThreadPerBatchJob" : 4,
+    "kafkaProducerAsyncEnabled" : 0,
+    "kafkaProducerAckEnabled" : 1,
+    "timeSendKafkaPerBatchJob" : 4000,
+    "sendKafkaMaxRetries" : 2,
+    "defaultPartitioner" : "server.kafka.SimplePartitioner",     
+    "kafkaProducerList" : {
+        "tk" : {
+            "kafkaTopic" : "item-tracking",
+            "brokerList" : "127.0.0.1:9092"
         },
-        u : {
-            kafkaTopic : "user-activity",
-            brokerList : "127.0.0.1:9092"
+        "u" : {
+            "kafkaTopic" : "user-activity",
+            "brokerList" : "127.0.0.1:9092"
         },
-        c : {
-            kafkaTopic : "click",
-            brokerList : "127.0.0.1:9092"
+        "c" : {
+            "kafkaTopic" : "click",
+            "brokerList" : "127.0.0.1:9092"
         }
     }
 }

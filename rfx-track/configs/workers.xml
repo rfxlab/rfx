@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<WorkerConfigs classpath="rfx.core.configs.WorkerConfigs" type="object" >
+	
+	<!-- the shell-script for start workers -->
+	<startWorkerScriptPath>		
+		./start-worker.sh
+	</startWorkerScriptPath>
+		
+	<!-- where the debug/info/error logs store -->
+	<debugLogPath>/home/hungnt/data/logs</debugLogPath>
+	
+	<!-- the allocated port for workers -->	
+	<allocatedWorkers type="list" >		
+		<worker>
+			<hostName>127.0.0.1</hostName>
+			<port>14001</port>
+			<mainClass>sample.hello.HelloWorker</mainClass>
+		</worker>
+		<worker>
+			<hostName>127.0.0.1</hostName>
+			<port>14002</port>
+			<mainClass>sample.hello.OtherWorker</mainClass>
+		</worker>
+	</allocatedWorkers>
+		
+	<!-- the custom configs for workers -->
+	<customConfigs type="map" >
+		<config name="fullIP2LocationPath">
+			./geoip-data/IP-COUNTRY-REGION-CITY-LATITUDE-LONGITUDE-ISP-DOMAIN-MOBILE.BIN
+		</config>		
+	</customConfigs>
+		
+</WorkerConfigs>

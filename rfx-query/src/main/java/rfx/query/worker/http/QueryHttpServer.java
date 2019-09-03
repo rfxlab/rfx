@@ -21,7 +21,8 @@ public class QueryHttpServer  extends BaseWorker {
                 request.response().end(HELLO);
             }
         };
-        registerWorkerHttpHandler(host, port, handler);
+       
+        super.checkAndCreateHttpServer(host, port);
     }
     
     @Override
