@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import rfx.core.util.RandomUtil;
 import rfx.core.util.Utils;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
@@ -33,7 +34,7 @@ public class Query<T> {
 	}	
 	
 	public ActorRef getQueryActor() {			
-		ActorRef queryActor = queryActorPool.get(Utils.randomNumber(0, lastIndexActor));
+		ActorRef queryActor = queryActorPool.get(RandomUtil.randomNumber(0, lastIndexActor));
 		return queryActor;
 	}
 	

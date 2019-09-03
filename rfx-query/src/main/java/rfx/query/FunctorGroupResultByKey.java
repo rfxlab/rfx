@@ -8,6 +8,8 @@ public class FunctorGroupResultByKey extends Functor {
 		this.queryContext = queryContext;
 	}
 	
+	
+	
 	@Override
 	public void onReceive(Object message) throws Exception {		
 		if(message == null){
