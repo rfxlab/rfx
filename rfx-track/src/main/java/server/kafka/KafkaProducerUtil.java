@@ -5,8 +5,12 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
-import kafka.javaapi.producer.Producer;
-import kafka.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.serialization.LongSerializer;
+import org.apache.kafka.common.serialization.StringSerializer;
+
 import server.http.configs.KafkaProducerConfigs;
 
 public class KafkaProducerUtil {
@@ -28,13 +32,13 @@ public class KafkaProducerUtil {
 	public static Producer<String, String> getKafkaProducer(String actorId, ProducerConfig producerConfig, boolean refreshProducer){
 		Producer<String, String> producer = kafkaProducerPool.get(actorId);
 		if(producer == null){
-			producer = new Producer<>(producerConfig);
+			producer = new KafkaProducer<>(producerConfig.originals());
 			addKafkaProducer(actorId, producer);
 		} else {
 			if(refreshProducer){
 				System.out.println("### refreshProducer for actorId: " + actorId);
 				producer.close(); producer = null;
-				producer = new Producer<>(producerConfig);
+				producer = new KafkaProducer<>(producerConfig.originals());
 				addKafkaProducer(actorId, producer);
 			}
 		}
@@ -49,38 +53,19 @@ public class KafkaProducerUtil {
 	}
 	
 	
-	public static Properties createProducerProperties(String brokerList , String partioner, int batchNumSize){
+	public static Properties createProducerProperties(String clientId, String brokerList , String partioner, int batchNumSize){
 		//metadata.broker.list accepts input in the form "host1:port1,host2:port2"
+
 		Properties props = new Properties();
-		props.put("broker.list", brokerList);				
-		props.put("metadata.broker.list", brokerList);
-		//async mode Kafka Producer
-		if(kafkaProducerConfigs.getKafkaProducerAsyncEnabled()==1){
-			props.put("producer.type", "async");
-		}
-		props.put("serializer.class", "kafka.serializer.StringEncoder");
-		props.put("partitioner.class", partioner);
-		props.put("request.required.acks", ""+kafkaProducerConfigs.getKafkaProducerAckEnabled());
-		props.put("message.send.max.retries", ""+kafkaProducerConfigs.getSendKafkaMaxRetries()); // default=3
-		props.put("batch.num.messages", ""+batchNumSize);
-		props.put("send.buffer.bytes", "1048576");
-		props.put("request.timeout.ms", "8000");
-		//props.put("queue.enqueue.timeout.ms", "-1");
-		//props.put("compression.codec", "1");
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerList);
+        props.put(ProducerConfig.CLIENT_ID_CONFIG, clientId);
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, LongSerializer.class.getName());
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+        props.put(ProducerConfig.PARTITIONER_CLASS_CONFIG, partioner);
+        props.put(ProducerConfig.BATCH_SIZE_CONFIG, batchNumSize);
+        props.put(ProducerConfig.ACKS_CONFIG, kafkaProducerConfigs.getKafkaProducerAsyncEnabled()==1);
+        
 		return props;
 	}
 	
-	public static Properties createSynchedAckedProducerProperties(String brokerList , String partioner, int batchNumSize){
-		//metadata.broker.list accepts input in the form "host1:port1,host2:port2"
-		Properties props = new Properties();
-		props.put("broker.list", brokerList);				
-		props.put("metadata.broker.list", brokerList);		
-		props.put("serializer.class", "kafka.serializer.StringEncoder");
-		props.put("partitioner.class", partioner);
-		props.put("request.required.acks", "1");		
-		props.put("batch.num.messages", ""+batchNumSize);
-		props.put("send.buffer.bytes", "1048576");
-		props.put("request.timeout.ms", "8000");
-		return props;
-	}
 }

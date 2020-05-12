@@ -31,7 +31,7 @@ public class DateTimeUtil {
 	static final DateFormat DB_HOUR_NAME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:00:00");
 	static final DateFormat DATE_FORMAT_FOR_DB = new SimpleDateFormat("yyyy-MM-dd");	
 	
-	static final DateFormat DATEHOUR_FORMAT = new SimpleDateFormat("yyyy-MM-dd-HH");
+	static final DateFormat DATEHOUR_FORMAT = new SimpleDateFormat(DATE_HOUR_FORMAT_PATTERN);
 	static final DateFormat DATEHOURMINUTE_FORMAT = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
 
 	public static String formatRawDateTime(int unixtime){
@@ -149,9 +149,7 @@ public class DateTimeUtil {
 		return DATE_FORMAT2.format(new Date());
 	}
 	
-	public static void main(String[] args) {
-		System.out.println(DateTimeUtil.getDateHourStringForDb(new Date(1394792343 * 1000L)));
-	}
+	
 	
 	public static Date jsDateStringToJavaDate(String jsDateString) throws ParseException{
 	    String[] arrStrDateParts = jsDateString.split(" ");

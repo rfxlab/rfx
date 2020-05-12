@@ -10,7 +10,9 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import kafka.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.ProducerConfig;
+
+import rfx.core.util.DateTimeUtil;
 import rfx.core.util.LogUtil;
 import rfx.core.util.Utils;
 import server.http.configs.KafkaProducerConfigs;
@@ -70,7 +72,8 @@ public class KafkaProducerHandler {
 				if (partioner == null ) {
 					partioner = defaultPartitioner;
 				}
-				Properties configs = KafkaProducerUtil.createProducerProperties(brokerList, partioner,MAX_KAFKA_TO_SEND);
+				String clientId = key + "_" ;//FIXME
+				Properties configs = KafkaProducerUtil.createProducerProperties(clientId, brokerList, partioner,MAX_KAFKA_TO_SEND);
 				kafkaProducers.put(key, new KafkaProducerHandler(new ProducerConfig(configs), topic));
 				LogUtil.i("KafkaHandler.init-loaded: "+ key + " => "+jsonProducerConfig);
 			}

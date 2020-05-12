@@ -8,9 +8,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import kafka.javaapi.producer.Producer;
-import kafka.producer.KeyedMessage;
-import kafka.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.ProducerRecord;
+
 import rfx.core.util.LogUtil;
 import rfx.core.util.Utils;
 import server.http.configs.KafkaProducerConfigs;
@@ -68,7 +69,7 @@ public class SendLogBufferTask extends TimerTask {
 		if(queueSize > 0){
 			try {
 				//init the batch list with max capacity
-				List<KeyedMessage<String, String>> batchLogs = new ArrayList<>(queueSize);
+				List<ProducerRecord<String, String>> batchLogs = new ArrayList<>(queueSize);
 				int batchSize = 0;
 				while( true ){									
 					EventData data = this.queueLogs.poll();
@@ -76,7 +77,7 @@ public class SendLogBufferTask extends TimerTask {
 						break;
 					} else {					
 						//build the payload, and add to the list
-						KeyedMessage<String, String> payload = new KeyedMessage<String, String>(this.topic, data.toStringMessage());	
+						ProducerRecord<String, String> payload = new ProducerRecord<String, String>(this.topic, data.toStringMessage());	
 						batchLogs.add(payload);						
 						batchSize = batchLogs.size();
 						if(batchSize >= maxSize && maxSize > 0){

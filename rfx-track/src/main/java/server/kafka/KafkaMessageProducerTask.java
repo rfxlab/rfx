@@ -2,17 +2,18 @@ package server.kafka;
 
 import java.util.List;
 
-import kafka.javaapi.producer.Producer;
-import kafka.producer.KeyedMessage;
+import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.ProducerRecord;
+
 import rfx.core.util.LogUtil;
 
 public class KafkaMessageProducerTask implements Runnable  {
 	
-	List<KeyedMessage<String, String>> batchLogs;
+	List<ProducerRecord<String, String>> batchLogs;
 	private String actorId;
 	Producer<String, String> producer;
 
-	public KafkaMessageProducerTask(String actorId, Producer<String, String> producer, List<KeyedMessage<String, String>> batchLogs) {		
+	public KafkaMessageProducerTask(String actorId, Producer<String, String> producer, List<ProducerRecord<String, String>> batchLogs) {		
 		this.actorId = actorId;
 		this.producer = producer;
 		this.batchLogs = batchLogs;
@@ -26,7 +27,10 @@ public class KafkaMessageProducerTask implements Runnable  {
 		if(producer != null && batchLogs.size()>0){
 			try {				
 				System.out.println("FlushHttpDataLogsTask "+this.actorId+" batchsize = "+batchLogs.size());
-				producer.send(batchLogs);
+				for (ProducerRecord<String, String> producerRecord : batchLogs) {
+					producer.send(producerRecord);
+				}
+				
 			} catch (Exception e) {				
 				LogUtil.e("FlushHttpDataLogsTask", "sendToKafka fail : "+e.getMessage());	
 				//close & open the Kafka Connection manually				
