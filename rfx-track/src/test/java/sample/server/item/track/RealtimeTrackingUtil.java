@@ -3,7 +3,7 @@ package sample.server.item.track;
 import java.util.Date;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+
 
 import redis.clients.jedis.Pipeline;
 import redis.clients.jedis.ShardedJedisPool;
@@ -16,7 +16,7 @@ import com.google.gson.Gson;
 
 
 public class RealtimeTrackingUtil {
-	static Logger logger = Logger.getLogger(RealtimeTrackingUtil.class);
+	
 
 	public static final String DATE_FORMAT_PATTERN = "yyyy-MM-dd";
 	public static final String DATE_HOUR_FORMAT_PATTERN = "yyyy-MM-dd-HH";
