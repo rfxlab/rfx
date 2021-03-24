@@ -8,7 +8,7 @@ public class CommonUtil {
 
 	static final String REDIS_CONNECTION_POOL_CONFIG_FILE = "redis-connection-pool-configs.json";
 	static final String REDIS_CONFIG_FILE = "redis-configs.json";
-	static final String SQL_DB_CONFIG_FILE = "database-configs.json";	
+	static final String DATABASE_CONFIG_FILE = "database-configs.json";	
 	static final String KAFKA_PRODUCER_CONFIG_FILE = "kafka-producer-configs.json";
 	
 	static String baseConfig = "configs/";
@@ -24,8 +24,8 @@ public class CommonUtil {
 		return StringUtil.toString(baseConfig,REDIS_CONFIG_FILE);
 	}
 	
-	public static String getSqlDbConfigFile(){
-		return StringUtil.toString(baseConfig,SQL_DB_CONFIG_FILE);
+	public static String getDatabaseConfigFile(){
+		return StringUtil.toString(baseConfig,DATABASE_CONFIG_FILE);
 	}
 	
 	public static String getKafkaProducerConfigFile(){
