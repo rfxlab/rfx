@@ -136,11 +136,7 @@ public class LocationUtil {
             e.printStackTrace();
             LogUtil.e("LocationUtil.getLocationFromIp", e.getMessage());
         } finally {
-            if (commited) {
-                jedisPool.returnResource(shardedJedis);
-            } else {
-                jedisPool.returnBrokenResource(shardedJedis);
-            }
+            jedisPool.close();
         }
         if(locationCacheObj == null) {
         	locationCacheObj = new LocationCacheObj();
@@ -225,11 +221,7 @@ public class LocationUtil {
             e.printStackTrace();
             LogUtil.e("LocationUtil.getLocationFromIp", e.getMessage());
         } finally {
-            if (commited) {
-                jedisPool.returnResource(shardedJedis);
-            } else {
-                jedisPool.returnBrokenResource(shardedJedis);
-            }
+            jedisPool.close();
         }
         if(locationCacheObj == null) {
         	locationCacheObj = new LocationCacheObj();
