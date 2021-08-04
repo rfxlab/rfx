@@ -287,7 +287,7 @@ public abstract class BaseWorker {
 			    public void run() {
 			        ClusterDataManager.updateWorkerData(publicHost, publicPort);
 			    }
-			}, 2000, 2000);
+			}, 5000, 10000);
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 		}
