@@ -19,7 +19,7 @@ repositories {
 
 dependencies {
     compile (  			
-  			'io.vertx:vertx-core:3.9.10'	
+  			'io.vertx:vertx-core:3.8.5'	
 			,'com.google.code.gson:gson:2.8.2'
 			,'org.jsoup:jsoup:1.13.1'								
 			,'org.apache.commons:commons-lang3:3.3.2'
