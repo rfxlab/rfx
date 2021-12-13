@@ -138,7 +138,7 @@ public class HttpClientUtil {
 			HttpGet httpget = new HttpGet(url.toURI());
 			httpget.setHeader("User-Agent", USER_AGENT);
 			httpget.setHeader("Accept-Charset", "utf-8");
-			httpget.setHeader("Accept", "text/html,application/xhtml+xml");
+			httpget.setHeader("Accept", "text/html,application/xhtml+xml,application/json");
 			httpget.setHeader("Cache-Control", "max-age=3, must-revalidate, private");
 
 			httpClient = getThreadSafeClient();
@@ -176,7 +176,7 @@ public class HttpClientUtil {
 			httpget = new HttpGet(url.toURI());
 			httpget.setHeader("User-Agent", USER_AGENT);
 			httpget.setHeader("Accept-Charset", "utf-8");
-			httpget.setHeader("Accept", "text/html,application/xhtml+xml");
+			httpget.setHeader("Accept", "text/html,application/xhtml+xml,application/json");
 			httpget.setHeader("Cache-Control", "max-age=3, must-revalidate, private");
 
 			httpClient = getThreadSafeClient(slot);
