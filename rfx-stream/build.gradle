@@ -5,7 +5,7 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'maven'
 
-sourceCompatibility = 1.8
+sourceCompatibility = 11 
 
 repositories {
     mavenCentral()
@@ -15,17 +15,19 @@ repositories {
 dependencies {
     compile (
     		//rfx-core
-			 'io.vertx:vertx-core:3.8.1'			
-  			,'io.vertx:vertx-web:3.8.1'		
-			,'com.google.code.gson:gson:2.8.5'    		
-			,'log4j:log4j:1.2.17'
-			,'org.jsoup:jsoup:1.12.1'					
+  			'io.vertx:vertx-core:3.8.5'	
+			,'com.google.code.gson:gson:2.8.2'
+			,'org.jsoup:jsoup:1.14.3'								
 			,'org.apache.commons:commons-lang3:3.3.2'
 			,'commons-net:commons-net:3.6'    		
-			,'commons-io:commons-io:2.6'
-			,'redis.clients:jedis:3.1.0'
-			,'org.apache.httpcomponents:httpclient:4.5.9'
-			,'com.google.guava:guava:22.0'
+			,'commons-io:commons-io:2.5'
+			,'redis.clients:jedis:2.10.2'
+			,'org.apache.httpcomponents:httpclient:4.5.13'
+			,'com.google.guava:guava:23.6.1-jre' 
+			,'org.yaml:snakeyaml:1.18'
+			,'org.slf4j:slf4j-api:1.7.36'
+			,'org.slf4j:slf4j-simple:1.7.36'      
+			,'javax.activation:activation:1.1.1'
 			
 			,'rfx:rfx-core:1.0'
             ,'rfx:rfx-data-util:1.0'	
