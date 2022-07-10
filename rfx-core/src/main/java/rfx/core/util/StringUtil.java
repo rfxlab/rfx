@@ -12,8 +12,6 @@ import java.util.Set;
 
 import org.jsoup.Jsoup;
 
-
-
 import com.google.gson.Gson;
 
 public class StringUtil {
@@ -349,6 +347,18 @@ public class StringUtil {
 			}
 		}
 		return s.toString();
+	}
+	
+	public static String truncate(String s, int maxLen) {
+		String rs;
+		int len = s.length();
+		if (len > maxLen) {
+			int newLen = maxLen - 3;
+			rs = s.substring(0, newLen) + "...";
+		} else {
+			rs = s;
+		}
+		return rs;
 	}
 
 }
