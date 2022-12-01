@@ -56,7 +56,7 @@ public class ScheduledJobManager {
 					System.out.println("#process autoTaskConfig:"+config + " "+classpath);
 					
 					Class<?> clazz = Class.forName(classpath);
-					ScheduledJob autoTask = (ScheduledJob) clazz.newInstance();
+					ScheduledJob autoTask = (ScheduledJob) clazz.getDeclaredConstructor().newInstance();
 					autoTask.setScheduledJobsConfigs(config);
 					
 					if(config.getPeriod() <= 0){
