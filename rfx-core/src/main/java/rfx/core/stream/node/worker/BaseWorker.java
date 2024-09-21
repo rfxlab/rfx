@@ -5,6 +5,7 @@ import java.net.Socket;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 import com.google.gson.Gson;
 
@@ -35,7 +36,8 @@ import rfx.core.util.Utils;
  */
 public abstract class BaseWorker {
 	
-	public final long MAX_TIMEOUT_WORKER = 10000000000L;
+	public final long MAX_TIMEOUT_WORKER = 90000000000L;
+	
 	private static final String URI_GET_SERVER_TIME = "/get/server-time";
 	private static final String URI_GET_HOST = "/get/host";
 	private static final String URI_GET_NAME = "/get/name";
@@ -64,6 +66,9 @@ public abstract class BaseWorker {
 	protected Vertx vertxInstance;
 	protected HttpServer httpServerInstance;
 	
+	protected int cpuCores = Runtime.getRuntime().availableProcessors();
+
+	
 	protected Timer timer = new Timer(true);
 	
 	public static BaseWorker getInstance(){
@@ -88,7 +93,15 @@ public abstract class BaseWorker {
 		//DeploymentOptions options = new DeploymentOptions().setWorker(true);
 		VertxOptions options = new VertxOptions(); 
 		options.setMaxEventLoopExecuteTime(MAX_TIMEOUT_WORKER);		
-		options.setBlockedThreadCheckInterval(200000000);		
+		options.setBlockedThreadCheckInterval(5000)  // In milliseconds
+	       .setBlockedThreadCheckIntervalUnit(TimeUnit.MILLISECONDS);
+		options.setWorkerPoolSize(cpuCores * 10);
+		options.setEventLoopPoolSize(cpuCores * 2);
+		options.setPreferNativeTransport(true);
+		options.setMaxWorkerExecuteTime(100L).setMaxWorkerExecuteTimeUnit(TimeUnit.SECONDS);
+		options.setHAEnabled(true)
+	       .setQuorumSize(2);  // The number of nodes that must remain for the system to operate
+
 		vertxInstance = Vertx.vertx(options);
 		
 		initBeforeStart();
