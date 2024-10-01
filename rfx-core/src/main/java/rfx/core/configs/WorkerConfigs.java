@@ -26,8 +26,8 @@ public class WorkerConfigs implements Serializable, Configurable {
 	@AutoInjectedConfig(injectable = true)
 	static WorkerConfigs instance;
 
-	String startWorkerScriptPath;
-	String debugLogPath;
+	String startWorkerScriptPath = "";
+	String debugLogPath = "";
 	List<WorkerInfo> allocatedWorkers;
 	Map<String, String> customConfigs = new HashMap<>();
 
@@ -74,9 +74,18 @@ public class WorkerConfigs implements Serializable, Configurable {
 		return new ParseXmlObjectHandler() {
 			@Override
 			public void injectFieldValue() {
+				if(field == null ) {
+					return;
+				}
 				try {
 					WorkerConfigs workerConfigs = (WorkerConfigs) configurableObj;
 					Element node = xmlNode.select(field.getName()).first();
+					if(node == null ) {
+						return;
+					}
+					else {
+						System.out.println("WorkerConfigs node: " + node.nodeName());
+					}
 					if ("list".equals(node.attr("type"))) {
 						Elements workerNodes = xmlNode.select(field.getName() + " worker");
 						List<WorkerInfo> allocatedWorkers = new ArrayList<>(workerNodes.size());
