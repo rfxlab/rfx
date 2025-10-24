@@ -7,6 +7,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.gson.Gson;
 
 import io.vertx.core.Handler;
@@ -36,6 +39,8 @@ import rfx.core.util.Utils;
  */
 public abstract class BaseWorker {
 	
+	static Logger logger = LoggerFactory.getLogger(BaseWorker.class);
+	
 	public final long MAX_TIMEOUT_WORKER = 90000000000L;
 	
 	private static final String URI_GET_SERVER_TIME = "/get/server-time";
@@ -52,9 +57,6 @@ public abstract class BaseWorker {
 	public final int PAUSED = 3;
 	public final int KILLED = 4;
 	
-	
-	static BaseWorker _worker;
-	
 	protected String publicHost;
 	protected int publicPort;
 	protected String privateHost;
@@ -67,9 +69,10 @@ public abstract class BaseWorker {
 	protected HttpServer httpServerInstance;
 	
 	protected int cpuCores = Runtime.getRuntime().availableProcessors();
-
 	
 	protected Timer timer = new Timer(true);
+	
+	private static BaseWorker _worker;
 	
 	public static BaseWorker getInstance(){
 		return _worker;
@@ -145,7 +148,7 @@ public abstract class BaseWorker {
 	final protected boolean isAddressAlreadyInUse(String host, int port){
 		int timeout = 500;
 		try {
-			//System.out.println(" check "+workerInfo.getName());
+			//logger.info(" check "+workerInfo.getName());
 			Socket socket = new Socket();
 			socket.connect(new InetSocketAddress(host, port), timeout);
 			socket.close();					
@@ -215,7 +218,7 @@ public abstract class BaseWorker {
 			System.err.println("checkAndCreateNetServer return NULL value");
 			return;
 		}
-		System.out.println(String.format("...registerWorkerTcpHandler %s:%s",host,port));
+		logger.info(String.format("...registerWorkerTcpHandler %s:%s",host,port));
 		server.connectHandler(handler).listen(port, host);
 		//TODO
 		//registerWorkerNodeIntoCluster();		
@@ -239,7 +242,7 @@ public abstract class BaseWorker {
 	        }.execute();
 	        onBeforeBeStopped();			
 			status = KILLED;
-			System.out.println("Bye, now exiting "+classnameWorker);
+			logger.info("Bye, now exiting "+classnameWorker);
 			Utils.exitSystemAfterTimeout(1000);	
 		}
 	}
@@ -273,7 +276,7 @@ public abstract class BaseWorker {
 			startProcessing();			
 		}
 		
-		System.out.println("started worker Ok at ADDRESS[ "+this.publicHost + ":" + this.publicPort + "] classname:" +classnameWorker);
+		logger.info("started worker Ok at ADDRESS[ "+this.publicHost + ":" + this.publicPort + "] classname:" +classnameWorker);
 		Utils.foreverLoop();
 	}
 
@@ -357,28 +360,27 @@ public abstract class BaseWorker {
 	public abstract void start(String host, int port);
 	
 	protected void initBeforeStart(){
-		System.out.println("initBeforeStart "+classnameWorker);
+		logger.info("initBeforeStart "+classnameWorker);
 	}
 	
 	protected void onStartDone() {
-		System.out.println("onStartDone "+classnameWorker);
+		logger.info("onStartDone "+classnameWorker);
 	}
 	
 	protected void onProcessing() {
-		System.out.println("onProcessing "+classnameWorker);
+		logger.info("onProcessing "+classnameWorker);
 	}
 	
 	protected void onRestart() {
-		System.out.println("onRestart "+classnameWorker);
+		logger.info("onRestart "+classnameWorker);
 	}
 	
-	
 	protected void onBeforeBeStopped() {		
-		System.out.println("beforeBeKilledByMyself "+classnameWorker);
+		logger.info("beforeBeKilledByMyself "+classnameWorker);
 	}
 	
 	protected void onPause() {
-		System.out.println("onPause "+classnameWorker);
+		logger.info("onPause "+classnameWorker);
 	}	
 	
 	final public Vertx getVertxInstance() {

@@ -8,6 +8,8 @@ import java.util.Map;
 
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 
@@ -17,9 +19,12 @@ import rfx.core.configs.loader.Configurable;
 import rfx.core.configs.loader.ParseConfigHandler;
 import rfx.core.configs.loader.ParseXmlObjectHandler;
 import rfx.core.model.WorkerInfo;
+import rfx.core.util.LogUtil;
 import rfx.core.util.StringUtil;
 
 public class WorkerConfigs implements Serializable, Configurable {
+	
+	static Logger logger = LoggerFactory.getLogger(WorkerConfigs.class);
 
 	private static final long serialVersionUID = -8916185560981048895L;
 
@@ -84,7 +89,7 @@ public class WorkerConfigs implements Serializable, Configurable {
 						return;
 					}
 					else {
-						System.out.println("WorkerConfigs node: " + node.nodeName());
+						logger.info("WorkerConfigs node: " + node.nodeName());
 					}
 					if ("list".equals(node.attr("type"))) {
 						Elements workerNodes = xmlNode.select(field.getName() + " worker");

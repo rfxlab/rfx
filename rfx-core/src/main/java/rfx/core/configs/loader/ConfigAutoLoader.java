@@ -75,7 +75,6 @@ public class ConfigAutoLoader {
 				String type = rootNode.attr("type");
 				Class<?> clazz = Class.forName(classpath);
 								
-				System.out.println("--load configs for classpath: "+ classpath);
 								
 				if("list".equals(type)){
 					processListConfigClass(classpath, clazz, doc, rootNode);
