@@ -19,12 +19,12 @@ import rfx.core.configs.WorkerConfigs;
 import rfx.core.model.WorkerData;
 import rfx.core.model.WorkerInfo;
 import rfx.core.model.WorkerTimeLog;
+import rfx.core.nosql.jedis.RedisInfo;
 import rfx.core.util.LogUtil;
 import rfx.core.util.StringUtil;
 
 public class ClusterDataManager {
 
-    private static final String TAG = ClusterDataManager.class.getSimpleName();
 
     public static final String CLUSTER_WORKER_PREFIX = "workers";
     public static final String WORKER_INFO_POSTFIX = ".info";
@@ -37,7 +37,7 @@ public class ClusterDataManager {
     private static final JedisPooled redisClient = buildRedisClient();
 
     private static JedisPooled buildRedisClient() {
-        var redisInfo = RedisConfigs.load().get("clusterInfoRedis");
+    	RedisInfo redisInfo = RedisConfigs.load().get("clusterInfoRedis");
         String host = redisInfo.getHost();
         int port = redisInfo.getPort();
         String auth = redisInfo.getAuth();
@@ -50,7 +50,7 @@ public class ClusterDataManager {
         return new JedisPooled(new HostAndPort(host, port), cfg.build());
     }
 
-    public static JedisPooled getRedisClusterInfoClient() {
+    public static JedisPooled getJedisClient() {
         return redisClient;
     }
 
@@ -146,9 +146,7 @@ public class ClusterDataManager {
             String workerName = StringUtil.toString(host.replaceAll("\\.", ""), "_", port);
             Gson gson = new Gson();
 
-            WorkerData workerData = gson.fromJson(
-                    redisClient.hget(CLUSTER_WORKER_PREFIX, workerName + WORKER_DATA_POSTFIX),
-                    WorkerData.class);
+            WorkerData workerData = gson.fromJson(redisClient.hget(CLUSTER_WORKER_PREFIX, workerName + WORKER_DATA_POSTFIX), WorkerData.class);
 
             if (workerData == null) {
                 workerData = new WorkerData();

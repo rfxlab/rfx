@@ -1,6 +1,5 @@
 package rfx.core.configs;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,18 +7,17 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import rfx.core.nosql.jedis.RedisInfo;
-import rfx.core.nosql.jedis.Shardable;
-import rfx.core.util.CommonUtil;
-import rfx.core.util.FileUtils;
-import rfx.core.util.StringUtil;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-import com.google.gson.reflect.TypeToken;
+
+import rfx.core.nosql.jedis.RedisInfo;
+import rfx.core.nosql.jedis.Shardable;
+import rfx.core.util.CommonUtil;
+import rfx.core.util.FileUtils;
+import rfx.core.util.StringUtil;
 
 /**
  * Redis Configs for all Topology
@@ -122,11 +120,6 @@ public class RedisConfigs{
 			return (int) (shardKey % size);
 		}
 		throw new IllegalArgumentException("size in AutoShardingGenerator MUST > 0");
-	}
-	
-	public static void main(String[] args) {
-		RedisConfigs configs = RedisConfigs.load();
-		System.out.println(configs.get("clusterInfoRedis"));
 	}
 	
 }

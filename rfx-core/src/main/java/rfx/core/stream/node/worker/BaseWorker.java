@@ -219,10 +219,10 @@ public abstract class BaseWorker {
 
 	final synchronized protected void killWorker() {
 		if (this.status != KILLED) {
-			JedisPooled jedisPool = ClusterDataManager.getRedisClusterInfoClient();
+			JedisPooled jedisPool = ClusterDataManager.getJedisClient();
 			new RedisCommand<Boolean>(jedisPool) {
 				@Override
-				protected Boolean build(JedisPooled jedis) throws JedisException {
+				protected Boolean build() throws JedisException {
 					String workerName = StringUtil.toString(publicHost.replaceAll("\\.", ""), "_", publicPort);
 					WorkerTimeLog timeLog = new Gson().fromJson(getTimelog(jedis, workerName), WorkerTimeLog.class);
 					if (timeLog == null) {
@@ -283,10 +283,10 @@ public abstract class BaseWorker {
 
 	private void updateClusterInfo() {
 		try {
-			JedisPooled jedisPool = ClusterDataManager.getRedisClusterInfoClient();
+			JedisPooled jedisPool = ClusterDataManager.getJedisClient();
 			new RedisCommand<Boolean>(jedisPool) {
 				@Override
-				protected Boolean build(JedisPooled jedis) throws JedisException {
+				protected Boolean build() throws JedisException {
 					String workerName = StringUtil.toString(publicHost.replaceAll("\\.", ""), "_", publicPort);
 					WorkerTimeLog timeLog = new Gson().fromJson(jedis.hget(ClusterDataManager.CLUSTER_WORKER_PREFIX,
 							workerName + ClusterDataManager.WORKER_TIMELOG_POSTFIX), WorkerTimeLog.class);
