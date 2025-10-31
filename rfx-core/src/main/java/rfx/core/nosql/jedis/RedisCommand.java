@@ -1,45 +1,38 @@
 package rfx.core.nosql.jedis;
 
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.ShardedJedis;
-import redis.clients.jedis.ShardedJedisPool;
+import redis.clients.jedis.JedisPooled;
 import redis.clients.jedis.exceptions.JedisException;
 import rfx.core.util.LogUtil;
-import rfx.core.util.StringPool;
 
 public abstract class RedisCommand<T> {
-	protected ShardedJedisPool jedisPool;
-	protected ShardedJedis shardedJedis = null;
-	protected Jedis jedis = null;
 
-	public RedisCommand(ShardedJedisPool jedisPool) {
-		super();
-		if (jedisPool == null) {
-			throw new IllegalArgumentException("jedisPool is NULL!");
-		}
-		this.jedisPool = jedisPool;		
-	}
+    // JedisPooled is thread-safe and handles its own internal pool
+    protected final JedisPooled jedisClient;
 
-	public T execute() {		
-		T rs = null;
-		try {
-			shardedJedis = jedisPool.getResource();
-			if (shardedJedis != null) {				
-				jedis = shardedJedis.getShard(StringPool.BLANK);
-				rs = build();				
-			}
-		} catch (Exception e) {		
-			e.printStackTrace();
-			LogUtil.e("JedisPool: "+jedisPool.toString(), e.toString());
-		} finally {			
-			if(shardedJedis != null){
-				shardedJedis.close();
-			}
-		}
-		return rs;
-	}
-	
-	
-	//define the logic at implementer
-	protected abstract T build() throws JedisException;
+    public RedisCommand(JedisPooled jedisClient) {
+        if (jedisClient == null) {
+            throw new IllegalArgumentException("jedisClient is NULL!");
+        }
+        this.jedisClient = jedisClient;
+    }
+
+    /**
+     * Executes the Redis command safely, managing exceptions and resource scope.
+     */
+    public T execute() {
+        try {
+            return build(jedisClient);
+        } catch (JedisException e) {
+            LogUtil.e("Redis command failed: " + e.getMessage(), e);
+            throw e;
+        } catch (Exception e) {
+            LogUtil.e("Unexpected error in Redis command: " + e.getMessage(), e);
+            throw new JedisException("Unexpected Redis command error", e);
+        }
+    }
+
+    /**
+     * Implement your Redis logic here using the provided JedisPooled client.
+     */
+    protected abstract T build(JedisPooled jedis) throws JedisException;
 }

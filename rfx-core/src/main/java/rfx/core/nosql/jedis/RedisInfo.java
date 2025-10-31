@@ -1,39 +1,51 @@
 package rfx.core.nosql.jedis;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import redis.clients.jedis.JedisPoolConfig;
-import redis.clients.jedis.JedisShardInfo;
-import redis.clients.jedis.ShardedJedisPool;
+import redis.clients.jedis.DefaultJedisClientConfig;
+import redis.clients.jedis.HostAndPort;
+import redis.clients.jedis.JedisPooled;
 import rfx.core.configs.RedisConnectionPoolConfig;
 
+/**
+ * RedisInfo — modern Redis connection wrapper using JedisPooled (Jedis 7.x)
+ *
+ * Thread-safe, simple, and ideal for single-node or cluster-aware Redis setups.
+ */
 public class RedisInfo {
 	public static final String LOCALHOST_STR = "localhost";
 
 	private String host;
-	private int port;	
-	private String auth;	
-	private ShardedJedisPool shardedJedisPool; 
-	
-	protected void initThePool(){		
-		RedisConnectionPoolConfig connectionConfig = RedisConnectionPoolConfig.theInstance();
-		List<JedisShardInfo> shardInfos = new ArrayList<JedisShardInfo>(1);
-		shardInfos.add(new JedisShardInfo(getHost(), getPort(), connectionConfig.getConnectionTimeout()));
-		shardedJedisPool = new ShardedJedisPool(connectionConfig.getJedisPoolConfig(), shardInfos);
-	}
+	private int port;
+	private String auth;
+	private JedisPooled jedisClient;
 
 	public RedisInfo(String host, int port) {
-		this.host = host;
-		this.port = port;
-		initThePool();
+		this(host, port, null);
 	}
-	
-	public RedisInfo(String host, int port,String auth) {
+
+	public RedisInfo(String host, int port, String auth) {
 		this.host = host;
 		this.port = port;
 		this.auth = auth;
-		initThePool();
+		initTheClient();
+	}
+
+	/** Initialize the JedisPooled client (thread-safe, auto-managed) */
+	protected void initTheClient() {
+		RedisConnectionPoolConfig connectionConfig = RedisConnectionPoolConfig.theInstance();
+		int timeout = connectionConfig.getConnectionTimeout();
+
+		DefaultJedisClientConfig.Builder configBuilder = DefaultJedisClientConfig.builder()
+				.connectionTimeoutMillis(timeout).socketTimeoutMillis(timeout);
+
+		if (auth != null && !auth.isEmpty()) {
+			configBuilder.password(auth);
+		}
+
+		jedisClient = new JedisPooled(new HostAndPort(host, port), configBuilder.build());
+	}
+
+	public JedisPooled getJedisClient() {
+		return jedisClient;
 	}
 
 	public String getHost() {
@@ -43,11 +55,11 @@ public class RedisInfo {
 	public int getPort() {
 		return port;
 	}
-	
+
 	public String getAuth() {
 		return auth;
 	}
-	
+
 	public void setHost(String host) {
 		this.host = host;
 	}
@@ -63,16 +75,12 @@ public class RedisInfo {
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof RedisInfo) {
-			RedisInfo hp = (RedisInfo) obj;
-			String thisHost = convertHost(host);
-			String hpHost = convertHost(hp.host);
-			return port == hp.port && thisHost.equals(hpHost);
+			RedisInfo other = (RedisInfo) obj;
+			String thisHost = normalizeHost(this.host);
+			String thatHost = normalizeHost(other.host);
+			return this.port == other.port && thisHost.equals(thatHost);
 		}
 		return false;
-	}
-	
-	public ShardedJedisPool getShardedJedisPool() {
-		return shardedJedisPool;
 	}
 
 	@Override
@@ -80,12 +88,15 @@ public class RedisInfo {
 		return host + ":" + port;
 	}
 
-	private String convertHost(String host) {
-		if (host.equals("127.0.0.1"))
+	private String normalizeHost(String host) {
+		if (host == null)
 			return LOCALHOST_STR;
-		else if (host.equals("::1"))
+		switch (host) {
+		case "127.0.0.1":
+		case "::1":
 			return LOCALHOST_STR;
-
-		return host;
+		default:
+			return host;
+		}
 	}
 }

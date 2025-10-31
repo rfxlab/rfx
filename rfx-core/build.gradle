@@ -11,33 +11,49 @@ version = '1.0'
 
 repositories {
  	mavenLocal()
+	google()
     mavenCentral()
     maven {
     	url = "https://oss.sonatype.org/content/repositories/snapshots"
     }
 }
 
+
 dependencies {
     compile (  			
+    		// HTTP and TCP
   			'io.vertx:vertx-core:3.8.5'	
-			,'com.google.code.gson:gson:2.8.2'
-			,'org.jsoup:jsoup:1.14.3'								
-			,'org.apache.commons:commons-lang3:3.3.2'
+			
+			// common
+			,'com.google.code.gson:gson:2.9.0'
+			,'org.jsoup:jsoup:1.21.1'								
+			,'org.apache.commons:commons-lang3:3.12.0'
 			,'commons-net:commons-net:3.6'    		
 			,'commons-io:commons-io:2.5'
-			,'redis.clients:jedis:2.10.2'
 			,'org.apache.httpcomponents:httpclient:4.5.13'
-			,'com.google.guava:guava:32.0.1-jre'
-			,'org.yaml:snakeyaml:1.18'
-			,'org.slf4j:slf4j-api:1.7.36'
-			,'org.slf4j:slf4j-simple:1.7.36'      
-			,'javax.activation:activation:1.1.1'  
+			
+			,'org.yaml:snakeyaml:1.33'    
+			,'javax.activation:activation:1.1.1'
+			  
+			// log4j
+			,'org.slf4j:slf4j-api:2.0.3'
+			,'org.apache.logging.log4j:log4j-api:2.20.0'
+			,'org.apache.logging.log4j:log4j-core:2.20.0'
+			,'org.apache.logging.log4j:log4j-slf4j2-impl:2.20.0'
+			
+			// Redis
+			,'redis.clients:jedis:7.0.0'
+			
+			// Guava
+			,'com.google.guava:guava:30.1.1-jre'
+			
     )
     testCompile (
     	'junit:junit:4.12'    	
     	,'org.mockito:mockito-core:1.+'	
     )
 }
+
 
 tasks.withType(Jar) {
 	destinationDir = file("$rootDir/BUILD-OUTPUT")

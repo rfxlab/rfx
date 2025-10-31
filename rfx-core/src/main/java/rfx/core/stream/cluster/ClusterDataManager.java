@@ -7,219 +7,171 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.Pipeline;
-import redis.clients.jedis.ShardedJedis;
-import redis.clients.jedis.ShardedJedisPool;
-import redis.clients.jedis.exceptions.JedisException;
+import com.google.gson.Gson;
+
+import redis.clients.jedis.DefaultJedisClientConfig;
+import redis.clients.jedis.HostAndPort;
+import redis.clients.jedis.JedisPooled;
 import rfx.core.configs.RedisConfigs;
 import rfx.core.configs.WorkerConfigs;
 import rfx.core.model.WorkerData;
 import rfx.core.model.WorkerInfo;
 import rfx.core.model.WorkerTimeLog;
-import rfx.core.nosql.jedis.RedisCommand;
 import rfx.core.util.LogUtil;
-import rfx.core.util.StringPool;
 import rfx.core.util.StringUtil;
-
-import com.google.gson.Gson;
 
 public class ClusterDataManager {
 
-    static final String TAG = ClusterDataManager.class.getSimpleName();
+    private static final String TAG = ClusterDataManager.class.getSimpleName();
+
     public static final String CLUSTER_WORKER_PREFIX = "workers";
     public static final String WORKER_INFO_POSTFIX = ".info";
     public static final String WORKER_DATA_POSTFIX = ".data";
     public static final String WORKER_TIMELOG_POSTFIX = ".timelog";
 
-    // ------------ configs ------------
-    //static final ClusterInfoConfigs clusterInfoConfigs = ClusterInfoConfigs.load();
     static final WorkerConfigs workerConfigs = WorkerConfigs.load();
 
-    static ShardedJedisPool commonClusterRedisPool = RedisConfigs.load().get("clusterInfoRedis").getShardedJedisPool();
+    /** one pooled, thread-safe client shared across app */
+    private static final JedisPooled redisClient = buildRedisClient();
 
-    public static ShardedJedisPool getRedisClusterInfoPool() {
-        return commonClusterRedisPool;
+    private static JedisPooled buildRedisClient() {
+        var redisInfo = RedisConfigs.load().get("clusterInfoRedis");
+        String host = redisInfo.getHost();
+        int port = redisInfo.getPort();
+        String auth = redisInfo.getAuth();
+
+        DefaultJedisClientConfig.Builder cfg = DefaultJedisClientConfig.builder()
+                .connectionTimeoutMillis(2000)
+                .socketTimeoutMillis(2000);
+        if (auth != null && !auth.isEmpty()) cfg.password(auth);
+
+        return new JedisPooled(new HostAndPort(host, port), cfg.build());
     }
 
-    // //////////////////// static methods for WorkerInfo //////////////////////
+    public static JedisPooled getRedisClusterInfoClient() {
+        return redisClient;
+    }
 
-    /**
-     * 
-     * save WorkerInfo of specified worker, supervisor itself will call this
-     * 
-     * @return boolean
-     */
+    // ------------------------------------------------------------------------
+
     public static boolean saveWorkerInfo(WorkerInfo workerInfo) {
-        ShardedJedisPool jedisPool = getRedisClusterInfoPool();
-        ShardedJedis shardedJedis = null;
-        boolean ok = false;
         try {
-            shardedJedis = jedisPool.getResource();
-            Pipeline pipeline = shardedJedis.getShard(StringPool.BLANK).pipelined();
-            pipeline.hset(CLUSTER_WORKER_PREFIX, workerInfo.getName() + WORKER_INFO_POSTFIX,
+            redisClient.hset(CLUSTER_WORKER_PREFIX,
+                    workerInfo.getName() + WORKER_INFO_POSTFIX,
                     workerInfo.toJson());
-            pipeline.sync();
-            ok = true;
+            return true;
         } catch (Exception e) {
             LogUtil.error(e);
-        } finally {
-            if(jedisPool != null) jedisPool.close();
+            return false;
         }
-        return ok;
     }
 
-    /**
-     * registerWorkerInfo
-     * 
-     * @return boolean
-     */
     public static Map<String, WorkerInfo> getWorkerInfoFromRedis() {
-        ShardedJedisPool jedisPool = getRedisClusterInfoPool();
-        ShardedJedis shardedJedis = null;
-        boolean ok = false;
-        Map<String, WorkerInfo> mapWorkerInfo = null;
+        Map<String, WorkerInfo> mapWorkerInfo = new HashMap<>();
         try {
-            shardedJedis = jedisPool.getResource();
-            Jedis jedis = shardedJedis.getShard(StringPool.BLANK);
-            Map<String, String> map = jedis.hgetAll(CLUSTER_WORKER_PREFIX);
-            Set<String> names = map.keySet();
-            mapWorkerInfo = new HashMap<>(names.size());
-            for (String name : names) {
-                if (name.endsWith(WORKER_INFO_POSTFIX)) {
-                    String json = map.get(name);
-                    System.out.println(name + " json: " + json);
+            Map<String, String> map = redisClient.hgetAll(CLUSTER_WORKER_PREFIX);
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                String key = entry.getKey();
+                if (key.endsWith(WORKER_INFO_POSTFIX)) {
+                    String json = entry.getValue();
                     if (StringUtil.isNotEmpty(json)) {
-                        name = name.replace(WORKER_INFO_POSTFIX, "");
+                        String name = key.replace(WORKER_INFO_POSTFIX, "");
                         mapWorkerInfo.put(name, WorkerInfo.fromJson(json));
                     }
                 }
             }
-            ok = true;
         } catch (Exception e) {
             LogUtil.error(e);
-        } finally {
-        	if(jedisPool != null) jedisPool.close();
         }
-        return mapWorkerInfo == null ? new HashMap<String, WorkerInfo>() : mapWorkerInfo;
+        return mapWorkerInfo;
     }
 
     public static boolean ping(WorkerInfo workerInfo) {
-        try {
-            int timeout = 300;
-            Socket socket = new Socket();
-            socket.connect(new InetSocketAddress(workerInfo.getHost(), workerInfo.getPort()),
-                    timeout);
-            socket.close();
+        try (Socket socket = new Socket()) {
+            socket.connect(new InetSocketAddress(workerInfo.getHost(), workerInfo.getPort()), 300);
             return true;
         } catch (Exception ex) {
+            return false;
         }
-        return false;
     }
 
-    /**
-     * get all (the method for Master node dashboard )
-     * 
-     * @return
-     */
     public static List<WorkerData> getWorkerData() {
-        List<WorkerData> datas = null;
-        ShardedJedisPool jedisPool = ClusterDataManager.getRedisClusterInfoPool();
-        
-        Map<String, String> map = new RedisCommand<Map<String, String>>(jedisPool) {
-            @Override
-            protected Map<String, String> build() throws JedisException {
-            	return jedis.hgetAll(CLUSTER_WORKER_PREFIX);
-            }
-        }.execute();
-        
-            
-        Set<String> keys = map.keySet();
-        datas = new ArrayList<>(keys.size() / 3);
+        Map<String, String> map;
+        try {
+            map = redisClient.hgetAll(CLUSTER_WORKER_PREFIX);
+        } catch (Exception e) {
+            LogUtil.error(e);
+            return List.of();
+        }
 
-        System.out.println(map);
+        List<WorkerData> datas = new ArrayList<>(map.size() / 3);
+        Gson gson = new Gson();
 
-        for (String key : keys) {
+        for (String key : map.keySet()) {
             if (key.endsWith(WORKER_DATA_POSTFIX)) {
                 String jsonData = map.get(key);
                 String jsonInfo = map.get(key.replace(WORKER_DATA_POSTFIX, WORKER_INFO_POSTFIX));
                 String jsonTimeLog = map.get(key.replace(WORKER_DATA_POSTFIX, WORKER_TIMELOG_POSTFIX));
                 if (jsonData != null) {
-                    WorkerData workerData = new Gson().fromJson(jsonData, WorkerData.class);
-                    WorkerInfo workerInfo = new Gson().fromJson(jsonInfo, WorkerInfo.class);
-                    WorkerTimeLog workerTimeLog = new Gson().fromJson(jsonTimeLog, WorkerTimeLog.class);
+                    WorkerData workerData = gson.fromJson(jsonData, WorkerData.class);
+                    WorkerInfo workerInfo = gson.fromJson(jsonInfo, WorkerInfo.class);
+                    WorkerTimeLog workerTimeLog = gson.fromJson(jsonTimeLog, WorkerTimeLog.class);
+
                     workerData.setHostname(workerInfo.getHost() + ":" + workerInfo.getPort());
                     workerData.setStatus(workerInfo.isAlive() ? "ALIVE" : "DIED");
+
                     long upTime = workerTimeLog.getLastUpTime();
                     long downTime = workerTimeLog.getLastDownTime();
                     if (upTime > downTime) {
                         long upTimeAmount = System.currentTimeMillis() - upTime;
-                        long uptimeHours = TimeUnit.MILLISECONDS.toHours(upTimeAmount);
-                        long uptimeMinutes = TimeUnit.MILLISECONDS.toMinutes(upTimeAmount);
-                        long uptimeSeconds = TimeUnit.MILLISECONDS.toSeconds(upTimeAmount);
-                        if (uptimeMinutes > 0) {
-                            uptimeSeconds = uptimeSeconds % (60 * uptimeMinutes);
-                        }
-                        if (uptimeHours > 0) {
-                            uptimeMinutes = uptimeMinutes % (60 * uptimeHours);
-                        }
-
-                        String formatedTime = StringUtil.toString(uptimeHours, ":", uptimeMinutes, ":",
-                                uptimeSeconds);
-                        workerData.setUptime(formatedTime);
+                        long hours = TimeUnit.MILLISECONDS.toHours(upTimeAmount);
+                        long minutes = TimeUnit.MILLISECONDS.toMinutes(upTimeAmount) % 60;
+                        long seconds = TimeUnit.MILLISECONDS.toSeconds(upTimeAmount) % 60;
+                        workerData.setUptime(String.format("%d:%02d:%02d", hours, minutes, seconds));
                     } else {
-                        workerData.setActor_list("0:0:0");
+                        workerData.setUptime("0:0:0");
                     }
                     datas.add(workerData);
                 }
             }
         }
-        return datas == null ? new ArrayList<WorkerData>(0) : datas;
+        return datas;
     }
 
-    /**
-     * Set worker data (worker itself will call this )
-     * 
-     * @param host Worker host
-     * @param port worker port
-     */
+    /** worker node updates its own memory usage etc. */
     public static void updateWorkerData(String host, int port) {
-        ShardedJedisPool jedisPool =  ClusterDataManager.getRedisClusterInfoPool();
-        
-        new RedisCommand<Boolean>(jedisPool) {
-            @Override
-            protected Boolean build() throws JedisException {
-                Pipeline p = jedis.pipelined();
-                
-                String workerName = StringUtil.toString(host.replaceAll("\\.", ""), "_", port);
-                WorkerData workerData = new Gson().fromJson(jedis.hget(ClusterDataManager.CLUSTER_WORKER_PREFIX, workerName + ClusterDataManager.WORKER_DATA_POSTFIX), WorkerData.class);
-                if (workerData == null) {
-                    workerData = new WorkerData();
-                }
-                
-                Runtime rt = Runtime.getRuntime();
-                String memoryUsed = readableFileSize(rt.totalMemory() - rt.freeMemory());
-                String memoryLimit = readableFileSize(rt.maxMemory());
-                workerData.setMemory_usage(memoryUsed);
-                workerData.setMemory_limit(memoryLimit);
-                
-                p.hset(ClusterDataManager.CLUSTER_WORKER_PREFIX, workerName + ClusterDataManager.WORKER_DATA_POSTFIX, new Gson().toJson(workerData));
-                p.sync();
-                return true;
+        try {
+            String workerName = StringUtil.toString(host.replaceAll("\\.", ""), "_", port);
+            Gson gson = new Gson();
+
+            WorkerData workerData = gson.fromJson(
+                    redisClient.hget(CLUSTER_WORKER_PREFIX, workerName + WORKER_DATA_POSTFIX),
+                    WorkerData.class);
+
+            if (workerData == null) {
+                workerData = new WorkerData();
             }
-        }.execute();
-    }
-    
-    public static String readableFileSize(long size) {
-        if (size <= 0) {
-            return "0";
+
+            Runtime rt = Runtime.getRuntime();
+            workerData.setMemory_usage(readableFileSize(rt.totalMemory() - rt.freeMemory()));
+            workerData.setMemory_limit(readableFileSize(rt.maxMemory()));
+
+            redisClient.hset(CLUSTER_WORKER_PREFIX,
+                    workerName + WORKER_DATA_POSTFIX,
+                    gson.toJson(workerData));
+
+        } catch (Exception e) {
+            LogUtil.error(e);
         }
-        final String[] units = new String[] { "B", "KB", "MB", "GB", "TB" };
+    }
+
+    public static String readableFileSize(long size) {
+        if (size <= 0) return "0";
+        final String[] units = {"B", "KB", "MB", "GB", "TB"};
         int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
-        return new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " "
-                + units[digitGroups];
+        return new DecimalFormat("#,##0.#")
+                .format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
     }
 }
