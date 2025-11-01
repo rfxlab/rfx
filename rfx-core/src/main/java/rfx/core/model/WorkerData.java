@@ -1,164 +1,122 @@
 package rfx.core.model;
 
+import java.util.Objects;
+
+/**
+ * Represents a worker process in the system and its runtime metrics.
+ * 
+ * Provides safe enum-based status and structured resource information.
+ * @author Trieu Nguyen
+ */
 public class WorkerData {
-    
-    private String worker_name;
-	private String hostname;
-	private String status;
-	private String memory_usage;
-	private String memory_limit;
-	private String topology_name;
-	private String kafka_topic;
-	private String partition;
-	private String kafka_brokers;
-	private String data_emitting_counter;
-	private String uptime;
-	private String actor_list;
-	private String total_actors;
 
-	public WorkerData(String memory_usage, String memory_limit, String worker_name, String hostname , String topology_name, String kafka_topic,
-			String partition, String kafka_brokers, String data_emitting_counter, String uptime, String actor_list,
-			String total_actors) {
-		super();
-		this.worker_name = worker_name;
-		this.hostname = hostname;
-		this.memory_usage = memory_usage;
-		this.memory_limit = memory_limit;
-		this.topology_name = topology_name;
-		this.kafka_topic = kafka_topic;
-		this.partition = partition;
-		this.kafka_brokers = kafka_brokers;
-		this.data_emitting_counter = data_emitting_counter;
-		this.uptime = uptime;
-		this.actor_list = actor_list;
-		this.total_actors = total_actors;
-	}
-	
+    public enum Status {
+        STARTING, STARTED, RUNNING, PAUSED, KILLED
+    }
 
-	/**
-     * @param worker_name
-     * @param hostname
-     * @param status
-     * @param memory_usage
-     * @param memory_limit
-     * @param uptime
-     */
-    public WorkerData(String worker_name, String hostname, String memory_usage,
-            String memory_limit, String uptime) {
-        super();
-        this.worker_name = worker_name;
+    private String workerName;
+    private String hostname;
+    private Status status = Status.STARTING;
+
+    private String memoryUsage;
+    private String memoryLimit;
+    private String topology;
+    private String topic;
+    private String partition;
+    private String brokers;
+    private String emittingCounter;
+    private String uptime;
+    private String actorList;
+    private String totalActors;
+
+    // --- Constructors ---
+
+    public WorkerData() {
+    }
+
+    public WorkerData(String workerName, String hostname, String memoryUsage, String memoryLimit, String uptime) {
+        this.workerName = workerName;
         this.hostname = hostname;
-        this.memory_usage = memory_usage;
-        this.memory_limit = memory_limit;
+        this.memoryUsage = memoryUsage;
+        this.memoryLimit = memoryLimit;
         this.uptime = uptime;
     }
 
+    public WorkerData(String memoryUsage, String memoryLimit, String workerName, String hostname,
+                      String topology, String topic, String partition, String brokers,
+                      String emittingCounter, String uptime, String actorList, String totalActors) {
+        this(workerName, hostname, memoryUsage, memoryLimit, uptime);
+        this.topology = topology;
+        this.topic = topic;
+        this.partition = partition;
+        this.brokers = brokers;
+        this.emittingCounter = emittingCounter;
+        this.actorList = actorList;
+        this.totalActors = totalActors;
+    }
 
-    public WorkerData() {
-		// TODO Auto-generated constructor stub
-	}
+    // --- Getters & Setters ---
 
-	public String getWorkername() {
-		return worker_name;
-	}
+    public String getWorkerName() { return workerName; }
+    public void setWorkerName(String workerName) { this.workerName = workerName; }
 
-	public void setWorkername(String worker_name) {
-		this.worker_name = worker_name;
-	}
-	
-	public String getHostname() {
-		return hostname;
-	}
+    public String getHostname() { return hostname; }
+    public void setHostname(String hostname) { this.hostname = hostname; }
 
-	public void setHostname(String hostname) {
-		this.hostname = hostname;
-	}
+    public Status getStatus() { return status; }
+    public void setStatus(Status status) { this.status = status; }
 
-	public String getStatus() {
-		return status;
-	}
+    public String getMemoryUsage() { return memoryUsage; }
+    public void setMemoryUsage(String memoryUsage) { this.memoryUsage = memoryUsage; }
 
-	public void setStatus(String status) {
-		this.status = status;
-	}
+    public String getMemoryLimit() { return memoryLimit; }
+    public void setMemoryLimit(String memoryLimit) { this.memoryLimit = memoryLimit; }
 
-	public String getMemory_limit() {
-		return memory_limit;
-	}
+    public String getTopology() { return topology; }
+    public void setTopology(String topology) { this.topology = topology; }
 
-	public void setMemory_limit(String memory_limit) {
-		this.memory_limit = memory_limit;
-	}
+    public String getTopic() { return topic; }
+    public void setTopic(String topic) { this.topic = topic; }
 
-	public String getMemory_usage() {
-		return memory_usage;
-	}
+    public String getPartition() { return partition; }
+    public void setPartition(String partition) { this.partition = partition; }
 
-	public void setMemory_usage(String memory_usage) {
-		this.memory_usage = memory_usage;
-	}
+    public String getBrokers() { return brokers; }
+    public void setBrokers(String brokers) { this.brokers = brokers; }
 
-	public String getTopology_name() {
-		return topology_name;
-	}
+    public String getEmittingCounter() { return emittingCounter; }
+    public void setEmittingCounter(String emittingCounter) { this.emittingCounter = emittingCounter; }
 
-	public void setTopology_name(String topology_name) {
-		this.topology_name = topology_name;
-	}
+    public String getUptime() { return uptime; }
+    public void setUptime(String uptime) { this.uptime = uptime; }
 
-	public String getKafka_topic() {
-		return kafka_topic;
-	}
+    public String getActorList() { return actorList; }
+    public void setActorList(String actorList) { this.actorList = actorList; }
 
-	public void setKafka_topic(String kafka_topic) {
-		this.kafka_topic = kafka_topic;
-	}
+    public String getTotalActors() { return totalActors; }
+    public void setTotalActors(String totalActors) { this.totalActors = totalActors; }
 
-	public String getPartition() {
-		return partition;
-	}
+    // --- Utility methods ---
 
-	public void setPartition(String partition) {
-		this.partition = partition;
-	}
+    @Override
+    public String toString() {
+        return String.format(
+            "WorkerData{name=%s, host=%s, status=%s, mem=%s/%s, uptime=%s, topic=%s, partition=%s}",
+            workerName, hostname, status, memoryUsage, memoryLimit, uptime, topic, partition
+        );
+    }
 
-	public String getKafka_brokers() {
-		return kafka_brokers;
-	}
+    @Override
+    public int hashCode() {
+        return Objects.hash(workerName, hostname);
+    }
 
-	public void setKafka_brokers(String kafka_brokers) {
-		this.kafka_brokers = kafka_brokers;
-	}
-
-	public String getData_emitting_counter() {
-		return data_emitting_counter;
-	}
-
-	public void setData_emitting_counter(String data_emitting_counter) {
-		this.data_emitting_counter = data_emitting_counter;
-	}
-
-	public String getUptime() {
-		return uptime;
-	}
-
-	public void setUptime(String uptime) {
-		this.uptime = uptime;
-	}
-
-	public String getActor_list() {
-		return actor_list;
-	}
-
-	public void setActor_list(String actor_list) {
-		this.actor_list = actor_list;
-	}
-
-	public String getTotal_actors() {
-		return total_actors;
-	}
-
-	public void setTotal_actors(String total_actors) {
-		this.total_actors = total_actors;
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof WorkerData)) return false;
+        WorkerData other = (WorkerData) obj;
+        return Objects.equals(workerName, other.workerName) &&
+               Objects.equals(hostname, other.hostname);
+    }
 }

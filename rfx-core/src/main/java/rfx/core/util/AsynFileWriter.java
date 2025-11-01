@@ -69,7 +69,7 @@ public class AsynFileWriter {
 				}
 			}
 		} catch (Exception e) {
-			LogUtil.e("AsynFileWriter.flushDataToFile", e.getMessage());
+			e.printStackTrace();
 		}
 	}
 	

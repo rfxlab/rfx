@@ -5,29 +5,20 @@ import java.net.Socket;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
-
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.VertxOptions;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.net.NetServer;
 import io.vertx.core.net.NetSocket;
-import redis.clients.jedis.JedisPooled;
-import redis.clients.jedis.exceptions.JedisException;
-import rfx.core.model.WorkerTimeLog;
-import rfx.core.nosql.jedis.RedisCommand;
+import rfx.core.model.WorkerData;
 import rfx.core.stream.cluster.ClusterDataManager;
-import rfx.core.util.StringPool;
-import rfx.core.util.StringUtil;
 import rfx.core.util.Utils;
 
 /**
@@ -42,8 +33,6 @@ public abstract class BaseWorker {
 
 	static Logger logger = LoggerFactory.getLogger(BaseWorker.class);
 
-	public final long MAX_TIMEOUT_WORKER = 90000000000L;
-
 	private static final String URI_GET_SERVER_TIME = "/get/server-time";
 	private static final String URI_GET_HOST = "/get/host";
 	private static final String URI_GET_NAME = "/get/name";
@@ -52,11 +41,7 @@ public abstract class BaseWorker {
 	private static final String URI_RESTART = "/restart";
 	private static final String URI_PAUSE = "/pause";
 	private static final String URI_PING = "/ping";
-	public final int STARTING = 0;
-	public final int STARTED = 1;
-	public final int RUNNING = 2;
-	public final int PAUSED = 3;
-	public final int KILLED = 4;
+
 
 	protected String publicHost;
 	protected int publicPort;
@@ -64,12 +49,10 @@ public abstract class BaseWorker {
 	protected int privatePort;
 	protected String name;
 	protected String classnameWorker = getClass().getName();
-	protected int status = -1;
+	protected WorkerData.Status status = WorkerData.Status.KILLED;
 	protected boolean autoStart = true;
 	protected Vertx vertxInstance;
 	protected HttpServer httpServerInstance;
-
-	protected int cpuCores = Runtime.getRuntime().availableProcessors();
 
 	protected Timer timer = new Timer(true);
 
@@ -87,25 +70,8 @@ public abstract class BaseWorker {
 		super();
 		this.name = name;
 		this.classnameWorker = getClass().getName();
-		status = STARTING;
-
-		// disable the creation of file-cache folders ".vertx"
-		System.setProperty("vertx.disableFileCPResolving", "true");
-
-		// refer http://vertx.io/manual.html#performance-tuning
-		// DeploymentOptions options = new DeploymentOptions().setWorker(true);
-		VertxOptions options = new VertxOptions();
-		options.setMaxEventLoopExecuteTime(MAX_TIMEOUT_WORKER);
-		options.setBlockedThreadCheckInterval(5000) // In milliseconds
-				.setBlockedThreadCheckIntervalUnit(TimeUnit.MILLISECONDS);
-		options.setWorkerPoolSize(cpuCores * 10);
-		options.setEventLoopPoolSize(cpuCores * 2);
-		options.setPreferNativeTransport(true);
-		options.setMaxWorkerExecuteTime(100L).setMaxWorkerExecuteTimeUnit(TimeUnit.SECONDS);
-		options.setHAEnabled(true).setQuorumSize(2); // The number of nodes that must remain for the system to operate
-
-		vertxInstance = Vertx.vertx(options);
-
+		status = WorkerData.Status.STARTING;
+		vertxInstance = ClusterDataManager.theVertx();
 		initBeforeStart();
 	}
 
@@ -118,7 +84,7 @@ public abstract class BaseWorker {
 		return name;
 	}
 
-	final public int getStatus() {
+	final public WorkerData.Status getStatus() {
 		return status;
 	}
 
@@ -218,44 +184,25 @@ public abstract class BaseWorker {
 	}
 
 	final synchronized protected void killWorker() {
-		if (this.status != KILLED) {
-			JedisPooled jedisPool = ClusterDataManager.getJedisClient();
-			new RedisCommand<Boolean>(jedisPool) {
-				@Override
-				protected Boolean build() throws JedisException {
-					String workerName = StringUtil.toString(publicHost.replaceAll("\\.", ""), "_", publicPort);
-					WorkerTimeLog timeLog = new Gson().fromJson(getTimelog(jedis, workerName), WorkerTimeLog.class);
-					if (timeLog == null) {
-						timeLog = new WorkerTimeLog();
-					}
-					timeLog.addDownTime(System.currentTimeMillis());
-					jedis.hset(ClusterDataManager.CLUSTER_WORKER_PREFIX,
-							workerName + ClusterDataManager.WORKER_TIMELOG_POSTFIX, new Gson().toJson(timeLog));
-					return true;
-				}
-
-				private String getTimelog(JedisPooled jedis, String workerName) {
-					return jedis.hget(ClusterDataManager.CLUSTER_WORKER_PREFIX,
-							workerName + ClusterDataManager.WORKER_TIMELOG_POSTFIX);
-				}
-			}.execute();
+		if (this.status != WorkerData.Status.KILLED) {
+			ClusterDataManager.updateWorkerData(publicHost, publicPort, WorkerData.Status.KILLED);
 			onBeforeBeStopped();
-			status = KILLED;
+			status = WorkerData.Status.KILLED;
 			logger.info("Bye, now exiting " + classnameWorker);
 			Utils.exitSystemAfterTimeout(1000);
 		}
 	}
 
 	final synchronized protected void pauseWorker() {
-		status = PAUSED;
+		status = WorkerData.Status.PAUSED;
 		onPause();
 	}
 
 	final synchronized protected void restartWorker() {
-		if (status == PAUSED) {
-			status = RUNNING;
+		if (status == WorkerData.Status.PAUSED) {
+			status = WorkerData.Status.RUNNING;
 			onRestart();
-		} else if (status != RUNNING) {
+		} else if (status != WorkerData.Status.RUNNING) {
 			startProcessing();
 		} else {
 			// TODO make sure supervisor is alive, I kill myself because the supervisor will
@@ -265,7 +212,7 @@ public abstract class BaseWorker {
 	}
 
 	final protected void registerWorkerNodeIntoCluster() {
-		status = STARTED;
+		status = WorkerData.Status.STARTED;
 
 		updateClusterInfo();
 
@@ -283,27 +230,12 @@ public abstract class BaseWorker {
 
 	private void updateClusterInfo() {
 		try {
-			JedisPooled jedisPool = ClusterDataManager.getJedisClient();
-			new RedisCommand<Boolean>(jedisPool) {
-				@Override
-				protected Boolean build() throws JedisException {
-					String workerName = StringUtil.toString(publicHost.replaceAll("\\.", ""), "_", publicPort);
-					WorkerTimeLog timeLog = new Gson().fromJson(jedis.hget(ClusterDataManager.CLUSTER_WORKER_PREFIX,
-							workerName + ClusterDataManager.WORKER_TIMELOG_POSTFIX), WorkerTimeLog.class);
-					if (timeLog == null) {
-						timeLog = new WorkerTimeLog();
-					}
-					timeLog.addUpTime(System.currentTimeMillis());
-					jedis.hset(ClusterDataManager.CLUSTER_WORKER_PREFIX,
-							workerName + ClusterDataManager.WORKER_TIMELOG_POSTFIX, new Gson().toJson(timeLog));
-					return true;
-				}
-			}.execute();
+			ClusterDataManager.updateWorkerData(publicHost, publicPort, WorkerData.Status.STARTED);
 
 			timer.schedule(new TimerTask() {
 				@Override
 				public void run() {
-					ClusterDataManager.updateWorkerData(publicHost, publicPort);
+					ClusterDataManager.updateWorkerData(publicHost, publicPort, WorkerData.Status.RUNNING);
 				}
 			}, 5000, 10000);
 		} catch (Exception e) {
@@ -352,8 +284,8 @@ public abstract class BaseWorker {
 	}
 
 	final protected synchronized void startProcessing() {
-		if (status != RUNNING) {
-			status = RUNNING;
+		if (status != WorkerData.Status.RUNNING) {
+			status = WorkerData.Status.RUNNING;
 			onProcessing();
 		}
 	}

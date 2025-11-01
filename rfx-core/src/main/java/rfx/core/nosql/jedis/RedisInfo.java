@@ -32,16 +32,10 @@ public class RedisInfo {
 	/** Initialize the JedisPooled client (thread-safe, auto-managed) */
 	protected void initTheClient() {
 		RedisConnectionPoolConfig connectionConfig = RedisConnectionPoolConfig.theInstance();
-		int timeout = connectionConfig.getConnectionTimeout();
+		
+		DefaultJedisClientConfig configBuilder = connectionConfig.createJedisClientConfig(this.auth);
 
-		DefaultJedisClientConfig.Builder configBuilder = DefaultJedisClientConfig.builder()
-				.connectionTimeoutMillis(timeout).socketTimeoutMillis(timeout);
-
-		if (auth != null && !auth.isEmpty()) {
-			configBuilder.password(auth);
-		}
-
-		jedisClient = new JedisPooled(new HostAndPort(host, port), configBuilder.build());
+		jedisClient = new JedisPooled(new HostAndPort(host, port), configBuilder);
 	}
 
 	public JedisPooled getJedisClient() {

@@ -59,19 +59,6 @@ tasks.withType(Jar) {
 	destinationDir = file("$rootDir/BUILD-OUTPUT")
 }
 
-ext.rfxCoreMasterManifest = manifest {
-   attributes ('Implementation-Title': 'rfx.core.MasterNodeStarter', 
-        			'Implementation-Version': version ,
-        			'Main-Class': 'system.starter.MasterNodeStarter',
-        			'Class-Path' : getClasspathStringJars() )
-}
-
-ext.rfxSupervisorManifest = manifest {
-   attributes ('Implementation-Title': 'rfx.core.SupervisorNodeStarter', 
-        			'Implementation-Version': version ,
-        			'Main-Class': 'system.starter.SupervisorNodeStarter',
-        			'Class-Path' : getClasspathStringJars() )
-}
 
 ext.rfxScheduledJobManifest = manifest {
    attributes ('Implementation-Title': 'rfx.core.ScheduledJobNodeStarter', 
@@ -107,7 +94,7 @@ jar {
     }    
     baseName = 'rfx-core'
     manifest = project.manifest {
-        from rfxCoreMasterManifest
+        from rfxScheduledJobManifest
     }
 }
 
@@ -134,29 +121,7 @@ task rfxCopyToRelease(type: Copy) {
 }
 // ------------------------------------------------------------------
 
-task rfxCoreMasterJar(type: Jar) {	
-	dependsOn classes
-    from(sourceSets.main.output) {
-        include "**"
-    }
 
-    baseName = 'rfx-core-master'
-    manifest = project.manifest {
-        from rfxCoreMasterManifest
-    }
-}
-
-task rfxSupervisorJar(type: Jar) {	
-	dependsOn classes
-    from(sourceSets.main.output) {
-        include "**"
-    }
-
-    baseName = 'rfx-supervisor'
-    manifest = project.manifest {
-        from rfxSupervisorManifest
-    }
-}
 
 task rfxScheduledJobJar(type: Jar) {	
 	dependsOn classes

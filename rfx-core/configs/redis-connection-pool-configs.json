@@ -1,8 +1,8 @@
 {    
-	"maxTotal" : 3000,
+	"maxTotal" : 5000,
 	"maxIdle" : 20,
 	"minIdle" : 2,
-	"maxWaitMillis" : 5000,
+	"maxWaitMillis" : 10000,
 	"numTestsPerEvictionRun" : 10,
 	"testOnBorrow" : true,
 	"testOnReturn" : true,

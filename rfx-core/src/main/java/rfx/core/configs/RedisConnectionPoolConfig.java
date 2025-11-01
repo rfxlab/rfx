@@ -1,38 +1,45 @@
 package rfx.core.configs;
 
-import redis.clients.jedis.JedisPoolConfig;
-import rfx.core.util.CommonUtil;
-import rfx.core.util.FileUtils;
+import java.time.Duration;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
+import redis.clients.jedis.DefaultJedisClientConfig;
+import redis.clients.jedis.JedisPoolConfig;
+import rfx.core.util.CommonUtil;
+import rfx.core.util.FileUtils;
+
+/**
+ * @author Trieu Nguyen
+ * @since 2025
+ *
+ */
 public class RedisConnectionPoolConfig {
-	
+
 	protected static RedisConnectionPoolConfig _instance = null;
-	
+
 	public static RedisConnectionPoolConfig theInstance() {
-		if(_instance == null){
+		if (_instance == null) {
 			try {
 				String json = FileUtils.readFileAsString(CommonUtil.getRedisPoolConnectionConfigFile());
 				_instance = new Gson().fromJson(json, RedisConnectionPoolConfig.class);
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				if (e instanceof JsonSyntaxException) {
 					e.printStackTrace();
-					System.err.println("Wrong JSON syntax in file "+CommonUtil.getRedisPoolConnectionConfigFile());
-				}
-				else {
+					System.err.println("Wrong JSON syntax in file " + CommonUtil.getRedisPoolConnectionConfigFile());
+				} else {
 					e.printStackTrace();
 				}
 			}
 		}
 		return _instance;
 	}
-	public static JedisPoolConfig getJedisPoolConfigInstance(){		
-		return theInstance().getJedisPoolConfig();
+
+	public static JedisPoolConfig getJedisPoolConfigInstance() {
+		return theInstance().createJedisPoolConfig();
 	}
-	
+
 	int connectionTimeout = 0;
 	int maxTotal = 20;
 	int maxIdle = 10;
@@ -43,7 +50,7 @@ public class RedisConnectionPoolConfig {
 	boolean testOnReturn = true;
 	boolean testWhileIdle = true;
 	int timeBetweenEvictionRunsMillis = 60000;
-	
+
 	public int getMaxTotal() {
 		return maxTotal;
 	}
@@ -68,13 +75,14 @@ public class RedisConnectionPoolConfig {
 		this.minIdle = minIdle;
 	}
 
-
 	public int getMaxWaitMillis() {
 		return maxWaitMillis;
 	}
+
 	public void setMaxWaitMillis(int maxWaitMillis) {
 		this.maxWaitMillis = maxWaitMillis;
 	}
+
 	public int getNumTestsPerEvictionRun() {
 		return numTestsPerEvictionRun;
 	}
@@ -114,11 +122,11 @@ public class RedisConnectionPoolConfig {
 	public void setTimeBetweenEvictionRunsMillis(int timeBetweenEvictionRunsMillis) {
 		this.timeBetweenEvictionRunsMillis = timeBetweenEvictionRunsMillis;
 	}
-	
+
 	public int getConnectionTimeout() {
 		return connectionTimeout;
 	}
-	
+
 	public void setConnectionTimeout(int connectionTimeout) {
 		this.connectionTimeout = connectionTimeout;
 	}
@@ -127,17 +135,30 @@ public class RedisConnectionPoolConfig {
 		return new Gson().toJson(this);
 	}
 
-	public JedisPoolConfig getJedisPoolConfig() {
+	public JedisPoolConfig createJedisPoolConfig() {
 		JedisPoolConfig config = new JedisPoolConfig();
 		config.setMaxTotal(this.maxTotal);
 		config.setMaxIdle(this.maxIdle);
 		config.setMinIdle(this.minIdle);
-		config.setMaxWaitMillis(this.maxWaitMillis);
+		config.setMaxWait(Duration.ofMillis(this.maxWaitMillis));
 		config.setNumTestsPerEvictionRun(this.numTestsPerEvictionRun);
 		config.setTestOnBorrow(this.testOnBorrow);
 		config.setTestOnReturn(this.testOnReturn);
 		config.setTestWhileIdle(this.testWhileIdle);
-		config.setTimeBetweenEvictionRunsMillis(this.timeBetweenEvictionRunsMillis);		
+		config.setTimeBetweenEvictionRuns(Duration.ofMillis(this.timeBetweenEvictionRunsMillis));
 		return config;
+	}
+	
+	public DefaultJedisClientConfig createJedisClientConfig(String auth) {
+	    int timeout = this.getConnectionTimeout();
+	    DefaultJedisClientConfig.Builder configBuilder = DefaultJedisClientConfig.builder()
+	            .connectionTimeoutMillis(timeout)
+	            .socketTimeoutMillis(timeout);
+
+	    if (auth != null && !auth.isEmpty()) {
+	        configBuilder.password(auth);
+	    }
+
+	    return configBuilder.build();
 	}
 }

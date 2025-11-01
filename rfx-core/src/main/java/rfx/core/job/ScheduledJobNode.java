@@ -2,12 +2,15 @@ package rfx.core.job;
 
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServerRequest;
 import rfx.core.stream.node.worker.BaseWorker;
-import rfx.core.util.LogUtil;
 
 public class ScheduledJobNode extends BaseWorker {
+	static Logger logger = LoggerFactory.getLogger(ScheduledJobNode.class);
 
 	public ScheduledJobNode(String name) {
 		super(name);
@@ -39,9 +42,8 @@ public class ScheduledJobNode extends BaseWorker {
 	
 	 @Override
 	 protected void onStartDone() {
-		LogUtil.setSuffixLogFile(getName());
 		int c = ScheduledJobManager.getInstance().startScheduledJobs();
-		LogUtil.i("ScheduledJobManager.started "+ c + " ScheduledJobs");
+		logger.info("ScheduledJobManager.started "+ c + " ScheduledJobs");
 	 }
 
 }

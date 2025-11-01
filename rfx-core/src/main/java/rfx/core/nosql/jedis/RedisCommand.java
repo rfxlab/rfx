@@ -1,77 +1,89 @@
 package rfx.core.nosql.jedis;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
+import java.util.function.Consumer;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.vertx.core.Vertx;
-import redis.clients.jedis.JedisPooled;
+import redis.clients.jedis.*;
 import redis.clients.jedis.exceptions.JedisException;
-import rfx.core.util.LogUtil;
+import rfx.core.stream.cluster.ClusterDataManager;
 
 /**
- * Non-blocking Redis command executor compatible with Vert.x.
- * 
+ * High-concurrency Redis command executor with CPU-aware thread pool
+ * and automatic resource cleanup.
+ *
  * @param <T> Result type
- * 
  * @author Trieu
  * @since 2025
  */
 public abstract class RedisCommand<T> {
 
-    protected final JedisPooled jedis;
+    private static final Logger logger = LoggerFactory.getLogger(RedisCommand.class);
 
-    public RedisCommand(JedisPooled jedisPooled) {
-        if (jedisPooled == null) {
-            throw new IllegalArgumentException("jedisPooled is NULL!");
-        }
-        this.jedis = jedisPooled;
+    private final JedisPool jedisPool;
+
+    // Dynamically size thread pool based on CPU cores
+    private static final int CORES = Runtime.getRuntime().availableProcessors();
+    private static final ExecutorService REDIS_EXECUTOR = new ThreadPoolExecutor(
+            CORES,                      // core threads = CPU cores
+            CORES * 4,                  // allow bursts up to 4× cores
+            60L, TimeUnit.SECONDS,
+            new LinkedBlockingQueue<>(2000), // bounded queue for backpressure
+            new ThreadFactory() {
+                private final ThreadFactory base = Executors.defaultThreadFactory();
+                @Override public Thread newThread(Runnable r) {
+                    Thread t = base.newThread(r);
+                    t.setName("redis-io-" + t.getId());
+                    t.setDaemon(true);
+                    return t;
+                }
+            },
+            new ThreadPoolExecutor.CallerRunsPolicy() // throttles callers under pressure
+    );
+
+    public RedisCommand(JedisPool jedisPool) {
+        if (jedisPool == null)
+            throw new IllegalArgumentException("jedisPool is NULL!");
+        this.jedisPool = jedisPool;
     }
 
     /**
-     * Synchronous execution — legacy compatibility.
-     * Should NOT be called from Vert.x event loop.
+     * Blocking execution. Do NOT call from Vert.x event loop.
      */
     public T execute() {
-        try {
-            return build();
-        } catch (JedisException e) {
-            LogUtil.e("Redis command failed: " + e.getMessage(), e);
-            throw e;
+        try (Jedis jedis = jedisPool.getResource()) {
+            return build(jedis);
         } catch (Exception e) {
-            LogUtil.e("Unexpected Redis command error: " + e.getMessage(), e);
-            throw new JedisException("Unexpected Redis command error", e);
+            logger.error("Redis command failed: {}", e.getMessage(), e);
+            throw new JedisException("Redis command failed", e);
         }
     }
 
     /**
-     * Asynchronous execution using CompletableFuture.
-     * Runs the Redis command on a separate worker thread.
+     * High-throughput async execution on dedicated Redis I/O pool.
      */
     public CompletableFuture<T> executeAsync() {
         return CompletableFuture.supplyAsync(() -> {
-            try {
-                return build();
-            } catch (JedisException e) {
-                LogUtil.e("Redis command failed (async): " + e.getMessage(), e);
-                throw e;
+            try (Jedis jedis = jedisPool.getResource()) {
+                return build(jedis);
             } catch (Exception e) {
-                LogUtil.e("Unexpected Redis command error (async): " + e.getMessage(), e);
-                throw new JedisException("Unexpected Redis command error", e);
+                logger.error("Redis async command failed: {}", e.getMessage(), e);
+                throw new CompletionException(new JedisException("Redis async command failed", e));
             }
-        });
+        }, REDIS_EXECUTOR);
     }
 
     /**
-     * Executes asynchronously using Vert.x worker threads if Vert.x is provided.
-     * 
-     * This is the preferred method when running inside Vert.x.
+     * Async execution integrated with Vert.x worker threads.
      */
-    public void executeAsync(Vertx vertx, java.util.function.Consumer<T> onSuccess, java.util.function.Consumer<Throwable> onError) {
+    public void executeAsync(Consumer<T> onSuccess, Consumer<Throwable> onError) {
+        Vertx vertx = ClusterDataManager.theVertx();
         vertx.<T>executeBlocking(promise -> {
-            try {
-                T result = build();
-                promise.complete(result);
+            try (Jedis jedis = jedisPool.getResource()) {
+                promise.complete(build(jedis));
             } catch (Exception e) {
                 promise.fail(e);
             }
@@ -79,14 +91,27 @@ public abstract class RedisCommand<T> {
             if (res.succeeded()) {
                 if (onSuccess != null) onSuccess.accept(res.result());
             } else {
-                LogUtil.e("Redis async (Vert.x) command failed: " + res.cause().getMessage(), res.cause());
-                if (onError != null) onError.accept(res.cause());
+                Throwable cause = res.cause();
+                logger.error("Redis Vert.x async failed: {}", cause.getMessage(), cause);
+                if (onError != null) onError.accept(cause);
             }
         });
     }
 
     /**
-     * Implement your Redis logic here using the provided JedisPooled client.
+     * Implement Redis logic here using the provided Jedis instance.
      */
-    protected abstract T build() throws JedisException;
+    protected abstract T build(Jedis jedis) throws JedisException;
+
+    /**
+     * Graceful shutdown hook for Redis I/O pool.
+     */
+    public static void shutdownExecutor() {
+        REDIS_EXECUTOR.shutdown();
+        try {
+            if (!REDIS_EXECUTOR.awaitTermination(5, TimeUnit.SECONDS)) {
+                REDIS_EXECUTOR.shutdownNow();
+            }
+        } catch (InterruptedException ignored) {}
+    }
 }

@@ -47,10 +47,4 @@ public class CommonUtil {
 	
 	public static final Charset CHARSET_UTF8 = Charset.forName(StringPool.UTF_8);
 
-	public static List<String> CRAWLED_PREFIX_URL = new ArrayList<String>() {	
-		{
-			add("http://vnexpress.net/");
-			add("http://thethao.vnexpress.net/");
-		}
-	};
 }
