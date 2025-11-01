@@ -1,10 +1,5 @@
 package rfx.core.nosql.jedis;
 
-import redis.clients.jedis.DefaultJedisClientConfig;
-import redis.clients.jedis.HostAndPort;
-import redis.clients.jedis.JedisPooled;
-import rfx.core.configs.RedisConnectionPoolConfig;
-
 /**
  * RedisInfo — modern Redis connection wrapper using JedisPooled (Jedis 7.x)
  *
@@ -16,7 +11,6 @@ public class RedisInfo {
 	private String host;
 	private int port;
 	private String auth;
-	private JedisPooled jedisClient;
 
 	public RedisInfo(String host, int port) {
 		this(host, port, null);
@@ -26,21 +20,8 @@ public class RedisInfo {
 		this.host = host;
 		this.port = port;
 		this.auth = auth;
-		initTheClient();
 	}
 
-	/** Initialize the JedisPooled client (thread-safe, auto-managed) */
-	protected void initTheClient() {
-		RedisConnectionPoolConfig connectionConfig = RedisConnectionPoolConfig.theInstance();
-		
-		DefaultJedisClientConfig configBuilder = connectionConfig.createJedisClientConfig(this.auth);
-
-		jedisClient = new JedisPooled(new HostAndPort(host, port), configBuilder);
-	}
-
-	public JedisPooled getJedisClient() {
-		return jedisClient;
-	}
 
 	public String getHost() {
 		return host;
