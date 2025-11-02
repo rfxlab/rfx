@@ -116,17 +116,22 @@ public final class ClusterDataManager {
 		}
 	}
 
-	/** worker node updates its own memory usage etc. */
+	/**
+	 * worker node updates its own memory usage etc. 
+	 * 
+	 * @param host
+	 * @param port
+	 * @param status
+	 */
 	public static void updateWorkerData(String host, int port, WorkerData.Status status) {
-		logger.info("updateWorkerData " + host + ":" + port);
 		new RedisCommand<Void>(JEDIS_POOL) {
 			@Override
 			protected Void build(Jedis jedis) throws JedisException {
-				String workerName = StringUtil.toString(host.replaceAll("\\.", ""), "_", port);
+				String workerName = StringUtil.toString(host.replaceAll("\\.", ""), "_", port)+ WORKER_DATA_POSTFIX;
 				Gson gson = new Gson();
 
-				WorkerData workerData = gson.fromJson(
-						jedis.hget(CLUSTER_WORKER_PREFIX, workerName + WORKER_DATA_POSTFIX), WorkerData.class);
+				String json = jedis.hget(CLUSTER_WORKER_PREFIX, workerName);
+				WorkerData workerData = gson.fromJson(json, WorkerData.class);
 
 				if (workerData == null) {
 					workerData = new WorkerData();
@@ -137,7 +142,7 @@ public final class ClusterDataManager {
 				workerData.setMemoryLimit(readableFileSize(rt.maxMemory()));
 				workerData.setStatus(status);
 
-				jedis.hset(CLUSTER_WORKER_PREFIX, workerName + WORKER_DATA_POSTFIX, gson.toJson(workerData));
+				jedis.hset(CLUSTER_WORKER_PREFIX, workerName, gson.toJson(workerData));
 				return null;
 			}
 		}.executeAsync();
