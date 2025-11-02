@@ -148,17 +148,16 @@ public class RedisConnectionPoolConfig {
 		config.setTimeBetweenEvictionRuns(Duration.ofMillis(this.timeBetweenEvictionRunsMillis));
 		return config;
 	}
-	
+
 	public DefaultJedisClientConfig createJedisClientConfig(String auth) {
-	    int timeout = this.getConnectionTimeout();
-	    DefaultJedisClientConfig.Builder configBuilder = DefaultJedisClientConfig.builder()
-	            .connectionTimeoutMillis(timeout)
-	            .socketTimeoutMillis(timeout);
+		int timeout = this.getConnectionTimeout();
+		DefaultJedisClientConfig.Builder configBuilder = DefaultJedisClientConfig.builder()
+				.connectionTimeoutMillis(timeout).socketTimeoutMillis(timeout);
 
-	    if (auth != null && !auth.isEmpty()) {
-	        configBuilder.password(auth);
-	    }
+		if (auth != null && !auth.isEmpty()) {
+			configBuilder.password(auth);
+		}
 
-	    return configBuilder.build();
+		return configBuilder.build();
 	}
 }

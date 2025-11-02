@@ -2,13 +2,43 @@
 	"clusterInfoRedis": [
 		{
 			"host": "127.0.0.1",
-			"port": 6480
+			"port": 6480,
+			"auth": "test123456"
 		}
 	],
 	"realtimeDataStats": [
 		{
 			"host": "127.0.0.1",
-			"port": 6480
+			"port": 6480,
+			"auth": "test123456"
+		}
+	],
+	"localCache": [
+		{
+			"host": "127.0.0.1",
+			"port": 6480,
+			"auth": "test123456"
+		}
+	],
+	"masterCache": [
+		{
+			"host": "127.0.0.1",
+			"port": 6480,
+			"auth": "test123456"
+		}
+	],
+	"pubSubQueue": [
+		{
+			"host": "127.0.0.1",
+			"port": 6480,
+			"auth": "test123456"
+		}
+	],
+	"agentPubSubQueue": [
+		{
+			"host": "127.0.0.1",
+			"port": 6480,
+			"auth": "test123456"
 		}
 	]
 }

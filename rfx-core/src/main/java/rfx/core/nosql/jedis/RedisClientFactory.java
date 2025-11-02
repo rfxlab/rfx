@@ -11,6 +11,7 @@ import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.JedisPooled;
 import rfx.core.configs.RedisConfigs;
 import rfx.core.configs.RedisConnectionPoolConfig;
+import rfx.core.util.StringUtil;
 
 /**
  * Unified Redis client factory for LEO CDP
@@ -34,7 +35,7 @@ public class RedisClientFactory {
 
         RedisInfo redisInfo = RedisConfigs.load().get(redisPoolKey);
         if (redisInfo == null) {
-            throw new IllegalStateException("Missing Redis configuration: clusterInfoRedis");
+            throw new IllegalStateException("Missing Redis configuration for redisPoolKey " + redisPoolKey);
         }
 
         String host = redisInfo.getHost();
@@ -49,7 +50,7 @@ public class RedisClientFactory {
                 : 2000;
 
         // Jedis 7.x pool constructor
-        if (auth != null && !auth.isEmpty()) {
+        if (StringUtil.isNotEmpty(auth)) {
             jedisPool = new JedisPool(jedisPoolCfg, host, port, timeout, auth);
         } else {
             jedisPool = new JedisPool(jedisPoolCfg, host, port, timeout);
@@ -93,7 +94,7 @@ public class RedisClientFactory {
                 .connectionTimeoutMillis(timeout)
                 .socketTimeoutMillis(timeout);
 
-        if (auth != null && !auth.isEmpty()) {
+        if (StringUtil.isNotEmpty(auth)) {
             cfg.password(auth);
         }
 
