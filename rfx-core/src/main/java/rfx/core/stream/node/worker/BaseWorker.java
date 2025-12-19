@@ -2,9 +2,12 @@ package rfx.core.stream.node.worker;
 
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.Date;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +34,8 @@ import rfx.core.util.Utils;
  */
 public abstract class BaseWorker {
 
+	private static final int SEND_BUFFER_SIZE = 256 * 1024; // 256 KB
+
 	static Logger logger = LoggerFactory.getLogger(BaseWorker.class);
 
 	private static final String URI_GET_SERVER_TIME = "/get/server-time";
@@ -41,7 +46,6 @@ public abstract class BaseWorker {
 	private static final String URI_RESTART = "/restart";
 	private static final String URI_PAUSE = "/pause";
 	private static final String URI_PING = "/ping";
-
 
 	protected String publicHost;
 	protected int publicPort;
@@ -55,8 +59,8 @@ public abstract class BaseWorker {
 	protected HttpServer httpServerInstance;
 
 	protected Timer timer = new Timer(true);
-
 	private static BaseWorker _worker;
+	private final Map<String, Consumer<HttpServerResponse>> BASE_HANDLERS = createBaseHandlers();
 
 	public static BaseWorker getInstance() {
 		return _worker;
@@ -123,26 +127,34 @@ public abstract class BaseWorker {
 	}
 
 	protected HttpServer checkAndCreateHttpServer(String host, int port) {
+
 		if (isAddressAlreadyInUse(host, port)) {
 			System.err.println(host + ":" + port + " isAddressAlreadyInUse!");
 			Utils.exitSystemAfterTimeout(200);
 			return null;
 		}
-		try {
-			this.publicHost = host;
-			this.publicPort = port;
 
-			HttpServerOptions httpOptions = new HttpServerOptions();
-			httpOptions.setAcceptBacklog(10000).setUsePooledBuffers(true);
-			httpOptions.setSendBufferSize(4 * 1024);
-			httpOptions.setReceiveBufferSize(4 * 1024);
-			httpServerInstance = vertxInstance.createHttpServer(httpOptions);
+		this.publicHost = host;
+		this.publicPort = port;
 
-			return httpServerInstance;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
+		HttpServerOptions options = new HttpServerOptions()
+				// Connection handling
+				.setAcceptBacklog(20000)
+
+				// Buffer sizes — critical for large payloads
+				.setSendBufferSize(SEND_BUFFER_SIZE).setReceiveBufferSize(SEND_BUFFER_SIZE)
+
+				// Netty pooled buffers (good for throughput)
+				.setUsePooledBuffers(true)
+
+				// Protect server from slowloris / stuck clients
+				.setIdleTimeout(30) // seconds
+				.setTcpKeepAlive(true)
+
+				// HTTP behavior
+				.setCompressionSupported(true).setDecompressionSupported(true);
+
+		return vertxInstance.createHttpServer(options);
 	}
 
 	private NetServer checkAndCreateNetServer(String host, int port) {
@@ -249,38 +261,51 @@ public abstract class BaseWorker {
 	 * @param HttpServerRequest request
 	 * @return true if processed | false if no handler found
 	 */
-	final protected boolean handleRequestToBaseWorker(HttpServerRequest request) {
-		String uri = request.path();
-		HttpServerResponse res = request.response();
-		if (uri.equalsIgnoreCase(URI_PING)) {
-			res.end("PONG");
-			return true;
-		} else if (uri.equalsIgnoreCase(URI_PAUSE)) {
+	protected final boolean handleRequestToBaseWorker(HttpServerRequest request) {
+
+		final String uri = request.path();
+		final HttpServerResponse response = request.response();
+
+		Consumer<HttpServerResponse> handler = BASE_HANDLERS.get(uri);
+
+		if (handler == null) {
+			return false;
+		}
+
+		handler.accept(response);
+		return true;
+	}
+
+	private Map<String, Consumer<HttpServerResponse>> createBaseHandlers() {
+
+		Map<String, Consumer<HttpServerResponse>> map = new HashMap<>();
+
+		map.put(URI_PING, res -> res.end("PONG"));
+
+		map.put(URI_PAUSE, res -> {
 			pauseWorker();
 			res.end("paused");
-			return true;
-		} else if (uri.equalsIgnoreCase(URI_RESTART)) {
+		});
+
+		map.put(URI_RESTART, res -> {
 			restartWorker();
 			res.end("restarted");
-			return true;
-		} else if (uri.equalsIgnoreCase(URI_KILL)) {
+		});
+
+		map.put(URI_KILL, res -> {
 			res.end("Exiting...");
 			killWorker();
-			return true;
-		} else if (uri.equalsIgnoreCase(URI_GET_STATUS)) {
-			res.end("" + status);
-			return true;
-		} else if (uri.equalsIgnoreCase(URI_GET_NAME)) {
-			res.end(getName());
-			return true;
-		} else if (uri.equalsIgnoreCase(URI_GET_HOST)) {
-			res.end(getPublicHost() + ":" + getPublicPort());
-			return true;
-		} else if (uri.equalsIgnoreCase(URI_GET_SERVER_TIME)) {
-			res.end(new Date().toString());
-			return true;
-		}
-		return false;
+		});
+
+		map.put(URI_GET_STATUS, res -> res.end(String.valueOf(status)));
+
+		map.put(URI_GET_NAME, res -> res.end(getName()));
+
+		map.put(URI_GET_HOST, res -> res.end(getPublicHost() + ":" + getPublicPort()));
+
+		map.put(URI_GET_SERVER_TIME, res -> res.end(Instant.now().toString()));
+
+		return Map.copyOf(map); // immutable (JDK 11)
 	}
 
 	final protected synchronized void startProcessing() {
@@ -289,9 +314,6 @@ public abstract class BaseWorker {
 			onProcessing();
 		}
 	}
-
-	// for the implementer
-	public abstract void start(String host, int port);
 
 	protected void initBeforeStart() {
 		logger.info("initBeforeStart " + classnameWorker);
@@ -320,4 +342,7 @@ public abstract class BaseWorker {
 	final public Vertx getVertxInstance() {
 		return vertxInstance;
 	}
+
+	// for the implementer
+	public abstract void start(String host, int port);
 }
