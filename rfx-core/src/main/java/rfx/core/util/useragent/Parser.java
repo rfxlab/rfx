@@ -25,6 +25,7 @@ import java.util.Map;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 
+import rfx.core.util.CommonUtil;
 import rfx.core.util.useragent.DeviceParser.DevicePattern;
 import rfx.core.util.useragent.OSParser.OSPattern;
 
@@ -36,7 +37,7 @@ import rfx.core.util.useragent.OSParser.OSPattern;
  */
 public class Parser {
 
-  private static final String REGEX_YAML_PATH = "configs/regexes.yaml";
+  private static final String REGEX_YAML_PATH = CommonUtil.getBaseConfig() + "/regexes.yaml";
   private UserAgentParser uaParser;
   private OSParser osParser;
   private DeviceParser deviceParser;

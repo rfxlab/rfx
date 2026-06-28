@@ -23,8 +23,16 @@ public class CommonUtil {
     private static final String DEFAULT_REDIS_CONFIG_FILE = "redis-configs.json";
     private static final String DEFAULT_DATABASE_CONFIG_FILE = "database-configs.json"; 
     private static final String DEFAULT_KAFKA_PRODUCER_CONFIG_FILE = "kafka-producer-configs.json";
-    private static final String DEFAULT_BASE_CONFIG = "configs/";
+    
     private static final String DEFAULT_BASE_DIR = ".";
+
+  /**
+     * Base directory for the application. 
+     * It checks the system environment first. If not found, it uses the default "." (current directory).
+     */
+    static String baseDir = getEnvOrDefault(ENV_BASE_DIR, DEFAULT_BASE_DIR);
+
+    private static final String DEFAULT_BASE_CONFIG = baseDir +"/configs/";
 
     /**
      * Base config directory. 
@@ -32,11 +40,6 @@ public class CommonUtil {
      */
     static String baseConfig = getEnvOrDefault(ENV_BASE_CONFIG, DEFAULT_BASE_CONFIG);
 
-    /**
-     * Base directory for the application. 
-     * It checks the system environment first. If not found, it uses the default "." (current directory).
-     */
-    static String baseDir = getEnvOrDefault(ENV_BASE_DIR, DEFAULT_BASE_DIR);
 
     /**
      * Helper method to fetch environment variables with a fallback default.
