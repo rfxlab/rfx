@@ -14,102 +14,201 @@ import rfx.core.configs.RedisConnectionPoolConfig;
 import rfx.core.util.StringUtil;
 
 /**
- * Unified Redis client factory for LEO CDP
- * Supports both JedisPool (advanced) and JedisPooled (simple).
+ * ============================================================================
+ * RedisClientFactory
+ * ============================================================================
  *
- * Compatible with Jedis 7.x
+ * Central factory for creating and reusing Redis clients.
+ *
+ * Features
+ * --------
+ * ✓ Jedis 7.x compatible
+ * ✓ Redis 6 ACL (username/password)
+ * ✓ TLS / SSL
+ * ✓ Thread-safe lazy initialization
+ * ✓ Connection pooling
+ * ✓ Graceful shutdown
+ *
+ * Two client types are supported:
+ *
+ * 1. JedisPool
+ * - configurable pool
+ * - recommended for production
+ *
+ * 2. JedisPooled
+ * - lightweight wrapper
+ * - uses an internal pool
+ * - suitable for most applications
+ *
+ * ============================================================================
  */
-public class RedisClientFactory {
+public final class RedisClientFactory {
 
-    private static Map<String,JedisPool> jedisPoolMap = new ConcurrentHashMap<>();
-    private static Map<String,JedisPooled> jedisPooledMap = new ConcurrentHashMap<>();
-
-    /**
-     * Build or reuse a JedisPool with full config control.
-     */
-    public static synchronized JedisPool buildRedisPool(String redisPoolKey) {
-    	JedisPool jedisPool = jedisPoolMap.get(redisPoolKey);
-        if (jedisPool != null) {
-            return jedisPool;
-        }
-
-        RedisInfo redisInfo = RedisConfigs.load().get(redisPoolKey);
-        if (redisInfo == null) {
-            throw new IllegalStateException("Missing Redis configuration for redisPoolKey " + redisPoolKey);
-        }
-
-        String host = redisInfo.getHost();
-        int port = redisInfo.getPort();
-        String auth = redisInfo.getAuth();
-
-        RedisConnectionPoolConfig poolConfig = RedisConnectionPoolConfig.theInstance();
-        JedisPoolConfig jedisPoolCfg = poolConfig.createJedisPoolConfig();
-
-        int timeout = poolConfig.getConnectionTimeout() > 0
-                ? poolConfig.getConnectionTimeout()
-                : 2000;
-
-        // Jedis 7.x pool constructor
-        if (StringUtil.isNotEmpty(auth)) {
-            jedisPool = new JedisPool(jedisPoolCfg, host, port, timeout, auth);
-        } else {
-            jedisPool = new JedisPool(jedisPoolCfg, host, port, timeout);
-        }
-
-        return jedisPool;
+    private RedisClientFactory() {
     }
 
     /**
-     * Get Jedis connection from pool (remember to close it!)
+     * Shared Jedis pools.
+     */
+    private static final Map<String, JedisPool> JEDIS_POOLS = new ConcurrentHashMap<>();
+
+    /**
+     * Shared JedisPooled instances.
+     */
+    private static final Map<String, JedisPooled> JEDIS_POOLED = new ConcurrentHashMap<>();
+
+    /**
+     * Returns (or lazily creates) a JedisPool.
+     */
+    public static JedisPool buildRedisPool(String redisPoolKey) {
+
+        return JEDIS_POOLS.computeIfAbsent(redisPoolKey,
+                RedisClientFactory::createJedisPool);
+    }
+
+    /**
+     * Returns a Redis connection from the pool.
+     *
+     * IMPORTANT:
+     *
+     * <pre>
+     * try(Jedis jedis = RedisClientFactory.getConnection(...)){
+     *     ...
+     * }
+     * </pre>
      */
     public static Jedis getConnection(String redisPoolKey) {
-    	return buildRedisPool(redisPoolKey).getResource();
+        return buildRedisPool(redisPoolKey).getResource();
     }
 
     /**
-     * Create or reuse a simple JedisPooled instance.
+     * Returns (or lazily creates) a shared JedisPooled instance.
+     */
+    public static JedisPooled buildRedisPooled(String redisPoolKey) {
+
+        return JEDIS_POOLED.computeIfAbsent(redisPoolKey,
+                RedisClientFactory::createJedisPooled);
+    }
+
+    /**
+     * Actually creates a JedisPool.
+     */
+    private static JedisPool createJedisPool(String redisPoolKey) {
+
+        RedisInfo info = getRedisInfo(redisPoolKey);
+
+        RedisConnectionPoolConfig cfg = RedisConnectionPoolConfig.theInstance();
+
+        JedisPoolConfig poolConfig = cfg.createJedisPoolConfig();
+
+        DefaultJedisClientConfig clientConfig = buildClientConfig(info, cfg.getConnectionTimeout());
+
+        return new JedisPool(
+                poolConfig,
+                new HostAndPort(info.getHost(), info.getPort()),
+                clientConfig);
+    }
+
+    /**
+     * Actually creates a JedisPooled.
+     */
+    private static JedisPooled createJedisPooled(String redisPoolKey) {
+
+        RedisInfo info = getRedisInfo(redisPoolKey);
+
+        int timeout = RedisConnectionPoolConfig.theInstance()
+                .getConnectionTimeout();
+
+        DefaultJedisClientConfig clientConfig = buildClientConfig(info, timeout);
+
+        return new JedisPooled(
+                new HostAndPort(info.getHost(), info.getPort()),
+                clientConfig);
+    }
+
+    /**
+     * Build Jedis client configuration.
      *
-     * This uses the same Redis configuration but internal default pool settings.
-     * For dev or low-load environments.
+     * Supports:
+     *
+     * - Redis ACL
+     * - Password authentication
+     * - TLS
+     * - Connection timeout
+     * - Socket timeout
      */
-    public static synchronized JedisPooled buildRedisPooled(String redisPoolKey) {
-    	JedisPooled jedisPooled = jedisPooledMap.get(redisPoolKey);
-        if (jedisPooled != null) {
-            return jedisPooled;
+    private static DefaultJedisClientConfig buildClientConfig(
+            RedisInfo info,
+            int timeout) {
+
+        if (timeout <= 0) {
+            timeout = 2000;
         }
 
-        RedisInfo redisInfo = RedisConfigs.load().get(redisPoolKey);
-        if (redisInfo == null) {
-            throw new IllegalStateException("Missing Redis configuration: clusterInfoRedis");
-        }
-
-        String host = redisInfo.getHost();
-        int port = redisInfo.getPort();
-        String auth = redisInfo.getAuth();
-
-        int timeout = RedisConnectionPoolConfig.theInstance().getConnectionTimeout();
-        if (timeout <= 0) timeout = 2000;
-
-        DefaultJedisClientConfig.Builder cfg = DefaultJedisClientConfig.builder()
+        DefaultJedisClientConfig.Builder builder = DefaultJedisClientConfig.builder()
                 .connectionTimeoutMillis(timeout)
-                .socketTimeoutMillis(timeout);
+                .socketTimeoutMillis(timeout)
+                .ssl(info.isUseSsl());
 
-        if (StringUtil.isNotEmpty(auth)) {
-            cfg.password(auth);
+        if (StringUtil.isNotEmpty(info.getUsername())) {
+            builder.user(info.getUsername());
         }
 
-        jedisPooled = new JedisPooled(new HostAndPort(host, port), cfg.build());
-        return jedisPooled;
+        if (StringUtil.isNotEmpty(info.getPassword())) {
+            builder.password(info.getPassword());
+        }
+
+        return builder.build();
     }
 
     /**
-     * Gracefully close pool connections (for shutdown)
+     * Load Redis configuration.
      */
-    public static synchronized void close(String redisPoolKey) {
-    	JedisPool jedisPool = jedisPoolMap.get(redisPoolKey);
-    	if (jedisPool != null && !jedisPool.isClosed()) {
-            jedisPool.close();
+    private static RedisInfo getRedisInfo(String redisPoolKey) {
+
+        RedisInfo info = RedisConfigs.load().get(redisPoolKey);
+
+        if (info == null) {
+            throw new IllegalArgumentException(
+                    "Redis configuration not found: " + redisPoolKey);
         }
 
+        return info;
+    }
+
+    /**
+     * Close a single Redis pool.
+     */
+    public static void close(String redisPoolKey) {
+
+        JedisPool pool = JEDIS_POOLS.remove(redisPoolKey);
+
+        if (pool != null && !pool.isClosed()) {
+            pool.close();
+        }
+
+        /*
+         * JedisPooled has a close() method.
+         * Closing it releases its internal connection pool.
+         */
+        JedisPooled pooled = JEDIS_POOLED.remove(redisPoolKey);
+
+        if (pooled != null) {
+            pooled.close();
+        }
+    }
+
+    /**
+     * Close every Redis connection.
+     *
+     * Call once during application shutdown.
+     */
+    public static void shutdown() {
+
+        JEDIS_POOLS.keySet().forEach(RedisClientFactory::close);
+        JEDIS_POOLED.keySet().forEach(RedisClientFactory::close);
+
+        JEDIS_POOLS.clear();
+        JEDIS_POOLED.clear();
     }
 }

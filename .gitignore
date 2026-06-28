@@ -22,3 +22,5 @@ rfx-track/data/*
 *.jar
 *.war
 *.ear
+rfx-core/.project
+rfx-core/.vscode/settings.json
